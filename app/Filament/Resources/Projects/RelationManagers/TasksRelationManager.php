@@ -13,7 +13,9 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+
 
 class TasksRelationManager extends RelationManager
 {
@@ -82,13 +84,6 @@ class TasksRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('nama_task')
             ->columns([
-                TextColumn::make('room.nama_ruangan')
-                    ->label('Ruangan')
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
-                    ->color('info'),
-                
                 TextColumn::make('urutan')
                     ->label('No')
                     ->sortable()
@@ -119,8 +114,16 @@ class TasksRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('room.nama_ruangan')
+            ->groups([
+                Group::make('room.nama_ruangan')
+                    ->label('Ruangan')
+                    ->collapsible()
+                    ->titlePrefixedWithLabel(false),
+            ])
+            ->defaultGroup('room.nama_ruangan')
+            ->defaultSort('urutan')
             ->filters([
+
                 SelectFilter::make('project_room_id')
                     ->label('Ruangan')
                     ->options(fn () => $this->getOwnerRecord()->rooms()->pluck('nama_ruangan', 'id')),
