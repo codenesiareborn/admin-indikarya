@@ -70,6 +70,20 @@
             </div>
 
             <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Jenis Project</label>
+                <select 
+                    wire:model.live="projectType"
+                    style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--fi-input-border-color, #d1d5db); border-radius: 0.5rem; background: var(--fi-input-bg, #fff);"
+                    class="dark:bg-gray-700 dark:border-gray-600"
+                >
+                    <option value="">-- Semua Jenis Project --</option>
+                    @foreach($this->getProjectTypes() as $key => $label)
+                        <option value="{{ $key }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
                 <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Status</label>
                 <select 
                     wire:model.live="status"
@@ -89,13 +103,13 @@
         {{-- Export Buttons - Using anchor links to controller route --}}
         <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
             <a 
-                href="{{ route('reports.attendance.pdf', ['start_date' => $startDate, 'end_date' => $endDate, 'project_id' => $projectId, 'status' => $status]) }}"
+                href="{{ route('reports.attendance.pdf', ['start_date' => $startDate, 'end_date' => $endDate, 'project_id' => $projectId, 'status' => $status, 'project_type' => $projectType]) }}"
                 style="padding: 0.5rem 1.25rem; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;"
             >
                 📄 Export PDF
             </a>
             <a 
-                href="{{ route('reports.attendance.excel', ['start_date' => $startDate, 'end_date' => $endDate, 'project_id' => $projectId, 'status' => $status]) }}"
+                href="{{ route('reports.attendance.excel', ['start_date' => $startDate, 'end_date' => $endDate, 'project_id' => $projectId, 'status' => $status, 'project_type' => $projectType]) }}"
                 style="padding: 0.5rem 1.25rem; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;"
             >
                 📊 Export Excel
@@ -106,7 +120,7 @@
     {{-- Table Section --}}
     <div style="background: var(--fi-body-bg, #fff); border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden;" class="dark:bg-gray-800">
         <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--fi-sidebar-border-color, #e5e7eb);" class="dark:border-gray-700">
-            <h3 style="font-size: 1.1rem; font-weight: 600;">📋 Data Absensi</h3>
+            <h3 style="font-size: 1.1rem; font-weight: 600;">📋 Data Presensi</h3>
         </div>
         
         <div style="padding: 0;">

@@ -43,7 +43,7 @@ class AdminPanelProvider extends PanelProvider
                 AccountWidget::class,
             ])
             ->navigationItems([
-                NavigationItem::make('Laporan Absensi')
+                NavigationItem::make('Laporan Presensi')
                     ->url('/admin/attendances/report')
                     ->icon('heroicon-o-document-chart-bar')
                     ->group('Laporan')

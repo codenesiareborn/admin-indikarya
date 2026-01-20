@@ -56,7 +56,7 @@ class ProjectForm
                             ]),
                     ]),
                 
-                Section::make('Pengaturan Absensi')
+                Section::make('Pengaturan Presensi')
                     ->schema([
                         Grid::make(2)
                             ->schema([

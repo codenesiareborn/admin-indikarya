@@ -78,7 +78,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
 
     public function title(): string
     {
-        return 'Laporan Absensi';
+        return 'Laporan Presensi';
     }
 
     public function registerEvents(): array
@@ -96,7 +96,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
                 $sheet->setCellValue('A1', $companyName);
                 $sheet->setCellValue('A2', $companyAddress);
                 $sheet->setCellValue('A3', '');
-                $sheet->setCellValue('A4', 'LAPORAN ABSENSI PEGAWAI');
+                $sheet->setCellValue('A4', 'LAPORAN PRESENSI PEGAWAI');
                 $sheet->setCellValue('A5', "Periode: {$this->startDate} s/d {$this->endDate} | No: {$this->reportNumber}");
                 
                 // Style header

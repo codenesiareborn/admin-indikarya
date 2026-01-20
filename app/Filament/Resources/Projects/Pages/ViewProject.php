@@ -70,7 +70,7 @@ class ViewProject extends ViewRecord
                     ])
                     ->columnSpanFull(),
                 
-                Section::make('Pengaturan Absensi')
+                Section::make('Pengaturan Presensi')
                     ->schema([
                         TextEntry::make('jam_masuk')
                             ->label('Jam Masuk')

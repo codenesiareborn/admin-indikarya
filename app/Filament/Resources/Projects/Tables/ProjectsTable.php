@@ -57,8 +57,8 @@ class ProjectsTable
                     ->sortable(),
                 
                 Tables\Columns\TextColumn::make('id')
-                    ->label('Absensi')
-                    ->formatStateUsing(fn () => 'Cek Absensi')
+                    ->label('Presensi')
+                    ->formatStateUsing(fn () => 'Cek Presensi')
                     ->url(fn (Project $record): string => route('filament.admin.resources.attendances.manage-project', ['project' => $record->id]))
                     ->color('info')
                     ->icon('heroicon-o-calendar-days'),
@@ -69,7 +69,14 @@ class ProjectsTable
                     ->url(fn (Project $record): string => route('filament.admin.resources.task-lists.manage-project', ['project' => $record->id]))
                     ->color('success')
                     ->icon('heroicon-o-clipboard-document-check'),
+                
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Tanggal Dibuat')
+                    ->dateTime('d M Y, H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('jenis_project')
                     ->options([

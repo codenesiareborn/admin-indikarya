@@ -21,11 +21,11 @@ class AttendanceResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
-    protected static ?string $navigationLabel = 'Absensi';
+    protected static ?string $navigationLabel = 'Presensi';
 
-    protected static ?string $modelLabel = 'Absensi';
+    protected static ?string $modelLabel = 'Presensi';
 
-    protected static ?string $pluralModelLabel = 'Absensi';
+    protected static ?string $pluralModelLabel = 'Presensi';
 
     protected static ?string $recordTitleAttribute = 'attendance';
 

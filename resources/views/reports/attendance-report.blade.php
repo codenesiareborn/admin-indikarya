@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Laporan Absensi</title>
+    <title>Laporan Presensi</title>
     <style>
         * {
             margin: 0;
@@ -109,7 +109,7 @@
     </div>
 
     <div class="report-title">
-        <h1>LAPORAN ABSENSI PEGAWAI</h1>
+        <h1>LAPORAN PRESENSI PEGAWAI</h1>
         <p>Periode: {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</p>
         <p>No. Laporan: {{ $reportNumber }}</p>
     </div>

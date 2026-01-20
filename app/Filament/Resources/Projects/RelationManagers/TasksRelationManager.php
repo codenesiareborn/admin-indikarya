@@ -58,11 +58,6 @@ class TasksRelationManager extends RelationManager
                     ->required()
                     ->maxLength(255),
                 
-                TextInput::make('urutan')
-                    ->label('Urutan')
-                    ->numeric()
-                    ->default(0)
-                    ->required(),
                 
                 Textarea::make('deskripsi')
                     ->label('Deskripsi')

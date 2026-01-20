@@ -24,6 +24,7 @@ class ReportController extends Controller
         $endDate = $request->get('end_date', now()->format('Y-m-d'));
         $projectId = $request->get('project_id');
         $status = $request->get('status');
+        $projectType = $request->get('project_type');
 
         $data = Attendance::query()
             ->with(['employee', 'project'])
@@ -31,13 +32,14 @@ class ReportController extends Controller
             ->when($endDate, fn ($q) => $q->whereDate('tanggal', '<=', $endDate))
             ->when($projectId, fn ($q) => $q->where('project_id', $projectId))
             ->when($status, fn ($q) => $q->where('status', $status))
+            ->when($projectType, fn ($q) => $q->whereHas('project', fn ($q) => $q->where('jenis_project', $projectType)))
             ->get();
 
         $stats = $this->getAttendanceStats($data);
         $settings = GeneralSetting::getAllSettings();
         $reportNumber = 'LAP-ABS-' . now()->format('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
-        $filename = "laporan-absensi-{$startDate}-{$endDate}.xlsx";
+        $filename = "laporan-presensi-{$startDate}-{$endDate}.xlsx";
         $path = "exports/{$filename}";
         
         // Save to storage first
@@ -68,6 +70,7 @@ class ReportController extends Controller
         $endDate = $request->get('end_date', now()->format('Y-m-d'));
         $projectId = $request->get('project_id');
         $status = $request->get('status');
+        $projectType = $request->get('project_type');
 
         $data = Attendance::query()
             ->with(['employee', 'project'])
@@ -75,13 +78,14 @@ class ReportController extends Controller
             ->when($endDate, fn ($q) => $q->whereDate('tanggal', '<=', $endDate))
             ->when($projectId, fn ($q) => $q->where('project_id', $projectId))
             ->when($status, fn ($q) => $q->where('status', $status))
+            ->when($projectType, fn ($q) => $q->whereHas('project', fn ($q) => $q->where('jenis_project', $projectType)))
             ->get();
 
         $stats = $this->getAttendanceStats($data);
         $settings = GeneralSetting::getAllSettings();
         $reportNumber = 'LAP-ABS-' . now()->format('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
-        $filename = "laporan-absensi-{$startDate}-{$endDate}.pdf";
+        $filename = "laporan-presensi-{$startDate}-{$endDate}.pdf";
         $fullPath = storage_path("app/public/exports/{$filename}");
 
         // Ensure directory exists
@@ -120,6 +124,7 @@ class ReportController extends Controller
         $endDate = $request->get('end_date', now()->format('Y-m-d'));
         $projectId = $request->get('project_id');
         $roomId = $request->get('room_id');
+        $projectType = $request->get('project_type');
 
         $data = TaskSubmission::query()
             ->with(['employee', 'project', 'room', 'items'])
@@ -127,6 +132,7 @@ class ReportController extends Controller
             ->when($endDate, fn ($q) => $q->whereDate('tanggal', '<=', $endDate))
             ->when($projectId, fn ($q) => $q->where('project_id', $projectId))
             ->when($roomId, fn ($q) => $q->where('project_room_id', $roomId))
+            ->when($projectType, fn ($q) => $q->whereHas('project', fn ($q) => $q->where('jenis_project', $projectType)))
             ->get();
 
         $stats = $this->getTaskListStats($data);
@@ -164,6 +170,7 @@ class ReportController extends Controller
         $endDate = $request->get('end_date', now()->format('Y-m-d'));
         $projectId = $request->get('project_id');
         $roomId = $request->get('room_id');
+        $projectType = $request->get('project_type');
 
         $data = TaskSubmission::query()
             ->with(['employee', 'project', 'room', 'items'])
@@ -171,6 +178,7 @@ class ReportController extends Controller
             ->when($endDate, fn ($q) => $q->whereDate('tanggal', '<=', $endDate))
             ->when($projectId, fn ($q) => $q->where('project_id', $projectId))
             ->when($roomId, fn ($q) => $q->where('project_room_id', $roomId))
+            ->when($projectType, fn ($q) => $q->whereHas('project', fn ($q) => $q->where('jenis_project', $projectType)))
             ->get();
 
         $stats = $this->getTaskListStats($data);

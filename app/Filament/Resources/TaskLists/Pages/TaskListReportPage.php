@@ -32,6 +32,7 @@ class TaskListReportPage extends Page implements HasTable, HasForms
     public ?string $endDate = null;
     public ?string $projectId = null;
     public ?string $roomId = null;
+    public ?string $projectType = null;
 
     public function mount(): void
     {
@@ -57,6 +58,18 @@ class TaskListReportPage extends Page implements HasTable, HasForms
                 TextColumn::make('project.nama_project')
                     ->label('Project')
                     ->sortable(),
+
+                TextColumn::make('project.jenis_project')
+                    ->label('Jenis Project')
+                    ->sortable()
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'cleaning_services' => 'info',
+                        'security_services' => 'warning',
+                        'gardening_services' => 'success',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => ucwords(str_replace('_', ' ', $state))),
                 
                 TextColumn::make('room.nama_ruangan')
                     ->label('Area')
@@ -97,7 +110,8 @@ class TaskListReportPage extends Page implements HasTable, HasForms
             ->when($this->startDate, fn (Builder $q) => $q->whereDate('tanggal', '>=', $this->startDate))
             ->when($this->endDate, fn (Builder $q) => $q->whereDate('tanggal', '<=', $this->endDate))
             ->when($this->projectId, fn (Builder $q) => $q->where('project_id', $this->projectId))
-            ->when($this->roomId, fn (Builder $q) => $q->where('project_room_id', $this->roomId));
+            ->when($this->roomId, fn (Builder $q) => $q->where('project_room_id', $this->roomId))
+            ->when($this->projectType, fn (Builder $q) => $q->whereHas('project', fn($q) => $q->where('jenis_project', $this->projectType)));
     }
 
     public function getStats(): array
@@ -121,7 +135,11 @@ class TaskListReportPage extends Page implements HasTable, HasForms
 
     public function getProjects(): array
     {
-        return Project::pluck('nama_project', 'id')->toArray();
+        $query = Project::query();
+        if ($this->projectType) {
+            $query->where('jenis_project', $this->projectType);
+        }
+        return $query->pluck('nama_project', 'id')->toArray();
     }
 
     public function getRooms(): array
@@ -130,6 +148,15 @@ class TaskListReportPage extends Page implements HasTable, HasForms
             return ProjectRoom::pluck('nama_ruangan', 'id')->toArray();
         }
         return ProjectRoom::where('project_id', $this->projectId)->pluck('nama_ruangan', 'id')->toArray();
+    }
+
+    public function getProjectTypes(): array
+    {
+        return [
+            'cleaning_services' => 'Cleaning Services',
+            'security_services' => 'Security Services',
+            'gardening_services' => 'Gardening Services',
+        ];
     }
 
     public function applyFilter(): void

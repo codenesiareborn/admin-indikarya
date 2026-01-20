@@ -32,7 +32,7 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
 
     protected static string $resource = AttendanceResource::class;
 
-    protected static ?string $title = 'Manage Absensi Project';
+    protected static ?string $title = 'Manage Presensi Project';
 
     protected string $view = 'filament.resources.attendances.pages.manage-project-attendance';
 
@@ -56,8 +56,8 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
     public function getTitle(): string
     {
         return $this->project 
-            ? "Manage Absensi - {$this->project->nama_project}"
-            : 'Manage Absensi Project';
+            ? "Manage Presensi - {$this->project->nama_project}"
+            : 'Manage Presensi Project';
     }
 
     public function getSubheading(): ?string

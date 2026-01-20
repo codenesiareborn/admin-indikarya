@@ -21,7 +21,7 @@
     {{-- Delete Button --}}
     <form action="{{ route('filament.admin.resources.projects.destroy', ['record' => $record->id]) }}" 
         method="POST" 
-        onsubmit="return confirm('Apakah Anda yakin ingin menghapus project {{ $record->nama_project }}? Data yang terkait (ruangan, task, absensi) juga akan terhapus.');"
+        onsubmit="return confirm('Apakah Anda yakin ingin menghapus project {{ $record->nama_project }}? Data yang terkait (ruangan, task, presensi) juga akan terhapus.');"
         class="inline-block">
         @csrf
         @method('DELETE')

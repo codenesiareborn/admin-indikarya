@@ -22,7 +22,7 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
 
     protected static string $resource = AttendanceResource::class;
 
-    protected static ?string $title = 'Laporan Absensi Pegawai';
+    protected static ?string $title = 'Laporan Presensi Pegawai';
 
     protected string $view = 'filament.resources.attendances.pages.attendance-report';
 
@@ -30,6 +30,7 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
     public ?string $endDate = null;
     public ?string $projectId = null;
     public ?string $status = null;
+    public ?string $projectType = null;
 
     public function mount(): void
     {
@@ -55,6 +56,18 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
                 TextColumn::make('project.nama_project')
                     ->label('Project')
                     ->sortable(),
+
+                TextColumn::make('project.jenis_project')
+                    ->label('Jenis Project')
+                    ->sortable()
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'cleaning_services' => 'info',
+                        'security_services' => 'warning',
+                        'gardening_services' => 'success',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => ucwords(str_replace('_', ' ', $state))),
                 
                 TextColumn::make('tanggal')
                     ->label('Tanggal')
@@ -98,7 +111,8 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
             ->when($this->startDate, fn (Builder $q) => $q->whereDate('tanggal', '>=', $this->startDate))
             ->when($this->endDate, fn (Builder $q) => $q->whereDate('tanggal', '<=', $this->endDate))
             ->when($this->projectId, fn (Builder $q) => $q->where('project_id', $this->projectId))
-            ->when($this->status, fn (Builder $q) => $q->where('status', $this->status));
+            ->when($this->status, fn (Builder $q) => $q->where('status', $this->status))
+            ->when($this->projectType, fn (Builder $q) => $q->whereHas('project', fn($q) => $q->where('jenis_project', $this->projectType)));
     }
 
     public function getStats(): array
@@ -117,7 +131,20 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
 
     public function getProjects(): array
     {
-        return Project::pluck('nama_project', 'id')->toArray();
+        $query = Project::query();
+        if ($this->projectType) {
+            $query->where('jenis_project', $this->projectType);
+        }
+        return $query->pluck('nama_project', 'id')->toArray();
+    }
+
+    public function getProjectTypes(): array
+    {
+        return [
+            'cleaning_services' => 'Cleaning Services',
+            'security_services' => 'Security Services',
+            'gardening_services' => 'Gardening Services',
+        ];
     }
 
     public function applyFilter(): void

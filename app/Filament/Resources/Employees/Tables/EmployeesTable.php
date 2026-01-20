@@ -56,7 +56,14 @@ class EmployeesTable
                     ->label('Tanggal Masuk')
                     ->date('d M Y')
                     ->sortable(),
+                
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Tanggal Dibuat')
+                    ->dateTime('d M Y, H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('staf')
                     ->options([
