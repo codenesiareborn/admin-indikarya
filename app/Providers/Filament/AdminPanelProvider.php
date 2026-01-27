@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use Filament\Http\Middleware\Authenticate;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -30,8 +31,34 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+->renderHook(
+    'panels::head.end',
+    fn (): string => '
+        <link href="' . asset('css/custom.css') . '" rel="stylesheet">
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Inject text "Indikarya Total Solution" ke header
+                const brandElements = document.querySelectorAll(".filament-brand, .filament-topbar .filament-brand");
+                
+                brandElements.forEach(function(element) {
+                    // Cek apakah sudah ada text
+                    if (!element.querySelector(".indikarya-brand-text")) {
+                        // Buat element text baru
+                        const textElement = document.createElement("span");
+                        textElement.className = "indikarya-brand-text";
+                        textElement.textContent = "Indikarya Total Solution";
+                        
+                        // Insert text setelah logo disembunyikan
+                        element.appendChild(textElement);
+                    }
+                });
+            });
+        </script>
+    ',
+)
+            ->brandName('Indikarya Total Solution')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Blue,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
@@ -64,6 +91,9 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+            ])
+            ->plugins([
+                FilamentShieldPlugin::make(),
             ])
             ->authMiddleware([
                 Authenticate::class,
