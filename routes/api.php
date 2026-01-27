@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\CheckpointController;
+use App\Http\Controllers\Api\PatrolController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -32,4 +33,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/checkpoints/{id}', [CheckpointController::class, 'show']);
     Route::get('/projects/{projectId}/rooms', [CheckpointController::class, 'getRooms']);
     Route::get('/rooms/{roomId}', [CheckpointController::class, 'getRoomDetail']);
+    
+    // Patrol endpoints
+    Route::post('/patrols', [PatrolController::class, 'submit']);
+    Route::get('/patrols/areas', [PatrolController::class, 'getAreas']);
+    Route::get('/patrols/today', [PatrolController::class, 'today']);
+    Route::get('/patrols/history', [PatrolController::class, 'history']);
+    Route::get('/patrols/{id}', [PatrolController::class, 'show']);
 });

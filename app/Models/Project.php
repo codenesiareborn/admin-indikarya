@@ -58,6 +58,16 @@ class Project extends Model
         return $this->hasMany(Attendance::class);
     }
 
+    public function patrolAreas(): HasMany
+    {
+        return $this->hasMany(PatrolArea::class);
+    }
+
+    public function patrols(): HasMany
+    {
+        return $this->hasMany(Patrol::class);
+    }
+
     public function getNilaiKontrakRupiahAttribute()
     {
         return 'Rp ' . number_format($this->nilai_kontrak, 2, ',', '.');
