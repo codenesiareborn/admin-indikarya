@@ -10,16 +10,6 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create Super Admin
-        $superAdmin = User::create([
-            'name' => 'Super Admin',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'super_admin',
-            'is_active' => true,
-        ]);
-        $superAdmin->assignRole('super_admin');
-
         // 1. Create 10 Regular Users (Admin/Staff)
         for ($i = 1; $i <= 10; $i++) {
             User::create([
