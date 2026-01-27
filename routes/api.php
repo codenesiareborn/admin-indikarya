@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\CheckpointController;
 use App\Http\Controllers\Api\PatrolController;
+use App\Http\Controllers\Api\ShiftReportController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -40,4 +41,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/patrols/today', [PatrolController::class, 'today']);
     Route::get('/patrols/history', [PatrolController::class, 'history']);
     Route::get('/patrols/{id}', [PatrolController::class, 'show']);
+    
+    // Shift Report endpoints
+    Route::post('/shift-reports', [ShiftReportController::class, 'submit']);
+    Route::get('/shift-reports/today', [ShiftReportController::class, 'today']);
+    Route::get('/shift-reports/history', [ShiftReportController::class, 'history']);
+    Route::get('/shift-reports/{id}', [ShiftReportController::class, 'show']);
+    Route::delete('/shift-reports/{id}', [ShiftReportController::class, 'destroy']);
 });
