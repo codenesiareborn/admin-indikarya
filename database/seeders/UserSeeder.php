@@ -10,14 +10,6 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create Super Admin
-        User::create([
-            'name' => 'Super Admin',
-            'email' => 'admin@indikarya.com',
-            'password' => Hash::make('password'),
-            'role' => 'super_admin',
-        ]);
-
         // 1. Create 10 Regular Users (Admin/Staff)
         for ($i = 1; $i <= 10; $i++) {
             User::create([

@@ -1,0 +1,68 @@
+/* Custom Indikarya Branding */
+
+/* Logo 2x Lebih Besar di Login Page */
+img[src*="logo-indikarya"] {
+    width: 300px !important;
+    height: auto !important;
+    max-height: 150px !important;
+    object-fit: contain !important;
+}
+
+/* AGGRESSIVE: Hide ALL logos in admin panel */
+.filament-brand img,
+.filament-sidebar-header img,
+.filament-topbar img,
+.filament-main-layout img,
+img[alt*="Indikarya"],
+img[src*="logo"],
+header img,
+nav img {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Force show brand text (native Filament brandName) - only for sidebar brand */
+.fi-sidebar-header a,
+.fi-topbar .fi-logo {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+}
+
+/* Login Page Branding */
+.filament-auth .filament-brand img {
+    width: 300px !important;
+    height: auto !important;
+}
+
+/* Custom Blue Theme Enhancement */
+.fi-btn-primary {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+}
+
+.fi-btn-primary:hover {
+    background-color: #2563eb !important;
+    border-color: #2563eb !important;
+}
+
+/* Login Form Styling */
+.filament-auth-card {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Input Fields */
+.filament-input {
+    border-radius: 8px !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+.filament-input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
