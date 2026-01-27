@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class TaskSubmission extends Model
 {
     protected $fillable = [
-        'employee_id',
+        'user_id',
         'project_id',
         'project_room_id',
         'tanggal',
@@ -23,9 +23,15 @@ class TaskSubmission extends Model
         'submitted_at' => 'datetime',
     ];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Alias for backward compatibility
     public function employee(): BelongsTo
     {
-        return $this->belongsTo(Employee::class);
+        return $this->user();
     }
 
     public function project(): BelongsTo

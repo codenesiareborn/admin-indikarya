@@ -156,7 +156,7 @@ class ManageProjectTaskList extends Page implements HasTable, HasForms
             'total_tasks_completed' => $totalCompleted,
             'total_tasks_pending' => $totalPending,
             'completion_rate' => $completionRate,
-            'active_employees' => $submissions->pluck('employee_id')->unique()->count(),
+            'active_employees' => $submissions->pluck('user_id')->unique()->count(),
         ];
     }
 

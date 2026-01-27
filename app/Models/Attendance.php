@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Attendance extends Model
 {
     protected $fillable = [
-        'employee_id',
+        'user_id',
         'project_id',
         'tanggal',
         'check_in',
@@ -29,9 +29,15 @@ class Attendance extends Model
         'check_out' => 'datetime:H:i',
     ];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Alias for backward compatibility
     public function employee(): BelongsTo
     {
-        return $this->belongsTo(Employee::class);
+        return $this->user();
     }
 
     public function project(): BelongsTo

@@ -15,7 +15,7 @@ class EmployeeForm
             ->components([
                 Section::make('Data Pribadi')
                     ->schema([
-                        Forms\Components\TextInput::make('nama_lengkap')
+                        Forms\Components\TextInput::make('name')
                             ->label('Nama Lengkap')
                             ->required()
                             ->maxLength(255),
@@ -25,6 +25,15 @@ class EmployeeForm
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
+                        
+                        Forms\Components\TextInput::make('password')
+                            ->label('Password')
+                            ->password()
+                            ->required(fn (string $context): bool => $context === 'create')
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->minLength(8)
+                            ->maxLength(255)
+                            ->helperText('Minimal 8 karakter. Kosongkan jika tidak ingin mengubah password.'),
                         
                         Grid::make(2)
                             ->schema([
@@ -91,6 +100,9 @@ class EmployeeForm
                             ])
                             ->default('aktif')
                             ->required(),
+                        
+                        Forms\Components\Hidden::make('role')
+                            ->default('employee'),
                     ]),
             ]);
     }

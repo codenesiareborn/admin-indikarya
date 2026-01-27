@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Employee;
+use App\Models\User;
 use App\Models\Project;
 use App\Models\ProjectRoom;
 use App\Models\TaskList;
@@ -15,7 +15,7 @@ class TaskSubmissionSeeder extends Seeder
     public function run(): void
     {
         $projects = Project::with(['rooms.tasks'])->get();
-        $employees = Employee::where('status_pegawai', 'aktif')->get();
+        $employees = User::where('status_pegawai', 'aktif')->get();
 
         if ($projects->isEmpty() || $employees->isEmpty()) {
             $this->command->info('No projects or employees found. Skipping TaskSubmissionSeeder.');
@@ -35,7 +35,7 @@ class TaskSubmissionSeeder extends Seeder
                     
                     foreach ($randomEmployees as $employee) {
                         // Check if submission already exists
-                        $existingSubmission = TaskSubmission::where('employee_id', $employee->id)
+                        $existingSubmission = TaskSubmission::where('user_id', $employee->id)
                             ->where('project_room_id', $room->id)
                             ->whereDate('tanggal', $date)
                             ->exists();
@@ -44,7 +44,7 @@ class TaskSubmissionSeeder extends Seeder
 
                         // Create submission
                         $submission = TaskSubmission::create([
-                            'employee_id' => $employee->id,
+                            'user_id' => $employee->id,
                             'project_id' => $project->id,
                             'project_room_id' => $room->id,
                             'tanggal' => $date,

@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\Project;
 use App\Models\ProjectRoom;
 use App\Models\TaskList;
-use App\Models\Employee;
+use App\Models\User;
 use App\Models\Attendance;
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
@@ -142,7 +142,7 @@ class ProjectSeeder extends Seeder
     private function assignEmployees(Project $project): array
     {
         $stafType = $project->jenis_project === 'cleaning_services' ? 'cleaning_services' : 'security_services';
-        $employees = Employee::where('staf', $stafType)->take(15)->get();
+        $employees = User::where('staf', $stafType)->take(15)->get();
 
         foreach ($employees as $employee) {
             $project->employees()->attach($employee->id, [
@@ -182,7 +182,7 @@ class ProjectSeeder extends Seeder
                 $checkOut = $checkIn ? Carbon::parse($project->jam_keluar)->addMinutes(rand(-10, 30)) : null;
 
                 Attendance::create([
-                    'employee_id' => $employee['id'],
+                    'user_id' => $employee['id'],
                     'project_id' => $project->id,
                     'tanggal' => $date->format('Y-m-d'),
                     'check_in' => $checkIn ? $checkIn->format('H:i:s') : null,

@@ -14,7 +14,7 @@ return new class extends Migration
         // Main submission per area
         Schema::create('task_submissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->foreignId('project_room_id')->constrained()->onDelete('cascade');
             $table->date('tanggal');
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Unique constraint: one submission per employee per room per day
-            $table->unique(['employee_id', 'project_room_id', 'tanggal'], 'unique_daily_submission');
+            $table->unique(['user_id', 'project_room_id', 'tanggal'], 'unique_daily_submission');
         });
 
         // Individual task items within a submission

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->date('tanggal');
             
@@ -31,7 +31,7 @@ return new class extends Migration
             $table->text('keterangan')->nullable();
             $table->timestamps();
             
-            $table->unique(['employee_id', 'project_id', 'tanggal']);
+            $table->unique(['user_id', 'project_id', 'tanggal']);
             $table->index(['project_id', 'tanggal']);
         });
     }

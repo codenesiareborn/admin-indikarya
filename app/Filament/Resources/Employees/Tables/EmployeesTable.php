@@ -14,7 +14,7 @@ class EmployeesTable
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nama_lengkap')
+                Tables\Columns\TextColumn::make('name')
                     ->label('Nama Lengkap')
                     ->searchable()
                     ->sortable(),

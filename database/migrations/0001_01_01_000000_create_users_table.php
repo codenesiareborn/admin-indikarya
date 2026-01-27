@@ -17,6 +17,18 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            
+            // Employee fields
+            $table->string('nip')->unique()->nullable();
+            $table->enum('staf', ['cleaning_services', 'security_services'])->nullable();
+            $table->string('no_hp')->nullable();
+            $table->date('tanggal_lahir')->nullable();
+            $table->enum('jenis_kelamin', ['laki-laki', 'perempuan'])->nullable();
+            $table->date('tanggal_masuk')->nullable();
+            $table->text('alamat')->nullable();
+            $table->enum('status_pegawai', ['aktif', 'non-aktif', 'cuti'])->default('aktif');
+            $table->enum('role', ['super_admin', 'admin', 'employee'])->default('employee');
+            
             $table->rememberToken();
             $table->timestamps();
         });

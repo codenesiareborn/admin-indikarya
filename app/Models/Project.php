@@ -48,7 +48,7 @@ class Project extends Model
 
     public function employees(): BelongsToMany
     {
-        return $this->belongsToMany(Employee::class, 'employee_projects')
+        return $this->belongsToMany(User::class, 'employee_projects')
             ->withPivot('tanggal_mulai', 'tanggal_selesai')
             ->withTimestamps();
     }

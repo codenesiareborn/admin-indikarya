@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Employee;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -16,6 +15,7 @@ class UserSeeder extends Seeder
             'name' => 'Super Admin',
             'email' => 'admin@indikarya.com',
             'password' => Hash::make('password'),
+            'role' => 'super_admin',
         ]);
 
         // 1. Create 10 Regular Users (Admin/Staff)
@@ -24,23 +24,19 @@ class UserSeeder extends Seeder
                 'name' => "User Admin {$i}",
                 'email' => "admin{$i}@indikarya.com",
                 'password' => Hash::make('password'),
+                'role' => 'admin',
             ]);
         }
 
         // 2. Create 50 Cleaning Services Employees
         for ($i = 1; $i <= 50; $i++) {
-            $user = User::create([
+            User::create([
                 'name' => "Cleaning Staff {$i}",
                 'email' => "cleaning{$i}@indikarya.com",
                 'password' => Hash::make('password'),
-            ]);
-
-            Employee::create([
-                'user_id' => $user->id,
-                'nama_lengkap' => "Cleaning Staff {$i}",
+                'role' => 'employee',
                 'nip' => 'CS-' . str_pad($i, 4, '0', STR_PAD_LEFT),
                 'staf' => 'cleaning_services',
-                'email' => $user->email,
                 'no_hp' => '08' . rand(1000000000, 9999999999),
                 'tanggal_lahir' => now()->subYears(rand(20, 45)),
                 'jenis_kelamin' => rand(0, 1) ? 'laki-laki' : 'perempuan',
@@ -52,18 +48,13 @@ class UserSeeder extends Seeder
 
         // 3. Create 50 Security Services Employees
         for ($i = 1; $i <= 50; $i++) {
-            $user = User::create([
+            User::create([
                 'name' => "Security Staff {$i}",
                 'email' => "security{$i}@indikarya.com",
                 'password' => Hash::make('password'),
-            ]);
-
-            Employee::create([
-                'user_id' => $user->id,
-                'nama_lengkap' => "Security Staff {$i}",
+                'role' => 'employee',
                 'nip' => 'SEC-' . str_pad($i, 4, '0', STR_PAD_LEFT),
                 'staf' => 'security_services',
-                'email' => $user->email,
                 'no_hp' => '08' . rand(1000000000, 9999999999),
                 'tanggal_lahir' => now()->subYears(rand(20, 45)),
                 'jenis_kelamin' => rand(0, 1) ? 'laki-laki' : 'perempuan',
@@ -73,6 +64,6 @@ class UserSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('✅ Created Super Admin + 10 users + 100 employees (50 cleaning + 50 security)');
+        $this->command->info('✅ Created Super Admin + 10 admins + 100 employees (50 cleaning + 50 security)');
     }
 }

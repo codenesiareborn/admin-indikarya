@@ -15,8 +15,9 @@ class AttendanceForm
     {
         return $schema
             ->components([
-                Select::make('employee_id')
-                    ->relationship('employee', 'id')
+                Select::make('user_id')
+                    ->relationship('user', 'name')
+                    ->label('Employee')
                     ->required(),
                 Select::make('project_id')
                     ->relationship('project', 'id')
