@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\LoginRequest;
+use App\Http\Requests\Api\UpdateProfileRequest;
+use App\Http\Requests\Api\UpdatePasswordRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\ProjectResource;
 use App\Models\User;
@@ -117,6 +119,51 @@ class AuthController extends Controller
                 'token' => $token,
                 'user' => new UserResource($user),
             ],
+        ], 200);
+    }
+
+    /**
+     * Update user profile
+     */
+    public function updateProfile(UpdateProfileRequest $request): JsonResponse
+    {
+        $user = $request->user();
+        $validated = $request->validated();
+
+        // Update user data
+        $user->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profil berhasil diperbarui',
+            'data' => new UserResource($user),
+        ], 200);
+    }
+
+    /**
+     * Update user password
+     */
+    public function updatePassword(UpdatePasswordRequest $request): JsonResponse
+    {
+        $user = $request->user();
+        $validated = $request->validated();
+
+        // Check if current password is correct
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Password saat ini tidak benar',
+            ], 422);
+        }
+
+        // Update password
+        $user->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password berhasil diperbarui',
         ], 200);
     }
 }
