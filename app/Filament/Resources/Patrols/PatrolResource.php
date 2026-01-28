@@ -46,8 +46,9 @@ class PatrolResource extends Resource
     {
         return [
             'index' => ListPatrols::route('/'),
-            'view' => ViewPatrol::route('/{record}'),
+            'report' => \App\Filament\Resources\Patrols\Pages\PatrolReportPage::route('/report'),
             'manage-project' => ManageProjectPatrol::route('/project'),
+            'view' => ViewPatrol::route('/{record}'),
         ];
     }
 
