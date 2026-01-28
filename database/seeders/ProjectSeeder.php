@@ -7,6 +7,8 @@ use App\Models\ProjectRoom;
 use App\Models\TaskList;
 use App\Models\User;
 use App\Models\Attendance;
+use App\Models\Patrol;
+use App\Models\PatrolArea;
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
 
@@ -91,7 +93,13 @@ class ProjectSeeder extends Seeder
             // Create 30 days attendance
             $this->createAttendance($project, $employees);
 
-            $this->command->info("✅ Project {$projectData['nama_project']} completed with rooms, tasks, and attendance");
+            // Create Patrol Areas and Patrols for security projects
+            if ($project->jenis_project === 'security_services') {
+                $patrolAreas = $this->createPatrolAreas($project);
+                $this->createPatrols($project, $employees, $patrolAreas);
+            }
+
+            $this->command->info("✅ Project {$projectData['nama_project']} completed with rooms, tasks, attendance" . ($project->jenis_project === 'security_services' ? ', and patrols' : ''));
         }
     }
 
@@ -196,6 +204,96 @@ class ProjectSeeder extends Seeder
                     'status' => $status,
                     'keterangan' => $status === 'izin' ? 'Izin sakit' : ($status === 'alpha' ? 'Tanpa keterangan' : null),
                 ]);
+            }
+        }
+    }
+
+    private function createPatrolAreas(Project $project): array
+    {
+        $areaTemplates = [
+            ['kode_area' => 'PA-001', 'nama_area' => 'Pos Jaga Utama', 'deskripsi' => 'Pos jaga pintu masuk utama', 'urutan' => 1],
+            ['kode_area' => 'PA-002', 'nama_area' => 'Lobby Utama', 'deskripsi' => 'Area lobby utama dan resepsionis', 'urutan' => 2],
+            ['kode_area' => 'PA-003', 'nama_area' => 'Parkir Basement', 'deskripsi' => 'Area parkir basement lantai B1', 'urutan' => 3],
+            ['kode_area' => 'PA-004', 'nama_area' => 'Koridor Lantai 1', 'deskripsi' => 'Koridor utama lantai 1', 'urutan' => 4],
+            ['kode_area' => 'PA-005', 'nama_area' => 'Tangga Darurat A', 'deskripsi' => 'Tangga darurat sisi timur', 'urutan' => 5],
+            ['kode_area' => 'PA-006', 'nama_area' => 'Rooftop', 'deskripsi' => 'Area rooftop dan mesin lift', 'urutan' => 6],
+            ['kode_area' => 'PA-007', 'nama_area' => 'Pos Jaga Belakang', 'deskripsi' => 'Pos jaga pintu belakang', 'urutan' => 7],
+        ];
+
+        $areas = [];
+        $projectCode = 'P' . $project->id . '-';
+        
+        foreach ($areaTemplates as $areaData) {
+            $areas[] = PatrolArea::firstOrCreate(
+                [
+                    'project_id' => $project->id,
+                    'kode_area' => $projectCode . $areaData['kode_area'],
+                ],
+                [
+                    'nama_area' => $areaData['nama_area'],
+                    'deskripsi' => $areaData['deskripsi'],
+                    'status' => 'aktif',
+                    'urutan' => $areaData['urutan'],
+                ]
+            );
+        }
+
+        return $areas;
+    }
+
+    private function createPatrols(Project $project, array $employees, array $patrolAreas): void
+    {
+        $startDate = Carbon::parse($project->tanggal_mulai);
+        
+        // Generate 30 days patrol data
+        for ($day = 0; $day < 30; $day++) {
+            $date = $startDate->copy()->addDays($day);
+            
+            // Each day, security patrols multiple times
+            $patrolTimes = ['08:00', '12:00', '16:00', '20:00', '00:00'];
+            
+            foreach ($patrolTimes as $time) {
+                // Pick a random employee for this patrol round
+                $randomEmployee = $employees[array_rand($employees)];
+                
+                foreach ($patrolAreas as $area) {
+                    // 85% aman, 15% tidak aman
+                    $status = rand(1, 100) <= 85 ? 'Aman' : 'Tidak Aman';
+                    $patrolTime = Carbon::parse($time)->addMinutes(rand(0, 10));
+                    
+                    $notes = [
+                        'Aman' => [
+                            'Kondisi aman, tidak ada masalah.',
+                            'Area aman dan bersih.',
+                            'Patroli normal, aman terkendali.',
+                            'Tidak ada temuan mencurigakan.',
+                            null,
+                        ],
+                        'Tidak Aman' => [
+                            'Ditemukan pintu tidak terkunci.',
+                            'Lampu koridor mati, segera perbaiki.',
+                            'Ada orang mencurigakan, sudah diusir.',
+                            'Kebocoran air ditemukan, lapor maintenance.',
+                            'CCTV tidak berfungsi di area ini.',
+                        ],
+                    ];
+                    
+                    $note = $notes[$status][array_rand($notes[$status])];
+                    
+                    Patrol::create([
+                        'user_id' => $randomEmployee['id'],
+                        'project_id' => $project->id,
+                        'patrol_area_id' => $area->id,
+                        'area_name' => $area->nama_area,
+                        'area_code' => $area->kode_area,
+                        'status' => $status,
+                        'note' => $note,
+                        'photo' => 'patrols/dummy-patrol.jpg',
+                        'patrol_date' => $date->format('Y-m-d'),
+                        'patrol_time' => $patrolTime->format('H:i:s'),
+                        'submitted_at' => $date->copy()->setTimeFromTimeString($patrolTime->format('H:i:s'))->addMinutes(rand(1, 5)),
+                    ]);
+                }
             }
         }
     }

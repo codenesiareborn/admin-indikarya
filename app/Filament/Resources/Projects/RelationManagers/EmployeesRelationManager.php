@@ -50,14 +50,14 @@ class EmployeesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('nama_lengkap')
+            ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('nip')
                     ->label('NIP')
                     ->searchable()
                     ->sortable(),
                 
-                TextColumn::make('nama_lengkap')
+                TextColumn::make('name')
                     ->label('Nama Lengkap')
                     ->searchable()
                     ->sortable(),
@@ -120,8 +120,11 @@ class EmployeesRelationManager extends RelationManager
                     ->label('Assign Pegawai')
                     ->icon('heroicon-o-user-plus')
                     ->preloadRecordSelect()
+                    ->recordSelectSearchColumns(['name', 'nip'])
+                    ->recordSelectOptionsQuery(fn ($query) => $query->whereIn('role', ['employee', 'staff', 'manager']))
                     ->form(fn (AttachAction $action): array => [
-                        $action->getRecordSelect(),
+                        $action->getRecordSelect()
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->nip} - {$record->name} ({$record->staf_label})"),
                         DatePicker::make('tanggal_mulai')
                             ->label('Tanggal Mulai')
                             ->displayFormat('d/m/Y')
