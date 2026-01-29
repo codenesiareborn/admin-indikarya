@@ -68,6 +68,13 @@ class Project extends Model
         return $this->hasMany(Patrol::class);
     }
 
+    public function pics(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'project_pics')
+            ->withPivot('assigned_at')
+            ->withTimestamps();
+    }
+
     public function getNilaiKontrakRupiahAttribute()
     {
         return 'Rp ' . number_format($this->nilai_kontrak, 2, ',', '.');

@@ -30,6 +30,7 @@ class UserForm
                         
                         Forms\Components\TextInput::make('password')
                             ->password()
+                            ->revealable()
                             ->required(fn ($livewire) => $livewire instanceof \Filament\Resources\Pages\CreateRecord)
                             ->minLength(8)
                             ->dehydrateStateUsing(fn ($state) => filled($state) ? Hash::make($state) : null)
