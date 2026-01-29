@@ -59,7 +59,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
         return [
             $no,
             $attendance->employee->nip ?? '-',
-            $attendance->employee->nama_lengkap ?? '-',
+            $attendance->employee->name ?? '-',
             $attendance->project->nama_project ?? '-',
             $attendance->tanggal?->format('d/m/Y') ?? '-',
             $attendance->check_in?->format('H:i') ?? '-',

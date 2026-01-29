@@ -86,6 +86,11 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-document-text')
                     ->group('Laporan')
                     ->sort(12),
+                NavigationItem::make('Laporan Shift')
+                    ->url('/admin/shift-reports/report')
+                    ->icon('heroicon-o-clipboard-document-list')
+                    ->group('Laporan')
+                    ->sort(13),
             ])
             ->middleware([
                 EncryptCookies::class,

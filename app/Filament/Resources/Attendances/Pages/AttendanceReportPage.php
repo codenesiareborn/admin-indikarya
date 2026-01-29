@@ -48,7 +48,7 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
                     ->searchable()
                     ->sortable(),
                 
-                TextColumn::make('employee.nama_lengkap')
+                TextColumn::make('employee.name')
                     ->label('Nama Pegawai')
                     ->searchable()
                     ->sortable(),

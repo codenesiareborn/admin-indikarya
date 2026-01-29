@@ -77,6 +77,13 @@ class ProjectsTable
                     ->color('warning')
                     ->icon('heroicon-o-shield-check'),
                 
+                Tables\Columns\TextColumn::make('shift_link')
+                    ->label('Shift')
+                    ->state(fn () => 'Cek Shift')
+                    ->url(fn (Project $record): string => \App\Filament\Resources\ShiftReports\ShiftReportResource::getUrl('report', ['project_id' => $record->id]))
+                    ->color('success')
+                    ->icon('heroicon-o-clipboard-document-list'),
+                
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal Dibuat')
                     ->dateTime('d M Y, H:i')

@@ -147,7 +147,7 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $attendance->employee->nip ?? '-' }}</td>
-                    <td>{{ $attendance->employee->nama_lengkap ?? '-' }}</td>
+                    <td>{{ $attendance->employee->name ?? '-' }}</td>
                     <td>{{ $attendance->project->nama_project ?? '-' }}</td>
                     <td>{{ $attendance->tanggal?->format('d/m/Y') ?? '-' }}</td>
                     <td>{{ $attendance->check_in?->format('H:i') ?? '-' }}</td>

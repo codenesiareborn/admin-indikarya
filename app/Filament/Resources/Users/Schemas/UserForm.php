@@ -46,23 +46,16 @@ class UserForm
                             ->label('Role')
                             ->options(function () {
                                 $user = auth()->user();
+                                $query = \Spatie\Permission\Models\Role::query();
                                 
-                                // Super Admin can assign any role
-                                if ($user && $user->hasRole('super_admin')) {
-                                    return [
-                                        'super_admin' => 'Super Admin',
-                                        'admin' => 'Admin',
-                                        'manager' => 'Manager',
-                                        'staff' => 'Staff',
-                                    ];
+                                // Non-super_admin users cannot assign super_admin role
+                                if (!$user || !$user->hasRole('super_admin')) {
+                                    $query->where('name', '!=', 'super_admin');
                                 }
                                 
-                                // Admin cannot assign Super Admin role
-                                return [
-                                    'admin' => 'Admin',
-                                    'manager' => 'Manager',
-                                    'staff' => 'Staff',
-                                ];
+                                return $query->pluck('name', 'name')
+                                    ->mapWithKeys(fn ($name) => [$name => ucwords(str_replace('_', ' ', $name))])
+                                    ->toArray();
                             })
                             ->required()
                             ->native(false)

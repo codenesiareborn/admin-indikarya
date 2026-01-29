@@ -80,7 +80,7 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
                     ->searchable()
                     ->sortable(),
                 
-                TextColumn::make('employee.nama_lengkap')
+                TextColumn::make('employee.name')
                     ->label('Nama Pegawai')
                     ->searchable()
                     ->sortable(),
@@ -99,6 +99,8 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
                     ->label('Foto Masuk')
                     ->disk('public')
                     ->height(40)
+                    ->url(fn ($record) => $record->check_in_photo ? asset('storage/' . $record->check_in_photo) : null)
+                    ->openUrlInNewTab()
                     ->defaultImageUrl(url('/images/no-image.png')),
                 
                 TextColumn::make('check_in_location')
@@ -124,6 +126,8 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
                     ->label('Foto Keluar')
                     ->disk('public')
                     ->height(40)
+                    ->url(fn ($record) => $record->check_out_photo ? asset('storage/' . $record->check_out_photo) : null)
+                    ->openUrlInNewTab()
                     ->defaultImageUrl(url('/images/no-image.png')),
                 
                 TextColumn::make('check_out_location')

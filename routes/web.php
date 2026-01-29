@@ -15,4 +15,6 @@ Route::controller(App\Http\Controllers\ReportController::class)->group(function 
     Route::get('/reports/tasklist/pdf', 'tasklistPdf')->name('reports.tasklist.pdf');
     Route::get('/reports/patrol/excel', 'patrolExcel')->name('reports.patrol.excel');
     Route::get('/reports/patrol/pdf', 'patrolPdf')->name('reports.patrol.pdf');
+    Route::get('/reports/shift/excel', 'shiftExcel')->name('reports.shift.excel');
+    Route::get('/reports/shift/pdf', 'shiftPdf')->name('reports.shift.pdf');
 });
