@@ -31,6 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->darkMode(false)
 ->renderHook(
     'panels::head.end',
     fn (): string => '
@@ -80,6 +81,16 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-clipboard-document-list')
                     ->group('Laporan')
                     ->sort(11),
+                NavigationItem::make('Laporan Patroli')
+                    ->url('/admin/patrols/report')
+                    ->icon('heroicon-o-document-text')
+                    ->group('Laporan')
+                    ->sort(12),
+                NavigationItem::make('Laporan Shift')
+                    ->url('/admin/shift-reports/report')
+                    ->icon('heroicon-o-clipboard-document-list')
+                    ->group('Laporan')
+                    ->sort(13),
             ])
             ->middleware([
                 EncryptCookies::class,

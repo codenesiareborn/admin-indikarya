@@ -70,6 +70,20 @@ class ProjectsTable
                     ->color('success')
                     ->icon('heroicon-o-clipboard-document-check'),
                 
+                Tables\Columns\TextColumn::make('patrol_link')
+                    ->label('Patroli')
+                    ->state(fn () => 'Cek Patroli')
+                    ->url(fn (Project $record): string => route('filament.admin.resources.patrols.manage-project', ['project' => $record->id]))
+                    ->color('warning')
+                    ->icon('heroicon-o-shield-check'),
+                
+                Tables\Columns\TextColumn::make('shift_link')
+                    ->label('Shift')
+                    ->state(fn () => 'Cek Shift')
+                    ->url(fn (Project $record): string => \App\Filament\Resources\ShiftReports\ShiftReportResource::getUrl('report', ['project_id' => $record->id]))
+                    ->color('success')
+                    ->icon('heroicon-o-clipboard-document-list'),
+                
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal Dibuat')
                     ->dateTime('d M Y, H:i')

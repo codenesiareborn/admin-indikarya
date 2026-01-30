@@ -48,7 +48,7 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
                     ->searchable()
                     ->sortable(),
                 
-                TextColumn::make('employee.nama_lengkap')
+                TextColumn::make('employee.name')
                     ->label('Nama Pegawai')
                     ->searchable()
                     ->sortable(),
@@ -106,13 +106,23 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
 
     protected function getFilteredQuery(): Builder
     {
-        return Attendance::query()
+        $user = auth()->user();
+        
+        $query = Attendance::query()
             ->with(['employee', 'project'])
             ->when($this->startDate, fn (Builder $q) => $q->whereDate('tanggal', '>=', $this->startDate))
             ->when($this->endDate, fn (Builder $q) => $q->whereDate('tanggal', '<=', $this->endDate))
             ->when($this->projectId, fn (Builder $q) => $q->where('project_id', $this->projectId))
             ->when($this->status, fn (Builder $q) => $q->where('status', $this->status))
             ->when($this->projectType, fn (Builder $q) => $q->whereHas('project', fn($q) => $q->where('jenis_project', $this->projectType)));
+        
+        // Filter untuk PIC - hanya tampilkan data dari project yang di-assign
+        if ($user && $user->isPic() && !$user->hasRole('super_admin') && !$user->hasRole('admin')) {
+            $projectIds = $user->getPicProjectIds();
+            $query->whereIn('project_id', $projectIds);
+        }
+        
+        return $query;
     }
 
     public function getStats(): array
@@ -131,10 +141,19 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
 
     public function getProjects(): array
     {
+        $user = auth()->user();
         $query = Project::query();
+        
         if ($this->projectType) {
             $query->where('jenis_project', $this->projectType);
         }
+        
+        // Filter untuk PIC - hanya tampilkan project yang di-assign
+        if ($user && $user->isPic() && !$user->hasRole('super_admin') && !$user->hasRole('admin')) {
+            $projectIds = $user->getPicProjectIds();
+            $query->whereIn('id', $projectIds);
+        }
+        
         return $query->pluck('nama_project', 'id')->toArray();
     }
 

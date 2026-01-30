@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\TaskLists\Pages;
+namespace App\Filament\Resources\Patrols\Pages;
 
-use App\Filament\Resources\TaskLists\TaskListResource;
-use App\Models\GeneralSetting;
+use App\Filament\Resources\Patrols\PatrolResource;
+use App\Models\Patrol;
 use App\Models\Project;
-use App\Models\ProjectRoom;
-use App\Models\TaskSubmission;
+use App\Models\PatrolArea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Resources\Pages\Page;
@@ -15,25 +14,24 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Actions\ViewAction;
 use Illuminate\Database\Eloquent\Builder;
 
-class TaskListReportPage extends Page implements HasTable, HasForms
+class PatrolReportPage extends Page implements HasTable, HasForms
 {
     use InteractsWithTable;
     use InteractsWithForms;
 
-    protected static string $resource = TaskListResource::class;
+    protected static string $resource = PatrolResource::class;
 
-    protected static ?string $title = 'Laporan Task List';
+    protected static ?string $title = 'Laporan Patroli';
 
-    protected string $view = 'filament.resources.tasklists.pages.tasklist-report';
+    protected string $view = 'filament.resources.patrols.pages.patrol-report';
 
     public ?string $startDate = null;
     public ?string $endDate = null;
     public ?string $projectId = null;
-    public ?string $roomId = null;
     public ?string $projectType = null;
+    public ?string $status = null;
 
     public function mount(): void
     {
@@ -46,13 +44,13 @@ class TaskListReportPage extends Page implements HasTable, HasForms
         return $table
             ->query($this->getFilteredQuery())
             ->columns([
-                TextColumn::make('employee.nip')
-                    ->label('NIK')
+                TextColumn::make('user.nip')
+                    ->label('NIP')
                     ->searchable()
                     ->sortable(),
                 
-                TextColumn::make('employee.name')
-                    ->label('Nama Pegawai')
+                TextColumn::make('user.name')
+                    ->label('Nama Petugas')
                     ->searchable()
                     ->sortable(),
                 
@@ -72,52 +70,52 @@ class TaskListReportPage extends Page implements HasTable, HasForms
                     })
                     ->formatStateUsing(fn (string $state): string => ucwords(str_replace('_', ' ', $state))),
                 
-                TextColumn::make('room.nama_ruangan')
+                TextColumn::make('area_name')
                     ->label('Area')
+                    ->searchable()
                     ->sortable(),
                 
-                TextColumn::make('tanggal')
+                TextColumn::make('patrol_date')
                     ->label('Tanggal')
                     ->date('d M Y')
                     ->sortable(),
                 
-                TextColumn::make('submitted_at')
-                    ->label('Jam Submit')
-                    ->dateTime('H:i:s')
+                TextColumn::make('patrol_time')
+                    ->label('Waktu')
+                    ->time('H:i')
                     ->sortable(),
                 
-                TextColumn::make('task_completion')
-                    ->label('Task')
-                    ->state(fn (TaskSubmission $record) => "{$record->completed_count}/{$record->total_tasks}")
+                TextColumn::make('status')
+                    ->label('Status')
                     ->badge()
-                    ->color(fn (TaskSubmission $record) => $record->completion_rate >= 100 ? 'success' : ($record->completion_rate >= 50 ? 'warning' : 'danger')),
+                    ->color(fn (string $state): string => match ($state) {
+                        'Aman' => 'success',
+                        'Tidak Aman' => 'danger',
+                        default => 'gray',
+                    }),
                 
-                TextColumn::make('completion_rate')
-                    ->label('%')
-                    ->state(fn (TaskSubmission $record) => "{$record->completion_rate}%"),
-                
-                TextColumn::make('foto')
+                ImageColumn::make('photo')
                     ->label('Foto')
-                    ->formatStateUsing(fn ($state) => $state ? 'Lihat Foto' : '-')
-                    ->url(fn ($record) => $record->foto ? asset('storage/' . $record->foto) : null)
-                    ->openUrlInNewTab()
-                    ->color('info')
-                    ->icon('heroicon-o-photo'),
+                    ->disk('public')
+                    ->height(40),
+
+                TextColumn::make('note')
+                    ->label('Catatan')
+                    ->limit(30),
             ])
-            ->defaultSort('submitted_at', 'desc')
-            ->recordUrl(fn (TaskSubmission $record) => route('filament.admin.resources.task-lists.view-submission', ['record' => $record]));
+            ->defaultSort('patrol_date', 'desc');
     }
 
     protected function getFilteredQuery(): Builder
     {
         $user = auth()->user();
         
-        $query = TaskSubmission::query()
-            ->with(['employee', 'project', 'room', 'items'])
-            ->when($this->startDate, fn (Builder $q) => $q->whereDate('tanggal', '>=', $this->startDate))
-            ->when($this->endDate, fn (Builder $q) => $q->whereDate('tanggal', '<=', $this->endDate))
+        $query = Patrol::query()
+            ->with(['user', 'project', 'patrolArea'])
+            ->when($this->startDate, fn (Builder $q) => $q->whereDate('patrol_date', '>=', $this->startDate))
+            ->when($this->endDate, fn (Builder $q) => $q->whereDate('patrol_date', '<=', $this->endDate))
             ->when($this->projectId, fn (Builder $q) => $q->where('project_id', $this->projectId))
-            ->when($this->roomId, fn (Builder $q) => $q->where('project_room_id', $this->roomId))
+            ->when($this->status, fn (Builder $q) => $q->where('status', $this->status))
             ->when($this->projectType, fn (Builder $q) => $q->whereHas('project', fn($q) => $q->where('jenis_project', $this->projectType)));
         
         // Filter untuk PIC - hanya tampilkan data dari project yang di-assign
@@ -132,19 +130,22 @@ class TaskListReportPage extends Page implements HasTable, HasForms
     public function getStats(): array
     {
         $query = $this->getFilteredQuery();
-        $submissions = $query->get();
+        $patrols = $query->get();
         
-        $totalCompleted = $submissions->sum(fn ($s) => $s->items->where('is_completed', true)->count());
-        $totalPending = $submissions->sum(fn ($s) => $s->items->where('is_completed', false)->count());
-        $totalTasks = $totalCompleted + $totalPending;
-        $completionRate = $totalTasks > 0 ? round(($totalCompleted / $totalTasks) * 100, 1) : 0;
+        $total = $patrols->count();
+        $aman = $patrols->where('status', 'Aman')->count();
+        $tidakAman = $patrols->where('status', 'Tidak Aman')->count();
+        
+        $presentase = $total > 0 
+            ? round(($aman / $total) * 100, 1)
+            : 0;
         
         return [
-            'total_submissions' => $submissions->count(),
-            'total_completed' => $totalCompleted,
-            'total_pending' => $totalPending,
-            'completion_rate' => $completionRate,
-            'active_employees' => $submissions->pluck('user_id')->unique()->count(),
+            'total' => $total,
+            'aman' => $aman,
+            'tidak_aman' => $tidakAman,
+            'presentase' => $presentase,
+            'active_officers' => $patrols->pluck('user_id')->unique()->count(),
         ];
     }
 
@@ -166,12 +167,12 @@ class TaskListReportPage extends Page implements HasTable, HasForms
         return $query->pluck('nama_project', 'id')->toArray();
     }
 
-    public function getRooms(): array
+    public function getStatuses(): array
     {
-        if (!$this->projectId) {
-            return ProjectRoom::pluck('nama_ruangan', 'id')->toArray();
-        }
-        return ProjectRoom::where('project_id', $this->projectId)->pluck('nama_ruangan', 'id')->toArray();
+        return [
+            'Aman' => 'Aman',
+            'Tidak Aman' => 'Tidak Aman',
+        ];
     }
 
     public function getProjectTypes(): array

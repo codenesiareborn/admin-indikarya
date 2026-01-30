@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProjectResource extends Resource
 {
@@ -54,7 +55,27 @@ class ProjectResource extends Resource
             RelationManagers\RoomsRelationManager::class,
             RelationManagers\TasksRelationManager::class,
             RelationManagers\EmployeesRelationManager::class,
+            RelationManagers\PatrolAreasRelationManager::class,
+            RelationManagers\PicsRelationManager::class,
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+        
+        // If user is super_admin or admin, show all projects
+        if ($user && ($user->hasRole('super_admin') || $user->hasRole('admin'))) {
+            return $query;
+        }
+        
+        // If user is PIC, filter to only assigned projects
+        if ($user && $user->isPic()) {
+            return $query->whereHas('pics', fn (Builder $q) => $q->where('user_id', $user->id));
+        }
+        
+        return $query;
     }
 
     public static function getPages(): array

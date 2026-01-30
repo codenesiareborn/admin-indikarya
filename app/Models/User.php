@@ -75,6 +75,23 @@ class User extends Authenticatable
         return $this->hasMany(Attendance::class);
     }
 
+    public function picProjects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class, 'project_pics')
+            ->withPivot('assigned_at')
+            ->withTimestamps();
+    }
+
+    public function isPic(): bool
+    {
+        return $this->picProjects()->exists();
+    }
+
+    public function getPicProjectIds(): array
+    {
+        return $this->picProjects()->pluck('projects.id')->toArray();
+    }
+
     public function getStafLabelAttribute()
     {
         return match($this->staf) {

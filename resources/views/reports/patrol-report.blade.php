@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Laporan Presensi</title>
+    <title>Laporan Patroli</title>
     <style>
         * {
             margin: 0;
@@ -72,28 +72,14 @@
             margin-bottom: 10px;
             font-size: 12px;
         }
-        .summary-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .summary-item {
-            background: white;
-            padding: 8px 15px;
-            border-radius: 3px;
-            border: 1px solid #ddd;
-        }
         .footer {
             text-align: right;
             font-size: 9px;
             color: #888;
             margin-top: 20px;
         }
-        .status-hadir { color: #16a34a; }
-        .status-terlambat { color: #d97706; }
-        .status-izin { color: #2563eb; }
-        .status-sakit { color: #dc2626; }
-        .status-alpha { color: #6b7280; }
+        .status-aman { color: #16a34a; font-weight: bold; }
+        .status-bahaya { color: #dc2626; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -109,7 +95,7 @@
     </div>
 
     <div class="report-title">
-        <h1>LAPORAN PRESENSI PEGAWAI</h1>
+        <h1>LAPORAN PATROLI</h1>
         <p>Periode: {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</p>
         <p>No. Laporan: {{ $reportNumber }}</p>
     </div>
@@ -118,12 +104,10 @@
         <h3>📊 RINGKASAN</h3>
         <table style="width: auto; margin: 0;">
             <tr>
-                <td style="border: none; padding: 3px 15px;">Total Data: <strong>{{ $stats['total'] }}</strong></td>
-                <td style="border: none; padding: 3px 15px;">Hadir: <strong class="status-hadir">{{ $stats['hadir'] }}</strong></td>
-                <td style="border: none; padding: 3px 15px;">Terlambat: <strong class="status-terlambat">{{ $stats['terlambat'] }}</strong></td>
-                <td style="border: none; padding: 3px 15px;">Izin: <strong class="status-izin">{{ $stats['izin'] }}</strong></td>
-                <td style="border: none; padding: 3px 15px;">Sakit: <strong class="status-sakit">{{ $stats['sakit'] }}</strong></td>
-                <td style="border: none; padding: 3px 15px;">Alpha: <strong class="status-alpha">{{ $stats['alpha'] }}</strong></td>
+                <td style="border: none; padding: 3px 15px;">Total Patroli: <strong>{{ $stats['total'] }}</strong></td>
+                <td style="border: none; padding: 3px 15px;">Aman: <strong class="status-aman">{{ $stats['aman'] }}</strong></td>
+                <td style="border: none; padding: 3px 15px;">Tidak Aman: <strong class="status-bahaya">{{ $stats['tidak_aman'] }}</strong></td>
+                <td style="border: none; padding: 3px 15px;">% Aman: <strong>{{ $stats['presentase'] }}%</strong></td>
             </tr>
         </table>
     </div>
@@ -132,28 +116,30 @@
         <thead>
             <tr>
                 <th style="width: 30px;">No</th>
-                <th style="width: 70px;">NIP</th>
-                <th>Nama Pegawai</th>
+                <th style="width: 80px;">NIP</th>
+                <th>Nama Petugas</th>
                 <th>Project</th>
+                <th>Area</th>
                 <th style="width: 80px;">Tanggal</th>
-                <th style="width: 60px;">Masuk</th>
-                <th style="width: 60px;">Keluar</th>
-                <th style="width: 70px;">Status</th>
-                <th>Keterangan</th>
+                <th style="width: 60px;">Waktu</th>
+                <th style="width: 80px;">Status</th>
+                <th>Catatan</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($data as $index => $attendance)
+            @forelse($data as $index => $patrol)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $attendance->employee->nip ?? '-' }}</td>
-                    <td>{{ $attendance->employee->name ?? '-' }}</td>
-                    <td>{{ $attendance->project->nama_project ?? '-' }}</td>
-                    <td>{{ $attendance->tanggal?->format('d/m/Y') ?? '-' }}</td>
-                    <td>{{ $attendance->check_in?->format('H:i') ?? '-' }}</td>
-                    <td>{{ $attendance->check_out?->format('H:i') ?? '-' }}</td>
-                    <td class="status-{{ $attendance->status }}">{{ $attendance->status_label ?? '-' }}</td>
-                    <td>{{ $attendance->keterangan ?? '-' }}</td>
+                    <td>{{ $patrol->user->nip ?? '-' }}</td>
+                    <td>{{ $patrol->user->name ?? '-' }}</td>
+                    <td>{{ $patrol->project->nama_project ?? '-' }}</td>
+                    <td>{{ $patrol->area_name ?? '-' }}</td>
+                    <td>{{ $patrol->patrol_date?->format('d/m/Y') ?? '-' }}</td>
+                    <td>{{ $patrol->patrol_time ? date('H:i', strtotime($patrol->patrol_time)) : '-' }}</td>
+                    <td class="{{ $patrol->status === 'Aman' ? 'status-aman' : 'status-bahaya' }}">
+                        {{ $patrol->status }}
+                    </td>
+                    <td>{{ $patrol->note ?? '-' }}</td>
                 </tr>
             @empty
                 <tr>

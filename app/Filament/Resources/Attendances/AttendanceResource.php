@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class AttendanceResource extends Resource
 {
@@ -57,5 +58,22 @@ class AttendanceResource extends Resource
             'manage-project' => ManageProjectAttendance::route('/project'),
             'report' => \App\Filament\Resources\Attendances\Pages\AttendanceReportPage::route('/report'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+        
+        if ($user && ($user->hasRole('super_admin') || $user->hasRole('admin'))) {
+            return $query;
+        }
+        
+        if ($user && $user->isPic()) {
+            $projectIds = $user->getPicProjectIds();
+            return $query->whereIn('project_id', $projectIds);
+        }
+        
+        return $query;
     }
 }

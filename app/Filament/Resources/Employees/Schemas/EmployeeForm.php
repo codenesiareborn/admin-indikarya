@@ -29,6 +29,7 @@ class EmployeeForm
                         Forms\Components\TextInput::make('password')
                             ->label('Password')
                             ->password()
+                            ->revealable()
                             ->required(fn (string $context): bool => $context === 'create')
                             ->dehydrated(fn ($state) => filled($state))
                             ->minLength(8)

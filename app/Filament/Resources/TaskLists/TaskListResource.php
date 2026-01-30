@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Builder;
 
 class TaskListResource extends Resource
 {
@@ -68,6 +69,24 @@ class TaskListResource extends Resource
             'index' => ListTaskLists::route('/'),
             'manage-project' => ManageProjectTaskList::route('/project'),
             'report' => \App\Filament\Resources\TaskLists\Pages\TaskListReportPage::route('/report'),
+            'view-submission' => \App\Filament\Resources\TaskLists\Pages\ViewTaskSubmission::route('/submission/{record}'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+        
+        if ($user && ($user->hasRole('super_admin') || $user->hasRole('admin'))) {
+            return $query;
+        }
+        
+        if ($user && $user->isPic()) {
+            $projectIds = $user->getPicProjectIds();
+            return $query->whereHas('room.project', fn (Builder $q) => $q->whereIn('id', $projectIds));
+        }
+        
+        return $query;
     }
 }

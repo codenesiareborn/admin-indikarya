@@ -12,7 +12,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class AttendanceExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle, WithEvents
+class PatrolExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle, WithEvents
 {
     protected Collection $data;
     protected array $stats;
@@ -41,31 +41,31 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
         return [
             'No',
             'NIP',
-            'Nama Pegawai',
+            'Nama Petugas',
             'Project',
+            'Area',
             'Tanggal',
-            'Jam Masuk',
-            'Jam Keluar',
+            'Waktu',
             'Status',
-            'Keterangan',
+            'Catatan',
         ];
     }
 
-    public function map($attendance): array
+    public function map($patrol): array
     {
         static $no = 0;
         $no++;
         
         return [
             $no,
-            $attendance->employee->nip ?? '-',
-            $attendance->employee->name ?? '-',
-            $attendance->project->nama_project ?? '-',
-            $attendance->tanggal?->format('d/m/Y') ?? '-',
-            $attendance->check_in?->format('H:i') ?? '-',
-            $attendance->check_out?->format('H:i') ?? '-',
-            $attendance->status_label ?? '-',
-            $attendance->keterangan ?? '-',
+            $patrol->user->nip ?? '-',
+            $patrol->user->name ?? '-',
+            $patrol->project->nama_project ?? '-',
+            $patrol->area_name ?? '-',
+            $patrol->patrol_date?->format('d/m/Y') ?? '-',
+            $patrol->patrol_time ? date('H:i', strtotime($patrol->patrol_time)) : '-',
+            $patrol->status,
+            $patrol->note ?? '-',
         ];
     }
 
@@ -78,7 +78,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
 
     public function title(): string
     {
-        return 'Laporan Presensi';
+        return 'Laporan Patroli';
     }
 
     public function registerEvents(): array
@@ -96,7 +96,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
                 $sheet->setCellValue('A1', $companyName);
                 $sheet->setCellValue('A2', $companyAddress);
                 $sheet->setCellValue('A3', '');
-                $sheet->setCellValue('A4', 'LAPORAN PRESENSI PEGAWAI');
+                $sheet->setCellValue('A4', 'LAPORAN PATROLI');
                 $sheet->setCellValue('A5', "Periode: {$this->startDate} s/d {$this->endDate} | No: {$this->reportNumber}");
                 
                 // Style header
@@ -114,7 +114,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
                 $sheet->getStyle("A{$lastRow}")->getFont()->setBold(true);
                 
                 $lastRow++;
-                $sheet->setCellValue("A{$lastRow}", "Total Data: {$this->stats['total']} | Hadir: {$this->stats['hadir']} | Terlambat: {$this->stats['terlambat']} | Izin: {$this->stats['izin']} | Sakit: {$this->stats['sakit']} | Alpha: {$this->stats['alpha']}");
+                $sheet->setCellValue("A{$lastRow}", "Total Patroli: {$this->stats['total']} | Aman: {$this->stats['aman']} | Tidak Aman: {$this->stats['tidak_aman']} | Persentase Aman: {$this->stats['presentase']}%");
                 
                 $lastRow += 2;
                 $sheet->setCellValue("A{$lastRow}", "Dicetak: " . now()->format('d/m/Y H:i'));

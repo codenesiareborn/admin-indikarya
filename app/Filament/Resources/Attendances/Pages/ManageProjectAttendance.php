@@ -16,7 +16,6 @@ use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -76,11 +75,11 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
             )
             ->columns([
                 TextColumn::make('employee.nip')
-                    ->label('NIP')
+                    ->label('NIK')
                     ->searchable()
                     ->sortable(),
                 
-                TextColumn::make('employee.nama_lengkap')
+                TextColumn::make('employee.name')
                     ->label('Nama Pegawai')
                     ->searchable()
                     ->sortable(),
@@ -95,17 +94,19 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
                     ->time('H:i')
                     ->placeholder('-'),
                 
-                ImageColumn::make('check_in_photo')
+                TextColumn::make('check_in_photo')
                     ->label('Foto Masuk')
-                    ->disk('public')
-                    ->height(40)
-                    ->defaultImageUrl(url('/images/no-image.png')),
+                    ->formatStateUsing(fn ($state) => $state ? basename($state) : '-')
+                    ->url(fn ($record) => $record->check_in_photo ? asset('storage/' . $record->check_in_photo) : null)
+                    ->openUrlInNewTab()
+                    ->color('info')
+                    ->icon('heroicon-o-photo'),
                 
                 TextColumn::make('check_in_location')
                     ->label('Lokasi Masuk')
                     ->formatStateUsing(fn ($record) => 
                         $record->check_in_latitude && $record->check_in_longitude
-                            ? '📍 GPS'
+                            ? '(' . number_format($record->check_in_latitude, 2) . ', ' . number_format($record->check_in_longitude, 2) . ')'
                             : '-'
                     )
                     ->url(fn ($record) => 
@@ -113,24 +114,28 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
                             ? "https://www.google.com/maps?q={$record->check_in_latitude},{$record->check_in_longitude}"
                             : null
                     )
-                    ->openUrlInNewTab(),
+                    ->openUrlInNewTab()
+                    ->color('success')
+                    ->icon('heroicon-o-map-pin'),
                 
                 TextColumn::make('check_out')
                     ->label('Check Out')
                     ->time('H:i')
                     ->placeholder('-'),
                 
-                ImageColumn::make('check_out_photo')
+                TextColumn::make('check_out_photo')
                     ->label('Foto Keluar')
-                    ->disk('public')
-                    ->height(40)
-                    ->defaultImageUrl(url('/images/no-image.png')),
+                    ->formatStateUsing(fn ($state) => $state ? basename($state) : '-')
+                    ->url(fn ($record) => $record->check_out_photo ? asset('storage/' . $record->check_out_photo) : null)
+                    ->openUrlInNewTab()
+                    ->color('info')
+                    ->icon('heroicon-o-photo'),
                 
                 TextColumn::make('check_out_location')
                     ->label('Lokasi Keluar')
                     ->formatStateUsing(fn ($record) => 
                         $record->check_out_latitude && $record->check_out_longitude
-                            ? '📍 GPS'
+                            ? '(' . number_format($record->check_out_latitude, 2) . ', ' . number_format($record->check_out_longitude, 2) . ')'
                             : '-'
                     )
                     ->url(fn ($record) => 
@@ -138,7 +143,9 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
                             ? "https://www.google.com/maps?q={$record->check_out_latitude},{$record->check_out_longitude}"
                             : null
                     )
-                    ->openUrlInNewTab(),
+                    ->openUrlInNewTab()
+                    ->color('success')
+                    ->icon('heroicon-o-map-pin'),
                 
                 TextColumn::make('status_label')
                     ->label('Status')
