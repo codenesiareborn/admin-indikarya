@@ -69,6 +69,7 @@ class TaskListResource extends Resource
             'index' => ListTaskLists::route('/'),
             'manage-project' => ManageProjectTaskList::route('/project'),
             'report' => \App\Filament\Resources\TaskLists\Pages\TaskListReportPage::route('/report'),
+            'view-submission' => \App\Filament\Resources\TaskLists\Pages\ViewTaskSubmission::route('/submission/{record}'),
         ];
     }
 

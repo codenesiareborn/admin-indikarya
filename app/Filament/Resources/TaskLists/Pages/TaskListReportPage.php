@@ -15,6 +15,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Actions\ViewAction;
 use Illuminate\Database\Eloquent\Builder;
 
 class TaskListReportPage extends Page implements HasTable, HasForms
@@ -46,11 +47,11 @@ class TaskListReportPage extends Page implements HasTable, HasForms
             ->query($this->getFilteredQuery())
             ->columns([
                 TextColumn::make('employee.nip')
-                    ->label('NIP')
+                    ->label('NIK')
                     ->searchable()
                     ->sortable(),
                 
-                TextColumn::make('employee.nama_lengkap')
+                TextColumn::make('employee.name')
                     ->label('Nama Pegawai')
                     ->searchable()
                     ->sortable(),
@@ -95,12 +96,16 @@ class TaskListReportPage extends Page implements HasTable, HasForms
                     ->label('%')
                     ->state(fn (TaskSubmission $record) => "{$record->completion_rate}%"),
                 
-                ImageColumn::make('foto')
+                TextColumn::make('foto')
                     ->label('Foto')
-                    ->disk('public')
-                    ->height(40),
+                    ->formatStateUsing(fn ($state) => $state ? 'Lihat Foto' : '-')
+                    ->url(fn ($record) => $record->foto ? asset('storage/' . $record->foto) : null)
+                    ->openUrlInNewTab()
+                    ->color('info')
+                    ->icon('heroicon-o-photo'),
             ])
-            ->defaultSort('submitted_at', 'desc');
+            ->defaultSort('submitted_at', 'desc')
+            ->recordUrl(fn (TaskSubmission $record) => route('filament.admin.resources.task-lists.view-submission', ['record' => $record]));
     }
 
     protected function getFilteredQuery(): Builder

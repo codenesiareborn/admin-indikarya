@@ -50,11 +50,13 @@ class PatrolsTable
                         default => 'gray',
                     }),
                 
-                Tables\Columns\ImageColumn::make('photo')
+                Tables\Columns\TextColumn::make('photo')
                     ->label('Foto')
-                    ->disk('public')
-                    ->height(50)
-                    ->defaultImageUrl(url('/images/no-image.png')),
+                    ->formatStateUsing(fn ($state) => $state ? 'Lihat Foto' : '-')
+                    ->url(fn ($record) => $record->photo ? asset('storage/' . $record->photo) : null)
+                    ->openUrlInNewTab()
+                    ->color('info')
+                    ->icon('heroicon-o-photo'),
                 
                 Tables\Columns\TextColumn::make('note')
                     ->label('Catatan')
