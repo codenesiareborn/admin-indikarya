@@ -14,37 +14,86 @@ class AttendancesTable
     {
         return $table
             ->columns([
-                TextColumn::make('employee.id')
-                    ->searchable(),
-                TextColumn::make('project.id')
-                    ->searchable(),
+                TextColumn::make('employee.nip')
+                    ->label('NIK')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('employee.name')
+                    ->label('Nama Pegawai')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('project.nama_project')
+                    ->label('Project')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('tanggal')
-                    ->date()
+                    ->label('Tanggal')
+                    ->date('d M Y')
                     ->sortable(),
                 TextColumn::make('check_in')
-                    ->time()
+                    ->label('Check In')
+                    ->time('H:i')
                     ->sortable(),
                 TextColumn::make('check_in_photo')
-                    ->searchable(),
-                TextColumn::make('check_in_latitude')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('check_in_longitude')
-                    ->numeric()
-                    ->sortable(),
+                    ->label('Foto Masuk')
+                    ->formatStateUsing(fn ($state) => $state ? 'Lihat Foto' : '-')
+                    ->url(fn ($record) => $record->check_in_photo ? asset('storage/' . $record->check_in_photo) : null)
+                    ->openUrlInNewTab()
+                    ->color('info')
+                    ->icon('heroicon-o-photo'),
+                TextColumn::make('check_in_location')
+                    ->label('Lokasi Masuk')
+                    ->formatStateUsing(fn ($record) => 
+                        $record->check_in_latitude && $record->check_in_longitude
+                            ? 'Lihat Maps'
+                            : '-'
+                    )
+                    ->url(fn ($record) => 
+                        $record->check_in_latitude && $record->check_in_longitude
+                            ? "https://www.google.com/maps?q={$record->check_in_latitude},{$record->check_in_longitude}"
+                            : null
+                    )
+                    ->openUrlInNewTab()
+                    ->color('success')
+                    ->icon('heroicon-o-map-pin'),
                 TextColumn::make('check_out')
-                    ->time()
-                    ->sortable(),
+                    ->label('Check Out')
+                    ->time('H:i')
+                    ->sortable()
+                    ->placeholder('-'),
                 TextColumn::make('check_out_photo')
-                    ->searchable(),
-                TextColumn::make('check_out_latitude')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('check_out_longitude')
-                    ->numeric()
-                    ->sortable(),
+                    ->label('Foto Keluar')
+                    ->formatStateUsing(fn ($state) => $state ? 'Lihat Foto' : '-')
+                    ->url(fn ($record) => $record->check_out_photo ? asset('storage/' . $record->check_out_photo) : null)
+                    ->openUrlInNewTab()
+                    ->color('info')
+                    ->icon('heroicon-o-photo'),
+                TextColumn::make('check_out_location')
+                    ->label('Lokasi Keluar')
+                    ->formatStateUsing(fn ($record) => 
+                        $record->check_out_latitude && $record->check_out_longitude
+                            ? 'Lihat Maps'
+                            : '-'
+                    )
+                    ->url(fn ($record) => 
+                        $record->check_out_latitude && $record->check_out_longitude
+                            ? "https://www.google.com/maps?q={$record->check_out_latitude},{$record->check_out_longitude}"
+                            : null
+                    )
+                    ->openUrlInNewTab()
+                    ->color('success')
+                    ->icon('heroicon-o-map-pin'),
                 TextColumn::make('status')
-                    ->badge(),
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'hadir' => 'success',
+                        'terlambat' => 'warning',
+                        'izin' => 'info',
+                        'sakit' => 'danger',
+                        'alpha' => 'gray',
+                        default => 'gray',
+                    }),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

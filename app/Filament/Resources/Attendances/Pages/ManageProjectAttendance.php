@@ -75,7 +75,7 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
             )
             ->columns([
                 TextColumn::make('employee.nip')
-                    ->label('NIP')
+                    ->label('NIK')
                     ->searchable()
                     ->sortable(),
                 

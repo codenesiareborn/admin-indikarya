@@ -79,11 +79,21 @@ class ShiftReportPage extends Page implements HasTable, HasForms
 
     protected function getFilteredQuery(): Builder
     {
-        return ShiftReport::query()
+        $user = auth()->user();
+        
+        $query = ShiftReport::query()
             ->with(['user', 'project'])
             ->when($this->startDate, fn (Builder $q) => $q->whereDate('shift_date', '>=', $this->startDate))
             ->when($this->endDate, fn (Builder $q) => $q->whereDate('shift_date', '<=', $this->endDate))
             ->when($this->projectId, fn (Builder $q) => $q->where('project_id', $this->projectId));
+        
+        // Filter untuk PIC - hanya tampilkan data dari project yang di-assign
+        if ($user && $user->isPic() && !$user->hasRole('super_admin') && !$user->hasRole('admin')) {
+            $projectIds = $user->getPicProjectIds();
+            $query->whereIn('project_id', $projectIds);
+        }
+        
+        return $query;
     }
 
     public function getStats(): array
@@ -101,6 +111,15 @@ class ShiftReportPage extends Page implements HasTable, HasForms
 
     public function getProjects(): array
     {
-        return Project::pluck('nama_project', 'id')->toArray();
+        $user = auth()->user();
+        $query = Project::query();
+        
+        // Filter untuk PIC - hanya tampilkan project yang di-assign
+        if ($user && $user->isPic() && !$user->hasRole('super_admin') && !$user->hasRole('admin')) {
+            $projectIds = $user->getPicProjectIds();
+            $query->whereIn('id', $projectIds);
+        }
+        
+        return $query->pluck('nama_project', 'id')->toArray();
     }
 }
