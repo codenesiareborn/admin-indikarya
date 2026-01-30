@@ -72,6 +72,7 @@ class AttendanceController extends Controller
                     'check_in_photo' => $photoPath,
                     'check_in_latitude' => $validated['latitude'],
                     'check_in_longitude' => $validated['longitude'],
+                    'check_in_address' => $validated['address'] ?? null,
                     'status' => $status,
                 ]);
                 $attendance = $existingAttendance;
@@ -85,6 +86,7 @@ class AttendanceController extends Controller
                     'check_in_photo' => $photoPath,
                     'check_in_latitude' => $validated['latitude'],
                     'check_in_longitude' => $validated['longitude'],
+                    'check_in_address' => $validated['address'] ?? null,
                     'status' => $status,
                 ]);
             }
@@ -152,6 +154,7 @@ class AttendanceController extends Controller
                 'check_out_photo' => $photoPath,
                 'check_out_latitude' => $validated['latitude'],
                 'check_out_longitude' => $validated['longitude'],
+                'check_out_address' => $validated['address'] ?? null,
             ]);
 
             // Load project relation
