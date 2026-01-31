@@ -15,7 +15,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Actions\ViewAction;
+use Filament\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
 
 class TaskListReportPage extends Page implements HasTable, HasForms
@@ -98,14 +98,19 @@ class TaskListReportPage extends Page implements HasTable, HasForms
                 
                 TextColumn::make('foto')
                     ->label('Foto')
-                    ->formatStateUsing(fn ($state) => $state ? 'Lihat Foto' : '-')
+                    ->formatStateUsing(fn ($state) => $state ? basename($state) : '-')
                     ->url(fn ($record) => $record->foto ? asset('storage/' . $record->foto) : null)
                     ->openUrlInNewTab()
                     ->color('info')
                     ->icon('heroicon-o-photo'),
             ])
             ->defaultSort('submitted_at', 'desc')
-            ->recordUrl(fn (TaskSubmission $record) => route('filament.admin.resources.task-lists.view-submission', ['record' => $record]));
+            ->actions([
+                Action::make('view')
+                    ->label('Detail')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn (TaskSubmission $record) => TaskListResource::getUrl('view-submission', ['record' => $record])),
+            ]);
     }
 
     protected function getFilteredQuery(): Builder

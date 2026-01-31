@@ -57,6 +57,7 @@ class AttendanceResource extends Resource
             'edit' => EditAttendance::route('/{record}/edit'),
             'manage-project' => ManageProjectAttendance::route('/project'),
             'report' => \App\Filament\Resources\Attendances\Pages\AttendanceReportPage::route('/report'),
+            'view' => \App\Filament\Resources\Attendances\Pages\ViewAttendance::route('/{record}'),
         ];
     }
 

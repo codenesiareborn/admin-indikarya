@@ -81,9 +81,9 @@ class ViewTaskSubmission extends ViewRecord
                         ImageEntry::make('foto')
                             ->label('')
                             ->disk('public')
-                            ->height(300),
-                    ])
-                    ->visible(fn (TaskSubmission $record) => !empty($record->foto)),
+                            ->height(300)
+                            ->defaultImageUrl(url('/images/no-image.png')),
+                    ]),
                 
                 Section::make('Catatan')
                     ->schema([

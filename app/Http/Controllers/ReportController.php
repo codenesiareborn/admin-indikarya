@@ -7,6 +7,7 @@ use App\Exports\TaskListExport;
 use App\Models\Attendance;
 use App\Models\GeneralSetting;
 use App\Models\Patrol;
+use App\Models\TaskSubmission;
 use App\Models\ShiftReport;
 use App\Exports\ShiftReportExport;
 use Barryvdh\DomPDF\Facade\Pdf;

@@ -12,6 +12,7 @@ use Filament\Resources\Pages\Page;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Actions\Action;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
@@ -94,16 +95,25 @@ class PatrolReportPage extends Page implements HasTable, HasForms
                         default => 'gray',
                     }),
                 
-                ImageColumn::make('photo')
+                TextColumn::make('photo')
                     ->label('Foto')
-                    ->disk('public')
-                    ->height(40),
+                    ->formatStateUsing(fn ($state) => $state ? basename($state) : '-')
+                    ->url(fn ($record) => $record->photo ? asset('storage/' . $record->photo) : null)
+                    ->openUrlInNewTab()
+                    ->color('info')
+                    ->icon('heroicon-o-photo'),
 
                 TextColumn::make('note')
                     ->label('Catatan')
                     ->limit(30),
             ])
-            ->defaultSort('patrol_date', 'desc');
+            ->defaultSort('patrol_date', 'desc')
+            ->actions([
+                Action::make('view')
+                    ->label('Detail')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn ($record) => PatrolResource::getUrl('view', ['record' => $record])),
+            ]);
     }
 
     protected function getFilteredQuery(): Builder

@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
 
 class AttendanceReportPage extends Page implements HasTable, HasForms
@@ -101,7 +102,13 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
                     ->limit(30)
                     ->placeholder('-'),
             ])
-            ->defaultSort('tanggal', 'desc');
+            ->defaultSort('tanggal', 'desc')
+            ->actions([
+                Action::make('view')
+                    ->label('Detail')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn (Attendance $record) => AttendanceResource::getUrl('view', ['record' => $record])),
+            ]);
     }
 
     protected function getFilteredQuery(): Builder
