@@ -6,6 +6,7 @@ use App\Filament\Resources\Attendances\AttendanceResource;
 use App\Models\Attendance;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -89,11 +90,9 @@ class ViewAttendance extends ViewRecord
                                     ->icon('heroicon-o-map-pin'),
                             ]),
                         
-                        ImageEntry::make('check_in_photo')
+                        ViewEntry::make('check_in_photo')
                             ->label('Foto Check In')
-                            ->disk('public')
-                            ->height(300)
-                            ->defaultImageUrl(url('/images/no-image.png')),
+                            ->view('filament.resources.attendances.components.photo-display'),
                     ]),
                 
                 Section::make('Check Out')
@@ -122,11 +121,9 @@ class ViewAttendance extends ViewRecord
                                     ->icon('heroicon-o-map-pin'),
                             ]),
                         
-                        ImageEntry::make('check_out_photo')
+                        ViewEntry::make('check_out_photo')
                             ->label('Foto Check Out')
-                            ->disk('public')
-                            ->height(300)
-                            ->defaultImageUrl(url('/images/no-image.png')),
+                            ->view('filament.resources.attendances.components.photo-display'),
                     ]),
                 
                 Section::make('Informasi Sistem')

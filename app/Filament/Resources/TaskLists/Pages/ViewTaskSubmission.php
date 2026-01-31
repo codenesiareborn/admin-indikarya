@@ -78,11 +78,9 @@ class ViewTaskSubmission extends ViewRecord
                 
                 Section::make('Foto Dokumentasi')
                     ->schema([
-                        ImageEntry::make('foto')
+                        ViewEntry::make('foto')
                             ->label('')
-                            ->disk('public')
-                            ->height(300)
-                            ->defaultImageUrl(url('/images/no-image.png')),
+                            ->view('filament.resources.tasklists.components.photo-display'),
                     ]),
                 
                 Section::make('Catatan')
