@@ -6,6 +6,7 @@ use App\Filament\Resources\Patrols\PatrolResource;
 use App\Models\Patrol;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -70,17 +71,9 @@ class ViewPatrol extends ViewRecord
                 
                 Section::make('Foto Patroli')
                     ->schema([
-                        ImageEntry::make('photo')
-                            ->label('Foto')
-                            ->disk('public')
-                            ->height(300)
-                            ->visibility('public')
-                            ->visible(fn (Patrol $record) => !empty($record->photo)),
-                        
-                        TextEntry::make('no_photo')
-                            ->label('Foto')
-                            ->state('Tidak ada foto')
-                            ->visible(fn (Patrol $record) => empty($record->photo)),
+                        ViewEntry::make('photo')
+                            ->label('')
+                            ->view('filament.resources.patrols.components.photo-display'),
                     ])
                     ->columnSpanFull(),
                 
