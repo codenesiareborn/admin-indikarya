@@ -15,10 +15,12 @@ class Attendance extends Model
         'check_in_photo',
         'check_in_latitude',
         'check_in_longitude',
+        'check_in_address',
         'check_out',
         'check_out_photo',
         'check_out_latitude',
         'check_out_longitude',
+        'check_out_address',
         'status',
         'keterangan',
     ];

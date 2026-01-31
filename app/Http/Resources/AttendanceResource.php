@@ -30,6 +30,7 @@ class AttendanceResource extends JsonResource
             'check_in_longitude' => $this->check_in_longitude 
                 ? (float) $this->check_in_longitude 
                 : null,
+            'check_in_address' => $this->check_in_address,
             'check_out' => $this->check_out ? $this->check_out->format('H:i') : null,
             'check_out_photo_url' => $this->check_out_photo 
                 ? url('storage/' . $this->check_out_photo) 
@@ -40,6 +41,7 @@ class AttendanceResource extends JsonResource
             'check_out_longitude' => $this->check_out_longitude 
                 ? (float) $this->check_out_longitude 
                 : null,
+            'check_out_address' => $this->check_out_address,
             'status' => $this->status,
             'status_label' => $this->status_label,
             'keterangan' => $this->keterangan,

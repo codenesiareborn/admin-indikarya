@@ -44,6 +44,7 @@ class CheckOutRequest extends FormRequest
             'photo' => ['required', 'image', 'mimes:jpeg,jpg,png', 'max:5120'], // 5MB
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
+            'address' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
@@ -65,6 +66,8 @@ class CheckOutRequest extends FormRequest
             'latitude.between' => 'Latitude tidak valid',
             'longitude.required' => 'Longitude wajib diisi',
             'longitude.between' => 'Longitude tidak valid',
+            'address.string' => 'Alamat harus berupa teks',
+            'address.max' => 'Alamat maksimal 1000 karakter',
         ];
     }
 
