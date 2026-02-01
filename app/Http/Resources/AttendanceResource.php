@@ -42,6 +42,8 @@ class AttendanceResource extends JsonResource
                 ? (float) $this->check_out_longitude 
                 : null,
             'check_out_address' => $this->check_out_address,
+            'jam_masuk_snapshot' => $this->jam_masuk_snapshot?->format('H:i') ?? $this->jam_masuk_snapshot,
+            'jam_pulang_snapshot' => $this->jam_pulang_snapshot?->format('H:i') ?? $this->jam_pulang_snapshot,
             'status' => $this->status,
             'status_label' => $this->status_label,
             'keterangan' => $this->keterangan,

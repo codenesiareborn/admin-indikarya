@@ -58,10 +58,14 @@ class AttendanceController extends Controller
             // Get current time
             $checkInTime = now()->format('H:i');
 
-            // Calculate status
+            // Get project schedule times for snapshot
+            $jamMasukSnapshot = $project->jam_masuk?->format('H:i');
+            $jamPulangSnapshot = $project->jam_pulang?->format('H:i');
+
+            // Calculate status using the current project schedule
             $status = $this->attendanceService->calculateStatus(
                 $checkInTime,
-                $project->jam_masuk->format('H:i')
+                $jamMasukSnapshot
             );
 
             // Create or update attendance
@@ -73,11 +77,13 @@ class AttendanceController extends Controller
                     'check_in_latitude' => $validated['latitude'],
                     'check_in_longitude' => $validated['longitude'],
                     'check_in_address' => $validated['address'] ?? null,
+                    'jam_masuk_snapshot' => $jamMasukSnapshot,
+                    'jam_pulang_snapshot' => $jamPulangSnapshot,
                     'status' => $status,
                 ]);
                 $attendance = $existingAttendance;
             } else {
-                // Create new attendance record
+                // Create new attendance record with schedule snapshots
                 $attendance = Attendance::create([
                     'user_id' => $userId,
                     'project_id' => $projectId,
@@ -87,6 +93,8 @@ class AttendanceController extends Controller
                     'check_in_latitude' => $validated['latitude'],
                     'check_in_longitude' => $validated['longitude'],
                     'check_in_address' => $validated['address'] ?? null,
+                    'jam_masuk_snapshot' => $jamMasukSnapshot,
+                    'jam_pulang_snapshot' => $jamPulangSnapshot,
                     'status' => $status,
                 ]);
             }
@@ -148,14 +156,24 @@ class AttendanceController extends Controller
             // Get current time
             $checkOutTime = now()->format('H:i');
 
-            // Update attendance with check-out data
-            $attendance->update([
+            // Ensure schedule snapshots are set (for backward compatibility with existing records)
+            $updateData = [
                 'check_out' => $checkOutTime,
                 'check_out_photo' => $photoPath,
                 'check_out_latitude' => $validated['latitude'],
                 'check_out_longitude' => $validated['longitude'],
                 'check_out_address' => $validated['address'] ?? null,
-            ]);
+            ];
+
+            // If schedule snapshots are not set, use current project schedule
+            if (!$attendance->jam_masuk_snapshot || !$attendance->jam_pulang_snapshot) {
+                $project = Project::findOrFail($projectId);
+                $updateData['jam_masuk_snapshot'] = $attendance->jam_masuk_snapshot ?? $project->jam_masuk?->format('H:i');
+                $updateData['jam_pulang_snapshot'] = $attendance->jam_pulang_snapshot ?? $project->jam_pulang?->format('H:i');
+            }
+
+            // Update attendance with check-out data
+            $attendance->update($updateData);
 
             // Load project relation
             $attendance->load('project');
