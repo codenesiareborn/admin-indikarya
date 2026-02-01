@@ -27,8 +27,8 @@ class Attendance extends Model
 
     protected $casts = [
         'tanggal' => 'date',
-        'check_in' => 'datetime:H:i',
-        'check_out' => 'datetime:H:i',
+        'check_in' => 'datetime',
+        'check_out' => 'datetime',
     ];
 
     public function user(): BelongsTo

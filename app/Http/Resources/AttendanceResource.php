@@ -20,7 +20,7 @@ class AttendanceResource extends JsonResource
             'project_id' => $this->project_id,
             'project_name' => $this->project?->nama_project,
             'tanggal' => $this->tanggal?->format('Y-m-d'),
-            'check_in' => $this->check_in ? $this->check_in->format('H:i') : null,
+            'check_in' => $this->check_in ? (is_string($this->check_in) ? substr($this->check_in, 0, 5) : $this->check_in->format('H:i')) : null,
             'check_in_photo_url' => $this->check_in_photo 
                 ? url('storage/' . $this->check_in_photo) 
                 : null,
@@ -31,7 +31,7 @@ class AttendanceResource extends JsonResource
                 ? (float) $this->check_in_longitude 
                 : null,
             'check_in_address' => $this->check_in_address,
-            'check_out' => $this->check_out ? $this->check_out->format('H:i') : null,
+            'check_out' => $this->check_out ? (is_string($this->check_out) ? substr($this->check_out, 0, 5) : $this->check_out->format('H:i')) : null,
             'check_out_photo_url' => $this->check_out_photo 
                 ? url('storage/' . $this->check_out_photo) 
                 : null,
