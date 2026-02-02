@@ -145,4 +145,10 @@ class User extends Authenticatable
     {
         return $this->role === 'employee';
     }
+
+    // Accessor for backward compatibility
+    public function getNamaLengkapAttribute(): string
+    {
+        return $this->name;
+    }
 }
