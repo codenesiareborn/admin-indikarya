@@ -21,14 +21,16 @@ class Attendance extends Model
         'check_out_latitude',
         'check_out_longitude',
         'check_out_address',
+        'jam_masuk_snapshot',
+        'jam_pulang_snapshot',
         'status',
         'keterangan',
     ];
 
     protected $casts = [
         'tanggal' => 'date',
-        'check_in' => 'datetime:H:i',
-        'check_out' => 'datetime:H:i',
+        'check_in' => 'datetime',
+        'check_out' => 'datetime',
     ];
 
     public function user(): BelongsTo
