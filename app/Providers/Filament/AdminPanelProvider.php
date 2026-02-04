@@ -31,7 +31,37 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('Indikarya Total Solution')
             ->darkMode(false)
+->renderHook(
+    'panels::head.end',
+    fn (): string => '
+        <style>
+            /* Add logo to login page */
+            .fi-simple-main::before {
+                content: "";
+                display: block;
+                width: 100%;
+                height: 80px;
+                background-image: url("/logo-indikarya.png");
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                margin-bottom: 2rem;
+            }
+            
+            /* Ensure brand name is visible */
+            .fi-sidebar-header .fi-sidebar-brand,
+            .fi-topbar .fi-topbar-brand {
+                display: flex !important;
+                align-items: center;
+                font-size: 1.125rem;
+                font-weight: 600;
+                color: inherit;
+            }
+        </style>
+    '
+)
 ->renderHook(
     'panels::head.end',
     fn (): string => '
@@ -57,7 +87,6 @@ class AdminPanelProvider extends PanelProvider
         </script>
     ',
 )
-            ->brandName('Indikarya Total Solution')
             ->colors([
                 'primary' => Color::Blue,
             ])
