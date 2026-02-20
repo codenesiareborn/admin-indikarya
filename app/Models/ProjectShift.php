@@ -17,6 +17,7 @@ class ProjectShift extends Model
         'active_days',
         'is_auto_generated',
         'is_active',
+        'is_overnight',
     ];
 
     protected $casts = [
@@ -25,6 +26,7 @@ class ProjectShift extends Model
         'active_days' => 'array',
         'is_auto_generated' => 'boolean',
         'is_active' => 'boolean',
+        'is_overnight' => 'boolean',
     ];
 
     public function project(): BelongsTo
@@ -68,7 +70,8 @@ class ProjectShift extends Model
             'sunday' => 'Sun',
         ];
 
-        $labels = array_map(fn($day) => $dayLabels[$day] ?? $day, $this->active_days ?? []);
+        $labels = array_map(fn ($day) => $dayLabels[$day] ?? $day, $this->active_days ?? []);
+
         return implode(', ', $labels);
     }
 

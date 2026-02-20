@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Projects\RelationManagers;
 
-use App\Models\ProjectShift;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -69,6 +68,11 @@ class ShiftsRelationManager extends RelationManager
                     ->required()
                     ->default(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']),
 
+                Toggle::make('is_overnight')
+                    ->label('Overnight Shift')
+                    ->default(false)
+                    ->helperText('Enable for shifts that cross midnight (e.g., 22:00 - 06:00). Allows check-out on the next day.'),
+
                 Toggle::make('is_active')
                     ->label('Active')
                     ->default(true)
@@ -97,6 +101,11 @@ class ShiftsRelationManager extends RelationManager
                 TextColumn::make('active_days_label')
                     ->label('Active Days')
                     ->wrap(),
+
+                IconColumn::make('is_overnight')
+                    ->label('Overnight')
+                    ->boolean()
+                    ->sortable(),
 
                 IconColumn::make('is_active')
                     ->label('Active')

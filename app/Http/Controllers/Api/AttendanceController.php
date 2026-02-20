@@ -13,11 +13,11 @@ use App\Services\AttendanceService;
 use App\Services\ShiftService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
     protected AttendanceService $attendanceService;
+
     protected ShiftService $shiftService;
 
     public function __construct(AttendanceService $attendanceService, ShiftService $shiftService)
@@ -37,6 +37,16 @@ class AttendanceController extends Controller
             $projectId = $validated['project_id'];
             $shiftId = $validated['shift_id'];
             $today = now()->toDateString();
+
+            // Check if user has a pending overnight shift from yesterday
+            $pendingOvernight = $this->shiftService->getPendingOvernightShift($userId, $projectId);
+            if ($pendingOvernight) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda memiliki shift malam ('.$pendingOvernight['shift_name'].') yang belum check-out. Silakan check-out terlebih dahulu.',
+                    'pending_shift' => $pendingOvernight,
+                ], 409);
+            }
 
             // Check if already checked in today
             $existingAttendance = Attendance::where('user_id', $userId)
@@ -120,7 +130,7 @@ class AttendanceController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat check-in: ' . $e->getMessage(),
+                'message' => 'Terjadi kesalahan saat check-in: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -134,26 +144,44 @@ class AttendanceController extends Controller
             $validated = $request->validated();
             $userId = auth()->id();
             $projectId = $validated['project_id'];
+            $shiftId = $validated['shift_id'] ?? null;
             $today = now()->toDateString();
 
-            // Check if already checked in today
-            $attendance = Attendance::where('user_id', $userId)
-                ->where('project_id', $projectId)
-                ->whereDate('tanggal', $today)
-                ->first();
+            // Get attendance record - supports overnight shifts
+            $attendance = null;
 
-            if (!$attendance || !$attendance->check_in) {
+            if ($shiftId) {
+                // If shift_id is provided, use the service to find attendance (handles overnight)
+                $attendance = $this->shiftService->getAttendanceForCheckout($userId, $projectId, $shiftId);
+            } else {
+                // Backward compatibility: search today's attendance only
+                $attendance = Attendance::where('user_id', $userId)
+                    ->where('project_id', $projectId)
+                    ->whereDate('tanggal', $today)
+                    ->first();
+            }
+
+            if (! $attendance || ! $attendance->check_in) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Anda belum melakukan check-in hari ini',
+                    'message' => 'Anda belum melakukan check-in',
                 ], 400);
             }
 
             if ($attendance->check_out) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Anda sudah melakukan check-out hari ini',
+                    'message' => 'Anda sudah melakukan check-out',
                 ], 409);
+            }
+
+            // Validate check-out time is within allowed window
+            $checkOutTime = now()->format('H:i');
+            if (! $this->shiftService->isValidCheckoutTime($checkOutTime, $attendance->shift_id, $attendance->tanggal->toDateString())) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Waktu check-out melebihi batas toleransi yang diizinkan',
+                ], 400);
             }
 
             // Upload photo
@@ -161,9 +189,6 @@ class AttendanceController extends Controller
                 $request->file('photo'),
                 'check_out'
             );
-
-            // Get current time
-            $checkOutTime = now()->format('H:i');
 
             // Ensure schedule snapshots are set (for backward compatibility with existing records)
             $updateData = [
@@ -174,11 +199,11 @@ class AttendanceController extends Controller
                 'check_out_address' => $validated['address'] ?? null,
             ];
 
-            // If schedule snapshots are not set, use current project schedule
-            if (!$attendance->jam_masuk_snapshot || !$attendance->jam_pulang_snapshot) {
-                $project = Project::findOrFail($projectId);
-                $updateData['jam_masuk_snapshot'] = $attendance->jam_masuk_snapshot ?? $project->jam_masuk?->format('H:i');
-                $updateData['jam_pulang_snapshot'] = $attendance->jam_pulang_snapshot ?? $project->jam_pulang?->format('H:i');
+            // If schedule snapshots are not set, use shift schedule
+            if (! $attendance->jam_masuk_snapshot || ! $attendance->jam_pulang_snapshot) {
+                $shift = ProjectShift::find($attendance->shift_id);
+                $updateData['jam_masuk_snapshot'] = $attendance->jam_masuk_snapshot ?? $shift?->start_time?->format('H:i');
+                $updateData['jam_pulang_snapshot'] = $attendance->jam_pulang_snapshot ?? $shift?->end_time?->format('H:i');
             }
 
             // Update attendance with check-out data
@@ -196,7 +221,7 @@ class AttendanceController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat check-out: ' . $e->getMessage(),
+                'message' => 'Terjadi kesalahan saat check-out: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -210,12 +235,32 @@ class AttendanceController extends Controller
             $userId = auth()->id();
             $today = now()->toDateString();
 
+            // Check today's attendance
             $attendance = Attendance::where('user_id', $userId)
                 ->whereDate('tanggal', $today)
                 ->with(['project', 'shift'])
                 ->first();
 
-            if (!$attendance) {
+            // If no attendance today, check for pending overnight shift from yesterday
+            if (! $attendance) {
+                $yesterday = now()->subDay()->toDateString();
+                $pendingAttendance = Attendance::where('user_id', $userId)
+                    ->whereDate('tanggal', $yesterday)
+                    ->whereNotNull('check_in')
+                    ->whereNull('check_out')
+                    ->with(['project', 'shift'])
+                    ->first();
+
+                // Only return pending overnight shift if the shift is actually overnight
+                if ($pendingAttendance && $pendingAttendance->shift?->is_overnight) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Anda memiliki shift malam yang belum check-out',
+                        'data' => new AttendanceResource($pendingAttendance),
+                        'is_overnight_pending' => true,
+                    ], 200);
+                }
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Belum ada presensi hari ini',
@@ -231,7 +276,7 @@ class AttendanceController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'message' => 'Terjadi kesalahan: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -265,7 +310,7 @@ class AttendanceController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'message' => 'Terjadi kesalahan: '.$e->getMessage(),
             ], 500);
         }
     }
