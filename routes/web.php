@@ -7,6 +7,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Public Privacy Policy Page
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+})->name('privacy-policy');
+
 // Export
 Route::controller(App\Http\Controllers\ReportController::class)->group(function () {
     Route::get('/reports/attendance/excel', 'attendanceExcel')->name('reports.attendance.excel');
