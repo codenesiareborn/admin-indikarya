@@ -19,6 +19,8 @@ class AttendanceResource extends JsonResource
             'user_id' => $this->user_id,
             'project_id' => $this->project_id,
             'project_name' => $this->project?->nama_project,
+            'shift_id' => $this->shift_id,
+            'shift_name' => $this->shift_name_snapshot ?? $this->shift?->name,
             'tanggal' => $this->tanggal?->format('Y-m-d'),
             'check_in' => $this->check_in ? (is_string($this->check_in) ? substr($this->check_in, 0, 5) : $this->check_in->format('H:i')) : null,
             'check_in_photo_url' => $this->check_in_photo 

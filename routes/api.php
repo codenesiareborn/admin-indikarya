@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\ProjectShiftController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\CheckpointController;
 use App\Http\Controllers\Api\PatrolController;
@@ -21,6 +22,9 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // User projects
     Route::get('/user/projects', [ProjectController::class, 'index']);
+    
+    // Project shifts
+    Route::get('/projects/{projectId}/shifts', [ProjectShiftController::class, 'getProjectShifts']);
     
     // Attendance endpoints
     Route::post('/attendances/check-in', [AttendanceController::class, 'checkIn']);

@@ -69,7 +69,13 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => ucwords(str_replace('_', ' ', $state))),
-                
+
+                TextColumn::make('shift_name_display')
+                    ->label('Shift')
+                    ->badge()
+                    ->color('info')
+                    ->sortable(),
+
                 TextColumn::make('tanggal')
                     ->label('Tanggal')
                     ->date('d M Y')

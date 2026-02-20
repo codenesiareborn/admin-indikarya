@@ -58,19 +58,15 @@ class ProjectForm
                 
                 Section::make('Pengaturan Presensi')
                     ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                Forms\Components\TimePicker::make('jam_masuk')
-                                    ->label('Jam Masuk')
-                                    ->required()
-                                    ->seconds(false),
-                                
-                                Forms\Components\TimePicker::make('jam_keluar')
-                                    ->label('Jam Keluar')
-                                    ->required()
-                                    ->seconds(false)
-                                    ->after('jam_masuk'),
-                            ]),
+                        Forms\Components\Toggle::make('enable_attendance_status')
+                            ->label('Aktifkan Status Kehadiran')
+                            ->helperText('Jika aktif, sistem akan otomatis menandai alpha untuk pegawai yang tidak hadir')
+                            ->default(true),
+                        
+                        Forms\Components\Placeholder::make('shifts_info')
+                            ->label('Kelola Shift')
+                            ->content(fn ($record) => $record ? 'Kelola shift di menu Project Shifts' : 'Simpan project terlebih dahulu untuk mengelola shift')
+                            ->visible(fn ($record) => true),
                     ]),
                 
                 Section::make('Status Project')

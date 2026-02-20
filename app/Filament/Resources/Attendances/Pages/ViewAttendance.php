@@ -44,7 +44,12 @@ class ViewAttendance extends ViewRecord
                                 TextEntry::make('tanggal')
                                     ->label('Tanggal')
                                     ->date('d F Y'),
-                                
+
+                                TextEntry::make('shift_name_display')
+                                    ->label('Shift')
+                                    ->badge()
+                                    ->color('info'),
+
                                 TextEntry::make('status')
                                     ->label('Status')
                                     ->badge()
@@ -57,11 +62,11 @@ class ViewAttendance extends ViewRecord
                                         default => 'gray',
                                     })
                                     ->formatStateUsing(fn (string $state): string => ucfirst($state)),
-                                
-                                TextEntry::make('keterangan')
-                                    ->label('Keterangan')
-                                    ->placeholder('Tidak ada keterangan'),
                             ]),
+
+                        TextEntry::make('keterangan')
+                            ->label('Keterangan')
+                            ->placeholder('Tidak ada keterangan'),
                     ]),
                 
                 Section::make('Check In')

@@ -8,7 +8,9 @@ use App\Http\Requests\Api\CheckOutRequest;
 use App\Http\Resources\AttendanceResource;
 use App\Models\Attendance;
 use App\Models\Project;
+use App\Models\ProjectShift;
 use App\Services\AttendanceService;
+use App\Services\ShiftService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -16,10 +18,12 @@ use Carbon\Carbon;
 class AttendanceController extends Controller
 {
     protected AttendanceService $attendanceService;
+    protected ShiftService $shiftService;
 
-    public function __construct(AttendanceService $attendanceService)
+    public function __construct(AttendanceService $attendanceService, ShiftService $shiftService)
     {
         $this->attendanceService = $attendanceService;
+        $this->shiftService = $shiftService;
     }
 
     /**
@@ -31,6 +35,7 @@ class AttendanceController extends Controller
             $validated = $request->validated();
             $userId = auth()->id();
             $projectId = $validated['project_id'];
+            $shiftId = $validated['shift_id'];
             $today = now()->toDateString();
 
             // Check if already checked in today
@@ -46,8 +51,8 @@ class AttendanceController extends Controller
                 ], 409);
             }
 
-            // Get project to get schedule
-            $project = Project::findOrFail($projectId);
+            // Get shift details
+            $shift = ProjectShift::findOrFail($shiftId);
 
             // Upload photo
             $photoPath = $this->attendanceService->uploadPhoto(
@@ -58,14 +63,14 @@ class AttendanceController extends Controller
             // Get current time
             $checkInTime = now()->format('H:i');
 
-            // Get project schedule times for snapshot
-            $jamMasukSnapshot = $project->jam_masuk?->format('H:i');
-            $jamPulangSnapshot = $project->jam_pulang?->format('H:i');
+            // Get shift schedule times for snapshot
+            $jamMasukSnapshot = $shift->start_time?->format('H:i');
+            $jamPulangSnapshot = $shift->end_time?->format('H:i');
 
-            // Calculate status using the current project schedule
-            $status = $this->attendanceService->calculateStatus(
+            // Calculate status using the shift schedule
+            $status = $this->shiftService->calculateStatusWithShift(
                 $checkInTime,
-                $jamMasukSnapshot
+                $shiftId
             );
 
             // Create or update attendance
@@ -77,8 +82,10 @@ class AttendanceController extends Controller
                     'check_in_latitude' => $validated['latitude'],
                     'check_in_longitude' => $validated['longitude'],
                     'check_in_address' => $validated['address'] ?? null,
+                    'shift_id' => $shiftId,
                     'jam_masuk_snapshot' => $jamMasukSnapshot,
                     'jam_pulang_snapshot' => $jamPulangSnapshot,
+                    'shift_name_snapshot' => $shift->name,
                     'status' => $status,
                 ]);
                 $attendance = $existingAttendance;
@@ -87,6 +94,7 @@ class AttendanceController extends Controller
                 $attendance = Attendance::create([
                     'user_id' => $userId,
                     'project_id' => $projectId,
+                    'shift_id' => $shiftId,
                     'tanggal' => $today,
                     'check_in' => $checkInTime,
                     'check_in_photo' => $photoPath,
@@ -95,12 +103,13 @@ class AttendanceController extends Controller
                     'check_in_address' => $validated['address'] ?? null,
                     'jam_masuk_snapshot' => $jamMasukSnapshot,
                     'jam_pulang_snapshot' => $jamPulangSnapshot,
+                    'shift_name_snapshot' => $shift->name,
                     'status' => $status,
                 ]);
             }
 
-            // Load project relation
-            $attendance->load('project');
+            // Load project and shift relations
+            $attendance->load(['project', 'shift']);
 
             return response()->json([
                 'success' => true,
@@ -175,8 +184,8 @@ class AttendanceController extends Controller
             // Update attendance with check-out data
             $attendance->update($updateData);
 
-            // Load project relation
-            $attendance->load('project');
+            // Load project and shift relations
+            $attendance->load(['project', 'shift']);
 
             return response()->json([
                 'success' => true,
@@ -203,7 +212,7 @@ class AttendanceController extends Controller
 
             $attendance = Attendance::where('user_id', $userId)
                 ->whereDate('tanggal', $today)
-                ->with('project')
+                ->with(['project', 'shift'])
                 ->first();
 
             if (!$attendance) {
@@ -237,7 +246,7 @@ class AttendanceController extends Controller
             $perPage = $request->input('per_page', 15);
 
             $attendances = Attendance::where('user_id', $userId)
-                ->with('project')
+                ->with(['project', 'shift'])
                 ->orderBy('tanggal', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage);

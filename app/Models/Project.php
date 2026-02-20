@@ -75,6 +75,11 @@ class Project extends Model
             ->withTimestamps();
     }
 
+    public function shifts(): HasMany
+    {
+        return $this->hasMany(ProjectShift::class);
+    }
+
     public function getNilaiKontrakRupiahAttribute()
     {
         return 'Rp ' . number_format($this->nilai_kontrak, 2, ',', '.');

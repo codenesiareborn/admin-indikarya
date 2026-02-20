@@ -8,6 +8,8 @@ use App\Models\Project;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -20,6 +22,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Actions\Action;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\Attendances\Widgets\AttendanceStatsWidget;
@@ -71,7 +74,7 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
                 Attendance::query()
                     ->when($this->projectId, fn (Builder $query) => $query->where('project_id', $this->projectId))
                     ->when($this->filterDate, fn (Builder $query) => $query->whereDate('tanggal', $this->filterDate))
-                    ->with(['employee', 'project'])
+                    ->with(['employee', 'project', 'shift'])
             )
             ->columns([
                 TextColumn::make('employee.nip')
@@ -87,6 +90,12 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
                 TextColumn::make('tanggal')
                     ->label('Tanggal')
                     ->date('d M Y')
+                    ->sortable(),
+                
+                TextColumn::make('shift_name_display')
+                    ->label('Shift')
+                    ->badge()
+                    ->color('info')
                     ->sortable(),
                 
                 TextColumn::make('check_in')
@@ -156,13 +165,44 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
                         'Izin' => 'info',
                         'Sakit' => 'danger',
                         'Alpha' => 'gray',
+                        'Libur' => 'primary',
                         default => 'gray',
                     }),
-                
+
                 TextColumn::make('keterangan')
                     ->label('Keterangan')
                     ->limit(30)
                     ->placeholder('-'),
+            ])
+            ->actions([
+                Action::make('editStatus')
+                    ->label('Edit Status')
+                    ->icon('heroicon-o-pencil')
+                    ->color('warning')
+                    ->form([
+                        Select::make('status')
+                            ->label('Status')
+                            ->options([
+                                'hadir' => 'Hadir',
+                                'terlambat' => 'Terlambat',
+                                'izin' => 'Izin',
+                                'sakit' => 'Sakit',
+                                'alpha' => 'Alpha',
+                                'libur' => 'Libur',
+                            ])
+                            ->required(),
+                        Textarea::make('keterangan')
+                            ->label('Keterangan')
+                            ->rows(2),
+                    ])
+                    ->action(function (Attendance $record, array $data): void {
+                        $record->update([
+                            'status' => $data['status'],
+                            'keterangan' => $data['keterangan'],
+                        ]);
+                    })
+                    ->modalHeading('Edit Status Kehadiran')
+                    ->modalSubmitActionLabel('Simpan'),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -172,7 +212,11 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
                         'izin' => 'Izin',
                         'sakit' => 'Sakit',
                         'alpha' => 'Alpha',
+                        'libur' => 'Libur',
                     ]),
+                SelectFilter::make('shift_id')
+                    ->label('Shift')
+                    ->relationship('shift', 'name'),
                 Filter::make('tanggal')
                     ->form([
                         DatePicker::make('date')
@@ -212,7 +256,7 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
 
         $hadir = $attendances->where('status', 'hadir')->count();
         $terlambat = $attendances->where('status', 'terlambat')->count();
-        $tidakHadir = $attendances->whereIn('status', ['alpha', 'izin', 'sakit'])->count();
+        $tidakHadir = $attendances->whereIn('status', ['alpha', 'izin', 'sakit', 'libur'])->count();
         
         $totalHariKerja = $attendances->count();
         $presentase = $totalHariKerja > 0 

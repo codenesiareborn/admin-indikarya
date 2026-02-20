@@ -26,6 +26,12 @@ class AttendancesTable
                     ->label('Project')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('shift_name_display')
+                    ->label('Shift')
+                    ->badge()
+                    ->color('info')
+                    ->formatStateUsing(fn ($record) => $record->shift_name_display)
+                    ->sortable(),
                 TextColumn::make('tanggal')
                     ->label('Tanggal')
                     ->date('d M Y')

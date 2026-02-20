@@ -10,6 +10,7 @@ class Attendance extends Model
     protected $fillable = [
         'user_id',
         'project_id',
+        'shift_id',
         'tanggal',
         'check_in',
         'check_in_photo',
@@ -23,6 +24,7 @@ class Attendance extends Model
         'check_out_address',
         'jam_masuk_snapshot',
         'jam_pulang_snapshot',
+        'shift_name_snapshot',
         'status',
         'keterangan',
     ];
@@ -49,6 +51,11 @@ class Attendance extends Model
         return $this->belongsTo(Project::class);
     }
 
+    public function shift(): BelongsTo
+    {
+        return $this->belongsTo(ProjectShift::class, 'shift_id');
+    }
+
     public function getStatusLabelAttribute()
     {
         return match($this->status) {
@@ -57,6 +64,7 @@ class Attendance extends Model
             'izin' => 'Izin',
             'sakit' => 'Sakit',
             'alpha' => 'Alpha',
+            'libur' => 'Libur',
             default => $this->status,
         };
     }
@@ -97,5 +105,13 @@ class Attendance extends Model
             ];
         }
         return null;
+    }
+
+    public function getShiftNameDisplayAttribute(): string
+    {
+        // Priority: shift_name_snapshot > shift relation name > '-'
+        return $this->shift_name_snapshot 
+            ?? $this->shift?->name 
+            ?? '-';
     }
 }

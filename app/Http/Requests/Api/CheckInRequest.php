@@ -41,6 +41,24 @@ class CheckInRequest extends FormRequest
                     }
                 },
             ],
+            'shift_id' => [
+                'required',
+                'integer',
+                'exists:project_shifts,id',
+                function ($attribute, $value, $fail) {
+                    // Check if shift belongs to the project
+                    $projectId = $this->input('project_id');
+                    $isValidShift = DB::table('project_shifts')
+                        ->where('id', $value)
+                        ->where('project_id', $projectId)
+                        ->where('is_active', true)
+                        ->exists();
+                    
+                    if (!$isValidShift) {
+                        $fail('Shift tidak valid atau tidak aktif untuk project ini.');
+                    }
+                },
+            ],
             'photo' => ['required', 'image', 'mimes:jpeg,jpg,png', 'max:5120'], // 5MB
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
@@ -58,6 +76,8 @@ class CheckInRequest extends FormRequest
         return [
             'project_id.required' => 'Project wajib dipilih',
             'project_id.exists' => 'Project tidak ditemukan',
+            'shift_id.required' => 'Shift wajib dipilih',
+            'shift_id.exists' => 'Shift tidak ditemukan',
             'photo.required' => 'Foto selfie wajib diupload',
             'photo.image' => 'File harus berupa gambar',
             'photo.mimes' => 'Format foto harus jpeg, jpg, atau png',

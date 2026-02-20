@@ -57,6 +57,7 @@ class ProjectResource extends Resource
             RelationManagers\EmployeesRelationManager::class,
             RelationManagers\PatrolAreasRelationManager::class,
             RelationManagers\PicsRelationManager::class,
+            RelationManagers\ShiftsRelationManager::class,
         ];
     }
 
