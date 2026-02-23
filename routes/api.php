@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\CheckpointController;
 use App\Http\Controllers\Api\PatrolController;
 use App\Http\Controllers\Api\ShiftReportController;
+use App\Http\Controllers\Api\DailyQuoteController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -54,4 +55,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/shift-reports/history', [ShiftReportController::class, 'history']);
     Route::get('/shift-reports/{id}', [ShiftReportController::class, 'show']);
     Route::delete('/shift-reports/{id}', [ShiftReportController::class, 'destroy']);
+    
+    // Daily Quote endpoints
+    Route::get('/quotes/random', [DailyQuoteController::class, 'random']);
+    Route::get('/quotes', [DailyQuoteController::class, 'index']);
+    Route::get('/quotes/{id}', [DailyQuoteController::class, 'show']);
 });
