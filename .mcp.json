@@ -22,6 +22,12 @@
                 "/Users/almafazi/Documents/indikarya-admin",
                 "/Users/almafazi/Documents/indikarya-monitoring"
             ]
+        },
+        "ScraplingServer": {
+            "command": "scrapling",
+            "args": [
+                "mcp"
+            ]
         }
     }
 }
