@@ -120,10 +120,12 @@ class EmployeesRelationManager extends RelationManager
                     ->label('Assign Pegawai')
                     ->icon('heroicon-o-user-plus')
                     ->preloadRecordSelect()
+                    ->multiple()
                     ->recordSelectSearchColumns(['name', 'nip'])
                     ->recordSelectOptionsQuery(fn ($query) => $query->whereIn('role', ['employee', 'staff', 'manager']))
                     ->form(fn (AttachAction $action): array => [
                         $action->getRecordSelect()
+                            ->multiple()
                             ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->nip} - {$record->name} ({$record->staf_label})"),
                         DatePicker::make('tanggal_mulai')
                             ->label('Tanggal Mulai')
