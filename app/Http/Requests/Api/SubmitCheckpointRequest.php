@@ -76,6 +76,11 @@ class SubmitCheckpointRequest extends FormRequest
                 'string',
                 'max:1000',
             ],
+            'keterangan' => [
+                'nullable',
+                'string',
+                'max:2000',
+            ],
             'tasks' => [
                 'nullable',
                 'array',
