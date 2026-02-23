@@ -3,7 +3,9 @@
         "claude_code"
     ],
     "editors": [
-        "vscode"
+        "claude_code"
     ],
-    "guidelines": []
+    "guidelines": [
+        "filament/filament"
+    ]
 }
