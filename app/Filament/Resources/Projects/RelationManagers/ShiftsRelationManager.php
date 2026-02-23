@@ -26,6 +26,26 @@ class ShiftsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
+
+    protected function canCreate(): bool
+    {
+        return true;
+    }
+
+    protected function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return true;
+    }
+
+    protected function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return true;
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
