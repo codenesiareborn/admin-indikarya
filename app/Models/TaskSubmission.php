@@ -16,6 +16,7 @@ class TaskSubmission extends Model
         'submitted_at',
         'foto',
         'catatan',
+        'keterangan',
     ];
 
     protected $casts = [

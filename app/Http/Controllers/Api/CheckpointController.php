@@ -58,6 +58,7 @@ class CheckpointController extends Controller
                     'submitted_at' => now(),
                     'foto' => $photoPath,
                     'catatan' => $request->catatan,
+                    'keterangan' => $request->keterangan,
                 ]
             );
 
