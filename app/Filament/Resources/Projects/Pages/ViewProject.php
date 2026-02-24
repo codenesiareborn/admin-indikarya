@@ -72,13 +72,21 @@ class ViewProject extends ViewRecord
                 
                 Section::make('Pengaturan Presensi')
                     ->schema([
-                        TextEntry::make('jam_masuk')
-                            ->label('Jam Masuk')
-                            ->time('H:i'),
-                        
-                        TextEntry::make('jam_keluar')
-                            ->label('Jam Keluar')
-                            ->time('H:i'),
+                        TextEntry::make('enable_attendance_status')
+                            ->label('Status Kehadiran')
+                            ->badge()
+                            ->formatStateUsing(fn (bool $state): string => $state ? 'Aktif' : 'Nonaktif')
+                            ->color(fn (bool $state): string => $state ? 'success' : 'gray'),
+
+                        TextEntry::make('shifts')
+                            ->label('Shift Tersedia')
+                            ->formatStateUsing(function ($record) {
+                                $shifts = $record->shifts()->where('is_active', true)->get();
+                                if ($shifts->isEmpty()) {
+                                    return 'Tidak ada shift aktif';
+                                }
+                                return $shifts->map(fn ($s) => "{$s->name}: {$s->schedule_label}")->join(', ');
+                            }),
                     ])
                     ->columns(1)
                     ->columnSpanFull(),

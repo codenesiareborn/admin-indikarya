@@ -16,17 +16,15 @@ class Project extends Model
         'nilai_kontrak',
         'tanggal_mulai',
         'tanggal_selesai',
-        'jam_masuk',
-        'jam_keluar',
         'status',
+        'enable_attendance_status',
     ];
 
     protected $casts = [
         'nilai_kontrak' => 'decimal:2',
         'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',
-        'jam_masuk' => 'datetime:H:i',
-        'jam_keluar' => 'datetime:H:i',
+        'enable_attendance_status' => 'boolean',
     ];
 
     public function rooms(): HasMany
