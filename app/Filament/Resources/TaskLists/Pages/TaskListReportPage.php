@@ -34,11 +34,16 @@ class TaskListReportPage extends Page implements HasTable, HasForms
     public ?string $projectId = null;
     public ?string $roomId = null;
     public ?string $projectType = null;
+    public ?string $employeeId = null;
+    public array $employees = [];
 
     public function mount(): void
     {
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate = now()->format('Y-m-d');
+        
+        // Cache employees list
+        $this->employees = $this->getEmployees();
     }
 
     public function table(Table $table): Table
@@ -96,6 +101,11 @@ class TaskListReportPage extends Page implements HasTable, HasForms
                     ->label('%')
                     ->state(fn (TaskSubmission $record) => "{$record->completion_rate}%"),
                 
+                TextColumn::make('catatan')
+                    ->label('Catatan')
+                    ->limit(50)
+                    ->tooltip(fn (TaskSubmission $record): ?string => $record->catatan),
+                
                 TextColumn::make('foto')
                     ->label('Foto')
                     ->formatStateUsing(fn ($state) => $state ? basename($state) : '-')
@@ -123,7 +133,8 @@ class TaskListReportPage extends Page implements HasTable, HasForms
             ->when($this->endDate, fn (Builder $q) => $q->whereDate('tanggal', '<=', $this->endDate))
             ->when($this->projectId, fn (Builder $q) => $q->where('project_id', $this->projectId))
             ->when($this->roomId, fn (Builder $q) => $q->where('project_room_id', $this->roomId))
-            ->when($this->projectType, fn (Builder $q) => $q->whereHas('project', fn($q) => $q->where('jenis_project', $this->projectType)));
+            ->when($this->projectType, fn (Builder $q) => $q->whereHas('project', fn($q) => $q->where('jenis_project', $this->projectType)))
+            ->when($this->employeeId, fn (Builder $q) => $q->where('user_id', $this->employeeId));
         
         // Filter untuk PIC - hanya tampilkan data dari project yang di-assign
         if ($user && $user->isPic() && !$user->hasRole('super_admin') && !$user->hasRole('admin')) {
@@ -188,8 +199,63 @@ class TaskListReportPage extends Page implements HasTable, HasForms
         ];
     }
 
+    public function getEmployees(): array
+    {
+        return \App\Models\User::query()
+            ->where('role', 'employee')
+            ->orderBy('name')
+            ->pluck('name', 'id')
+            ->toArray();
+    }
+
     public function applyFilter(): void
     {
         $this->resetTable();
+    }
+
+    public function exportExcel()
+    {
+        $submissions = $this->getFilteredQuery()->get();
+        $stats = $this->getStats();
+        $settings = [
+            'company_name' => \App\Models\GeneralSetting::get('company_name', 'PT Indikarya Total Solution'),
+            'company_address' => \App\Models\GeneralSetting::get('company_address', ''),
+        ];
+        
+        $reportNumber = 'TL-' . now()->format('Ymd-His');
+        
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\TaskListExport($submissions, $stats, $settings, $this->startDate, $this->endDate, $reportNumber),
+            'laporan-tasklist-' . now()->format('Y-m-d') . '.xlsx'
+        );
+    }
+
+    public function exportPdf()
+    {
+        $submissions = $this->getFilteredQuery()->get();
+        $stats = $this->getStats();
+        $settings = [
+            'company_name' => \App\Models\GeneralSetting::get('company_name', 'PT Indikarya Total Solution'),
+            'company_address' => \App\Models\GeneralSetting::get('company_address', ''),
+            'company_phone' => \App\Models\GeneralSetting::get('company_phone', ''),
+            'company_email' => \App\Models\GeneralSetting::get('company_email', ''),
+        ];
+        
+        $reportNumber = 'LAP-TL-' . now()->format('Ymd-His');
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.tasklist-report', [
+            'data' => $submissions,
+            'stats' => $stats,
+            'settings' => $settings,
+            'startDate' => $this->startDate,
+            'endDate' => $this->endDate,
+            'reportNumber' => $reportNumber,
+        ]);
+        
+        $pdf->setPaper('a4', 'landscape');
+        
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, 'laporan-tasklist-' . now()->format('Y-m-d') . '.pdf');
     }
 }
