@@ -24,7 +24,7 @@ class EmployeeImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
             try {
                 // Validasi data
                 $validator = Validator::make($row->toArray(), [
-                    'nip' => 'required|string|max:50|unique:users,nip',
+                    'nip' => 'required|max:50|unique:users,nip',
                     'nama_lengkap' => 'required|string|max:255',
                     'email' => 'required|email|max:255|unique:users,email',
                     'no_hp' => 'nullable|string|max:20',

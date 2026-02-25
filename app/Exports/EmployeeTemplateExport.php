@@ -11,7 +11,7 @@ class EmployeeTemplateExport implements FromArray, WithHeadings, WithStyles
 {
     public function array(): array
     {
-        // Return 2 sample data yang valid untuk import
+        // Return 2 sample data yang valid untuk import (1 alphanumeric, 1 numeric)
         return [
             [
                 'EMP001',
@@ -27,7 +27,7 @@ class EmployeeTemplateExport implements FromArray, WithHeadings, WithStyles
                 'employee',
             ],
             [
-                'EMP002',
+                '12345',
                 'Dewi Lestari',
                 'dewi.lestari@example.com',
                 '081298765432',
