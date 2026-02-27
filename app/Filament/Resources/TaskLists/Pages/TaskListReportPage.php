@@ -36,6 +36,7 @@ class TaskListReportPage extends Page implements HasTable, HasForms
     public ?string $projectType = null;
     public ?string $employeeId = null;
     public array $employees = [];
+    public ?string $employeeSearch = null;
 
     public function mount(): void
     {
@@ -50,6 +51,7 @@ class TaskListReportPage extends Page implements HasTable, HasForms
     {
         return $table
             ->query($this->getFilteredQuery())
+            ->searchable()
             ->columns([
                 TextColumn::make('employee.nip')
                     ->label('NIK')
@@ -129,6 +131,12 @@ class TaskListReportPage extends Page implements HasTable, HasForms
         
         $query = TaskSubmission::query()
             ->with(['employee', 'project', 'room', 'items'])
+            ->when($this->employeeSearch, function (Builder $q) {
+                $q->whereHas('employee', function (Builder $subQ) {
+                    $subQ->where('nip', 'like', '%' . $this->employeeSearch . '%')
+                        ->orWhere('name', 'like', '%' . $this->employeeSearch . '%');
+                });
+            })
             ->when($this->startDate, fn (Builder $q) => $q->whereDate('tanggal', '>=', $this->startDate))
             ->when($this->endDate, fn (Builder $q) => $q->whereDate('tanggal', '<=', $this->endDate))
             ->when($this->projectId, fn (Builder $q) => $q->where('project_id', $this->projectId))

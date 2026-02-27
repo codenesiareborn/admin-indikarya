@@ -132,8 +132,22 @@
 
     {{-- Table Section --}}
     <div style="background: var(--fi-body-bg, #fff); border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden;" class="dark:bg-gray-800">
-        <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--fi-sidebar-border-color, #e5e7eb);" class="dark:border-gray-700">
+        <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--fi-sidebar-border-color, #e5e7eb); display: flex; justify-content: space-between; align-items: center;" class="dark:border-gray-700">
             <h3 style="font-size: 1.1rem; font-weight: 600;">Data Laporan Shift</h3>
+            
+            {{-- Search Input --}}
+            <div style="display: flex; align-items: center; gap: 0.5rem; max-width: 300px;">
+                <svg style="width: 20px; height: 20px; color: #9ca3af;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input 
+                    type="text" 
+                    wire:model.live.debounce.300ms="employeeSearch"
+                    placeholder="Cari Nama Personil..."
+                    style="flex: 1; padding: 0.5rem 0.75rem; border: 1px solid var(--fi-input-border-color, #d1d5db); border-radius: 0.5rem; background: var(--fi-input-bg, #fff); font-size: 0.875rem;"
+                    class="dark:bg-gray-700 dark:border-gray-600"
+                >
+            </div>
         </div>
         
         <div style="padding: 0;">

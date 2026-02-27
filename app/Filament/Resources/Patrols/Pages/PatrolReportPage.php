@@ -35,6 +35,7 @@ class PatrolReportPage extends Page implements HasTable, HasForms
     public ?string $status = null;
     public ?string $employeeId = null;
     public array $employees = [];
+    public ?string $employeeSearch = null;
 
     public function mount(): void
     {
@@ -49,6 +50,7 @@ class PatrolReportPage extends Page implements HasTable, HasForms
     {
         return $table
             ->query($this->getFilteredQuery())
+            ->searchable()
             ->columns([
                 TextColumn::make('user.nip')
                     ->label('NIP')
@@ -127,6 +129,12 @@ class PatrolReportPage extends Page implements HasTable, HasForms
         
         $query = Patrol::query()
             ->with(['user', 'project', 'patrolArea'])
+            ->when($this->employeeSearch, function (Builder $q) {
+                $q->whereHas('user', function (Builder $subQ) {
+                    $subQ->where('nip', 'like', '%' . $this->employeeSearch . '%')
+                        ->orWhere('name', 'like', '%' . $this->employeeSearch . '%');
+                });
+            })
             ->when($this->startDate, fn (Builder $q) => $q->whereDate('patrol_date', '>=', $this->startDate))
             ->when($this->endDate, fn (Builder $q) => $q->whereDate('patrol_date', '<=', $this->endDate))
             ->when($this->projectId, fn (Builder $q) => $q->where('project_id', $this->projectId))

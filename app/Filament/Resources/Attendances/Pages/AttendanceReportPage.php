@@ -56,6 +56,9 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
     {
         return $table
             ->query($this->getFilteredQuery())
+            ->defaultSort('tanggal', 'desc')
+            ->defaultSort('created_at', 'desc')
+            ->searchable()
             ->columns([
                 TextColumn::make('employee.nip')
                     ->label('NIP')

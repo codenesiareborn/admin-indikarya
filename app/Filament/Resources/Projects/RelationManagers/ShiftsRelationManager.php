@@ -51,52 +51,52 @@ class ShiftsRelationManager extends RelationManager
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->label('Shift Name')
+                    ->label('Nama Shift')
                     ->required()
                     ->maxLength(255)
-                    ->placeholder('e.g., Morning Shift, Night Shift'),
+                    ->placeholder('contoh: Shift Pagi, Shift Malam'),
 
                 TextInput::make('code')
-                    ->label('Shift Code')
+                    ->label('Kode Shift')
                     ->required()
                     ->maxLength(10)
-                    ->placeholder('e.g., P, S, M')
-                    ->helperText('Short code for this shift'),
+                    ->placeholder('contoh: P, S, M')
+                    ->helperText('Kode singkat untuk shift ini'),
 
                 TimePicker::make('start_time')
-                    ->label('Start Time')
+                    ->label('Waktu Mulai')
                     ->required()
                     ->seconds(false),
 
                 TimePicker::make('end_time')
-                    ->label('End Time')
+                    ->label('Waktu Selesai')
                     ->required()
                     ->seconds(false),
 
                 CheckboxList::make('active_days')
-                    ->label('Active Days')
+                    ->label('Hari Aktif')
                     ->options([
-                        'monday' => 'Monday',
-                        'tuesday' => 'Tuesday',
-                        'wednesday' => 'Wednesday',
-                        'thursday' => 'Thursday',
-                        'friday' => 'Friday',
-                        'saturday' => 'Saturday',
-                        'sunday' => 'Sunday',
+                        'monday' => 'Senin',
+                        'tuesday' => 'Selasa',
+                        'wednesday' => 'Rabu',
+                        'thursday' => 'Kamis',
+                        'friday' => 'Jumat',
+                        'saturday' => 'Sabtu',
+                        'sunday' => 'Minggu',
                     ])
                     ->columns(4)
                     ->required()
                     ->default(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']),
 
                 Toggle::make('is_overnight')
-                    ->label('Overnight Shift')
+                    ->label('Shift Malam')
                     ->default(false)
-                    ->helperText('Enable for shifts that cross midnight (e.g., 22:00 - 06:00). Allows check-out on the next day.'),
+                    ->helperText('Aktifkan untuk shift yang melewati tengah malam (contoh: 22:00 - 06:00). Memungkinkan check-out pada hari berikutnya.'),
 
                 Toggle::make('is_active')
-                    ->label('Active')
+                    ->label('Aktif')
                     ->default(true)
-                    ->helperText('Inactive shifts will not be available for selection'),
+                    ->helperText('Shift yang tidak aktif tidak akan tersedia untuk dipilih'),
             ]);
     }
 
@@ -105,35 +105,35 @@ class ShiftsRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Shift Name')
+                    ->label('Nama Shift')
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('code')
-                    ->label('Code')
+                    ->label('Kode')
                     ->badge()
                     ->sortable(),
 
                 TextColumn::make('schedule_label')
-                    ->label('Schedule')
+                    ->label('Jadwal')
                     ->sortable(),
 
                 TextColumn::make('active_days_label')
-                    ->label('Active Days')
+                    ->label('Hari Aktif')
                     ->wrap(),
 
                 IconColumn::make('is_overnight')
-                    ->label('Overnight')
+                    ->label('Malam')
                     ->boolean()
                     ->sortable(),
 
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label('Aktif')
                     ->boolean()
                     ->sortable(),
 
                 IconColumn::make('is_auto_generated')
-                    ->label('Auto Generated')
+                    ->label('Otomatis')
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -142,13 +142,13 @@ class ShiftsRelationManager extends RelationManager
                 SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
-                        '1' => 'Active',
-                        '0' => 'Inactive',
+                        '1' => 'Aktif',
+                        '0' => 'Tidak Aktif',
                     ]),
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->label('Add Shift'),
+                    ->label('Tambah Shift'),
             ])
             ->actions([
                 EditAction::make(),
@@ -159,11 +159,11 @@ class ShiftsRelationManager extends RelationManager
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->emptyStateHeading('No shifts found')
-            ->emptyStateDescription('Add shifts to this project')
+            ->emptyStateHeading('Tidak ada shift ditemukan')
+            ->emptyStateDescription('Tambah shift untuk project ini')
             ->emptyStateActions([
                 CreateAction::make()
-                    ->label('Add Shift'),
+                    ->label('Tambah Shift'),
             ]);
     }
 }

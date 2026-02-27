@@ -122,7 +122,20 @@ class EmployeesRelationManager extends RelationManager
                     ->preloadRecordSelect()
                     ->multiple()
                     ->recordSelectSearchColumns(['name', 'nip'])
-                    ->recordSelectOptionsQuery(fn ($query) => $query->whereIn('role', ['employee', 'staff', 'manager']))
+                    ->recordSelectOptionsQuery(function ($query) {
+                        // Get current project
+                        $project = $this->getOwnerRecord();
+                        
+                        // Base query for employees
+                        $query->whereIn('role', ['employee', 'staff', 'manager']);
+                        
+                        // Filter by project type (jenis_project)
+                        if ($project && $project->jenis_project) {
+                            $query->where('staf', $project->jenis_project);
+                        }
+                        
+                        return $query;
+                    })
                     ->form(fn (AttachAction $action): array => [
                         $action->getRecordSelect()
                             ->multiple()
