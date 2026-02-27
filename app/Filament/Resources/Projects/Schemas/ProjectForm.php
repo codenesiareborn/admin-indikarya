@@ -58,10 +58,10 @@ class ProjectForm
                 
                 Section::make('Pengaturan Presensi')
                     ->schema([
-                        Forms\Components\Toggle::make('enable_attendance_status')
+                        Forms\Components\Toggle::make('auto_mark_alpha')
                             ->label('Aktifkan Status Kehadiran')
                             ->helperText('Jika aktif, sistem akan otomatis menandai alpha untuk pegawai yang tidak hadir')
-                            ->default(true),
+                            ->default(false),
                         
                         Forms\Components\Placeholder::make('shifts_info')
                             ->label('Kelola Shift')
