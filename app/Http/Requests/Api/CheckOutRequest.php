@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Api;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\DB;
 
@@ -35,9 +35,33 @@ class CheckOutRequest extends FormRequest
                         ->where('user_id', auth()->id())
                         ->where('project_id', $value)
                         ->exists();
-                    
-                    if (!$isAssigned) {
+
+                    if (! $isAssigned) {
                         $fail('Anda tidak di-assign ke project ini.');
+                    }
+                },
+            ],
+            'shift_id' => [
+                'nullable',
+                'integer',
+                'exists:project_shifts,id',
+                function ($attribute, $value, $fail) {
+                    // If shift_id provided, verify user is assigned to project
+                    if ($value) {
+                        $shiftProject = DB::table('project_shifts')
+                            ->where('id', $value)
+                            ->value('project_id');
+
+                        if ($shiftProject) {
+                            $isAssigned = DB::table('employee_projects')
+                                ->where('user_id', auth()->id())
+                                ->where('project_id', $shiftProject)
+                                ->exists();
+
+                            if (! $isAssigned) {
+                                $fail('Anda tidak di-assign ke project ini.');
+                            }
+                        }
                     }
                 },
             ],
@@ -58,6 +82,8 @@ class CheckOutRequest extends FormRequest
         return [
             'project_id.required' => 'Project wajib dipilih',
             'project_id.exists' => 'Project tidak ditemukan',
+            'shift_id.exists' => 'Shift tidak ditemukan',
+            'project_id.exists' => 'Project tidak ditemukan',
             'photo.required' => 'Foto selfie wajib diupload',
             'photo.image' => 'File harus berupa gambar',
             'photo.mimes' => 'Format foto harus jpeg, jpg, atau png',
@@ -74,7 +100,6 @@ class CheckOutRequest extends FormRequest
     /**
      * Handle a failed validation attempt.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return void
      *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException
@@ -85,7 +110,7 @@ class CheckOutRequest extends FormRequest
             response()->json([
                 'success' => false,
                 'message' => 'Validasi gagal',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422)
         );
     }
