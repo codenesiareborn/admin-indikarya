@@ -33,17 +33,24 @@ class PatrolReportPage extends Page implements HasTable, HasForms
     public ?string $projectId = null;
     public ?string $projectType = null;
     public ?string $status = null;
+    public ?string $employeeId = null;
+    public array $employees = [];
+    public ?string $employeeSearch = null;
 
     public function mount(): void
     {
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate = now()->format('Y-m-d');
+        
+        // Cache employees list
+        $this->employees = $this->getEmployees();
     }
 
     public function table(Table $table): Table
     {
         return $table
             ->query($this->getFilteredQuery())
+            ->searchable()
             ->columns([
                 TextColumn::make('user.nip')
                     ->label('NIP')
@@ -122,11 +129,18 @@ class PatrolReportPage extends Page implements HasTable, HasForms
         
         $query = Patrol::query()
             ->with(['user', 'project', 'patrolArea'])
+            ->when($this->employeeSearch, function (Builder $q) {
+                $q->whereHas('user', function (Builder $subQ) {
+                    $subQ->where('nip', 'like', '%' . $this->employeeSearch . '%')
+                        ->orWhere('name', 'like', '%' . $this->employeeSearch . '%');
+                });
+            })
             ->when($this->startDate, fn (Builder $q) => $q->whereDate('patrol_date', '>=', $this->startDate))
             ->when($this->endDate, fn (Builder $q) => $q->whereDate('patrol_date', '<=', $this->endDate))
             ->when($this->projectId, fn (Builder $q) => $q->where('project_id', $this->projectId))
             ->when($this->status, fn (Builder $q) => $q->where('status', $this->status))
-            ->when($this->projectType, fn (Builder $q) => $q->whereHas('project', fn($q) => $q->where('jenis_project', $this->projectType)));
+            ->when($this->projectType, fn (Builder $q) => $q->whereHas('project', fn($q) => $q->where('jenis_project', $this->projectType)))
+            ->when($this->employeeId, fn (Builder $q) => $q->where('user_id', $this->employeeId));
         
         // Filter untuk PIC - hanya tampilkan data dari project yang di-assign
         if ($user && $user->isPic() && !$user->hasRole('super_admin') && !$user->hasRole('admin')) {
@@ -194,8 +208,63 @@ class PatrolReportPage extends Page implements HasTable, HasForms
         ];
     }
 
+    public function getEmployees(): array
+    {
+        return \App\Models\User::query()
+            ->where('role', 'employee')
+            ->orderBy('name')
+            ->pluck('name', 'id')
+            ->toArray();
+    }
+
     public function applyFilter(): void
     {
         $this->resetTable();
+    }
+
+    public function exportExcel()
+    {
+        $patrols = $this->getFilteredQuery()->get();
+        $stats = $this->getStats();
+        $settings = [
+            'company_name' => \App\Models\GeneralSetting::get('company_name', 'PT Indikarya Total Solution'),
+            'company_address' => \App\Models\GeneralSetting::get('company_address', ''),
+        ];
+        
+        $reportNumber = 'PTR-' . now()->format('Ymd-His');
+        
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\PatrolExport($patrols, $stats, $settings, $this->startDate, $this->endDate, $reportNumber),
+            'laporan-patroli-' . now()->format('Y-m-d') . '.xlsx'
+        );
+    }
+
+    public function exportPdf()
+    {
+        $patrols = $this->getFilteredQuery()->get();
+        $stats = $this->getStats();
+        $settings = [
+            'company_name' => \App\Models\GeneralSetting::get('company_name', 'PT Indikarya Total Solution'),
+            'company_address' => \App\Models\GeneralSetting::get('company_address', ''),
+            'company_phone' => \App\Models\GeneralSetting::get('company_phone', ''),
+            'company_email' => \App\Models\GeneralSetting::get('company_email', ''),
+        ];
+        
+        $reportNumber = 'LAP-PTR-' . now()->format('Ymd-His');
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.patrol-report', [
+            'data' => $patrols,
+            'stats' => $stats,
+            'settings' => $settings,
+            'startDate' => $this->startDate,
+            'endDate' => $this->endDate,
+            'reportNumber' => $reportNumber,
+        ]);
+        
+        $pdf->setPaper('a4', 'landscape');
+        
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, 'laporan-patroli-' . now()->format('Y-m-d') . '.pdf');
     }
 }

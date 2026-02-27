@@ -17,10 +17,8 @@
             position: relative;
         }
         .logo {
-            position: absolute;
-            left: 0;
-            top: 0;
-            max-height: 60px;
+            max-height: 120px;
+            margin-bottom: 10px;
         }
         .company-name {
             font-size: 20px;
@@ -109,11 +107,12 @@
 </head>
 <body>
     <div class="header">
-        @if(isset($settings['company_logo']) && $settings['company_logo'])
-            <img src="{{ public_path('storage/' . $settings['company_logo']) }}" class="logo" alt="Logo">
+        @if(file_exists(public_path('kop.png')))
+            <img src="{{ public_path('kop.png') }}" class="logo" alt="Kop Surat" style="max-width: 100%; height: auto; max-height: 120px;">
+        @else
+            <div class="company-name">{{ $settings['company_name'] ?? 'PT. Indikarya' }}</div>
+            <div class="company-address">{{ $settings['company_address'] ?? 'Jalan Raya No. 123, Jakarta' }}</div>
         @endif
-        <div class="company-name">{{ $settings['company_name'] ?? 'PT. Indikarya' }}</div>
-        <div class="company-address">{{ $settings['company_address'] ?? 'Jalan Raya No. 123, Jakarta' }}</div>
     </div>
 
     <div class="report-title">LAPORAN SHIFT</div>

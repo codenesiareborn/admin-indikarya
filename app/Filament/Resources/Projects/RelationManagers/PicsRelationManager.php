@@ -15,7 +15,7 @@ class PicsRelationManager extends RelationManager
 {
     protected static string $relationship = 'pics';
     
-    protected static ?string $title = 'PIC (Person In Charge)';
+    protected static ?string $title = 'PIC / Admin OPD';
 
     public function isReadOnly(): bool
     {
@@ -68,7 +68,7 @@ class PicsRelationManager extends RelationManager
             ])
             ->headerActions([
                 AttachAction::make()
-                    ->label('Assign PIC')
+                    ->label('Assign PIC / Admin OPD')
                     ->icon('heroicon-o-user-plus')
                     ->preloadRecordSelect()
                     ->recordSelectSearchColumns(['name', 'email'])
@@ -84,7 +84,7 @@ class PicsRelationManager extends RelationManager
             ])
             ->actions([
                 DetachAction::make()
-                    ->label('Hapus PIC'),
+                    ->label('Hapus PIC / Admin OPD'),
             ])
             ->bulkActions([
                 DetachBulkAction::make()

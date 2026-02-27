@@ -66,6 +66,17 @@ class EmployeeResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('role', 'employee');
+        $user = auth()->user();
+        $query = parent::getEloquentQuery()->where('role', 'employee');
+        
+        // Filter untuk PIC - hanya tampilkan pegawai dari project yang di-assign
+        if ($user && $user->isPic() && !$user->hasRole('super_admin') && !$user->hasRole('admin')) {
+            $projectIds = $user->getPicProjectIds();
+            $query->whereHas('projects', function (Builder $q) use ($projectIds) {
+                $q->whereIn('projects.id', $projectIds);
+            });
+        }
+        
+        return $query;
     }
 }

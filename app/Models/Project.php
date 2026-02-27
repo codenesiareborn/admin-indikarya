@@ -18,6 +18,7 @@ class Project extends Model
         'tanggal_selesai',
         'status',
         'enable_attendance_status',
+        'auto_mark_alpha',
     ];
 
     protected $casts = [
@@ -25,6 +26,7 @@ class Project extends Model
         'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',
         'enable_attendance_status' => 'boolean',
+        'auto_mark_alpha' => 'boolean',
     ];
 
     public function rooms(): HasMany

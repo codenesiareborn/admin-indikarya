@@ -21,7 +21,7 @@
             padding-bottom: 15px;
         }
         .logo {
-            max-height: 60px;
+            max-height: 120px;
             margin-bottom: 10px;
         }
         .company-name {
@@ -98,14 +98,15 @@
 </head>
 <body>
     <div class="header">
-        @if(!empty($settings['company_logo']))
-            <img src="{{ public_path('storage/' . $settings['company_logo']) }}" class="logo" alt="Logo">
+        @if(file_exists(public_path('kop.png')))
+            <img src="{{ public_path('kop.png') }}" class="logo" alt="Kop Surat" style="max-width: 100%; height: auto; max-height: 120px;">
+        @else
+            <div class="company-name">{{ $settings['company_name'] ?? 'PT Indikarya' }}</div>
+            <div class="company-info">
+                {{ $settings['company_address'] ?? '' }}<br>
+                Tel: {{ $settings['company_phone'] ?? '-' }} | Email: {{ $settings['company_email'] ?? '-' }}
+            </div>
         @endif
-        <div class="company-name">{{ $settings['company_name'] ?? 'PT Indikarya' }}</div>
-        <div class="company-info">
-            {{ $settings['company_address'] ?? '' }}<br>
-            Tel: {{ $settings['company_phone'] ?? '-' }} | Email: {{ $settings['company_email'] ?? '-' }}
-        </div>
     </div>
 
     <div class="report-title">
@@ -135,6 +136,7 @@
                 <th style="width: 70px;">NIP</th>
                 <th>Nama Pegawai</th>
                 <th>Project</th>
+                <th style="width: 70px;">Shift</th>
                 <th style="width: 80px;">Tanggal</th>
                 <th style="width: 60px;">Masuk</th>
                 <th style="width: 60px;">Keluar</th>
@@ -149,6 +151,7 @@
                     <td>{{ $attendance->employee->nip ?? '-' }}</td>
                     <td>{{ $attendance->employee->name ?? '-' }}</td>
                     <td>{{ $attendance->project->nama_project ?? '-' }}</td>
+                    <td>{{ $attendance->shift_name_display ?? '-' }}</td>
                     <td>{{ $attendance->tanggal?->format('d/m/Y') ?? '-' }}</td>
                     <td>{{ $attendance->check_in?->format('H:i') ?? '-' }}</td>
                     <td>{{ $attendance->check_out?->format('H:i') ?? '-' }}</td>
@@ -157,7 +160,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" style="text-align: center;">Tidak ada data</td>
+                    <td colspan="10" style="text-align: center;">Tidak ada data</td>
                 </tr>
             @endforelse
         </tbody>

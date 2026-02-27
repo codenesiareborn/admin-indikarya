@@ -20,7 +20,7 @@ class AttendanceForm
                     ->label('Employee')
                     ->required(),
                 Select::make('project_id')
-                    ->relationship('project', 'id')
+                    ->relationship('project', 'nama_project')
                     ->required(),
                 DatePicker::make('tanggal')
                     ->required(),

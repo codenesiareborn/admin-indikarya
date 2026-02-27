@@ -21,7 +21,7 @@
             padding-bottom: 15px;
         }
         .logo {
-            max-height: 60px;
+            max-height: 120px;
             margin-bottom: 10px;
         }
         .company-name {
@@ -84,14 +84,15 @@
 </head>
 <body>
     <div class="header">
-        @if(!empty($settings['company_logo']))
-            <img src="{{ public_path('storage/' . $settings['company_logo']) }}" class="logo" alt="Logo">
+        @if(file_exists(public_path('kop.png')))
+            <img src="{{ public_path('kop.png') }}" class="logo" alt="Kop Surat" style="max-width: 100%; height: auto; max-height: 120px;">
+        @else
+            <div class="company-name">{{ $settings['company_name'] ?? 'PT Indikarya' }}</div>
+            <div class="company-info">
+                {{ $settings['company_address'] ?? '' }}<br>
+                Tel: {{ $settings['company_phone'] ?? '-' }} | Email: {{ $settings['company_email'] ?? '-' }}
+            </div>
         @endif
-        <div class="company-name">{{ $settings['company_name'] ?? 'PT Indikarya' }}</div>
-        <div class="company-info">
-            {{ $settings['company_address'] ?? '' }}<br>
-            Tel: {{ $settings['company_phone'] ?? '-' }} | Email: {{ $settings['company_email'] ?? '-' }}
-        </div>
     </div>
 
     <div class="report-title">

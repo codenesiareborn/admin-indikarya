@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\Attendances\Pages;
 
+use App\Exports\AttendanceExport;
 use App\Filament\Resources\Attendances\AttendanceResource;
 use App\Models\Attendance;
 use App\Models\GeneralSetting;
 use App\Models\Project;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Resources\Pages\Page;
@@ -15,6 +17,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AttendanceReportPage extends Page implements HasTable, HasForms
 {
@@ -32,17 +35,30 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
     public ?string $projectId = null;
     public ?string $status = null;
     public ?string $projectType = null;
+    public ?string $employeeId = null;
+    public array $employees = [];
 
     public function mount(): void
     {
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate = now()->format('Y-m-d');
+        
+        // Cache employees list to avoid repeated queries
+        $this->employees = $this->getEmployees();
+        
+        // Set employee filter from URL parameter if exists
+        if (request()->has('employeeId')) {
+            $this->employeeId = request()->get('employeeId');
+        }
     }
 
     public function table(Table $table): Table
     {
         return $table
             ->query($this->getFilteredQuery())
+            ->defaultSort('tanggal', 'desc')
+            ->defaultSort('created_at', 'desc')
+            ->searchable()
             ->columns([
                 TextColumn::make('employee.nip')
                     ->label('NIP')
@@ -127,7 +143,8 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
             ->when($this->endDate, fn (Builder $q) => $q->whereDate('tanggal', '<=', $this->endDate))
             ->when($this->projectId, fn (Builder $q) => $q->where('project_id', $this->projectId))
             ->when($this->status, fn (Builder $q) => $q->where('status', $this->status))
-            ->when($this->projectType, fn (Builder $q) => $q->whereHas('project', fn($q) => $q->where('jenis_project', $this->projectType)));
+            ->when($this->projectType, fn (Builder $q) => $q->whereHas('project', fn($q) => $q->where('jenis_project', $this->projectType)))
+            ->when($this->employeeId, fn (Builder $q) => $q->where('user_id', $this->employeeId));
         
         // Filter untuk PIC - hanya tampilkan data dari project yang di-assign
         if ($user && $user->isPic() && !$user->hasRole('super_admin') && !$user->hasRole('admin')) {
@@ -179,8 +196,65 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
         ];
     }
 
+    public function getEmployees(): array
+    {
+        return \App\Models\User::query()
+            ->where('role', 'employee')
+            ->orderBy('name')
+            ->pluck('name', 'id')
+            ->toArray();
+    }
+
     public function applyFilter(): void
     {
         $this->resetTable();
+    }
+
+    public function exportExcel()
+    {
+        $attendances = $this->getFilteredQuery()->get();
+        $stats = $this->getStats();
+        $settings = [
+            'company_name' => GeneralSetting::get('company_name', 'PT Indikarya Total Solution'),
+            'company_address' => GeneralSetting::get('company_address', ''),
+        ];
+        
+        $startDate = $this->startDate ? \Carbon\Carbon::parse($this->startDate)->format('d/m/Y') : '-';
+        $endDate = $this->endDate ? \Carbon\Carbon::parse($this->endDate)->format('d/m/Y') : '-';
+        $reportNumber = 'ATT-' . now()->format('Ymd-His');
+        
+        return Excel::download(
+            new AttendanceExport($attendances, $stats, $settings, $startDate, $endDate, $reportNumber),
+            'laporan-presensi-' . now()->format('Y-m-d') . '.xlsx'
+        );
+    }
+
+    public function exportPdf()
+    {
+        $attendances = $this->getFilteredQuery()->get();
+        $stats = $this->getStats();
+        $settings = [
+            'company_name' => GeneralSetting::get('company_name', 'PT Indikarya Total Solution'),
+            'company_address' => GeneralSetting::get('company_address', ''),
+            'company_phone' => GeneralSetting::get('company_phone', ''),
+            'company_email' => GeneralSetting::get('company_email', ''),
+        ];
+        
+        $reportNumber = 'LAP-ABS-' . now()->format('Ymd-His');
+        
+        $pdf = Pdf::loadView('reports.attendance-report', [
+            'data' => $attendances,
+            'stats' => $stats,
+            'settings' => $settings,
+            'startDate' => $this->startDate,
+            'endDate' => $this->endDate,
+            'reportNumber' => $reportNumber,
+        ]);
+        
+        $pdf->setPaper('a4', 'landscape');
+        
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, 'laporan-presensi-' . now()->format('Y-m-d') . '.pdf');
     }
 }

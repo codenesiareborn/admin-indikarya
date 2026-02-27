@@ -8,11 +8,13 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithDrawings;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class AttendanceExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle, WithEvents
+class AttendanceExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle, WithEvents, WithDrawings
 {
     protected Collection $data;
     protected array $stats;
@@ -43,6 +45,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
             'NIP',
             'Nama Pegawai',
             'Project',
+            'Shift',
             'Tanggal',
             'Jam Masuk',
             'Jam Keluar',
@@ -61,6 +64,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
             $attendance->employee->nip ?? '-',
             $attendance->employee->name ?? '-',
             $attendance->project->nama_project ?? '-',
+            $attendance->shift_name_display ?? '-',
             $attendance->tanggal?->format('d/m/Y') ?? '-',
             $attendance->check_in?->format('H:i') ?? '-',
             $attendance->check_out?->format('H:i') ?? '-',
@@ -79,6 +83,20 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
     public function title(): string
     {
         return 'Laporan Presensi';
+    }
+
+    public function drawings()
+    {
+        $drawing = new Drawing();
+        $drawing->setName('Kop Surat');
+        $drawing->setDescription('Kop Surat Indikarya');
+        $drawing->setPath(public_path('kop.png'));
+        $drawing->setHeight(80);
+        $drawing->setCoordinates('A1');
+        $drawing->setOffsetX(10);
+        $drawing->setOffsetY(10);
+
+        return $drawing;
     }
 
     public function registerEvents(): array
@@ -104,7 +122,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
                 $sheet->getStyle('A4')->getFont()->setBold(true)->setSize(12);
                 
                 // Auto-fit columns
-                foreach (range('A', 'I') as $col) {
+                foreach (range('A', 'J') as $col) {
                     $sheet->getColumnDimension($col)->setAutoSize(true);
                 }
                 
