@@ -1,4 +1,9 @@
 <x-filament-panels::page>
+    <style>
+        .search-input-wrapper-custom {
+            padding: 0.75rem 1rem 0.75rem 1.5rem !important;
+        }
+    </style>
     {{-- Stats Widgets --}}
     @php
         $stats = $this->getStats();
@@ -93,18 +98,102 @@
                 </select>
             </div>
 
-            <div>
-                <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Pegawai</label>
-                <select 
-                    wire:model="employeeId"
-                    style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--fi-input-border-color, #d1d5db); border-radius: 0.5rem; background: var(--fi-input-bg, #fff);"
-                    class="dark:bg-gray-700 dark:border-gray-600"
-                >
-                    <option value="">-- Semua Pegawai --</option>
-                    @foreach($employees as $id => $name)
-                        <option value="{{ $id }}">{{ $name }}</option>
-                    @endforeach
-                </select>
+            <div 
+                x-data="{ 
+                    open: false, 
+                    search: '', 
+                    selected: @entangle('employeeId'),
+                    employees: @js($employees),
+                    get filteredEmployees() {
+                        if (!this.search) return this.employees;
+                        return Object.fromEntries(
+                            Object.entries(this.employees).filter(([id, name]) => 
+                                name.toLowerCase().includes(this.search.toLowerCase())
+                            )
+                        );
+                    },
+                    get selectedName() {
+                        return this.selected ? this.employees[this.selected] : '-- Semua Pegawai --';
+                    }
+                }"
+                x-init="$watch('selected', value => $wire.set('employeeId', value))"
+            >
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--fi-body-text-color, #374151);" class="dark:text-gray-200">
+                    Pegawai
+                </label>
+                
+                <div style="position: relative;">
+                    <button 
+                        @click="open = !open"
+                        type="button"
+                        style="width: 100%; height: 2.5rem; padding: 0.5rem 0.75rem; border: 1px solid var(--fi-input-border-color, #d1d5db); border-radius: 0.5rem; background: var(--fi-input-bg, #fff); text-align: left; display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; transition: all 0.15s ease;"
+                        class="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                        :class="open && 'ring-2 ring-primary-600 border-primary-600'"
+                    >
+                        <span x-text="selectedName" style="color: var(--fi-body-text-color, #374151); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="dark:text-gray-200"></span>
+                        <svg width="12" height="12" style="transition: transform 0.2s; flex-shrink: 0; margin-left: 0.5rem; color: var(--fi-body-text-color, #6b7280);" :style="open && 'transform: rotate(180deg)'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="dark:text-gray-400">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    
+                    <div 
+                        x-show="open"
+                        @click.away="open = false"
+                        x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        style="position: absolute; top: calc(100% + 0.25rem); left: 0; min-width: 100%; width: max-content; max-width: 400px; background: var(--fi-body-bg, #fff); border: 1px solid var(--fi-input-border-color, #d1d5db); border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); z-index: 50; max-height: 20rem; overflow: hidden;"
+                        class="dark:bg-gray-800 dark:border-gray-600"
+                        x-cloak
+                    >
+                        <div class="search-input-wrapper-custom dark:border-gray-600">
+                            <input 
+                                x-model="search"
+                                type="text"
+                                placeholder="Start typing to search..."
+                                style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--fi-input-border-color, #d1d5db); border-radius: 0.375rem; background: var(--fi-input-bg, #fff); font-size: 0.875rem; outline: none;"
+                                class="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-600 focus:border-primary-600"
+                                @click.stop
+                            >
+                        </div>
+                        
+                        <div style="max-height: 15rem; overflow-y: auto; border-top: 1px solid var(--fi-input-border-color, #e5e7eb);" class="dark:border-gray-600">
+                            <div 
+                                @click="selected = ''; open = false; search = ''"
+                                @mouseenter="$el.style.backgroundColor = '#3b82f6'; $el.style.color = '#ffffff';"
+                                @mouseleave="if (selected !== '') { $el.style.backgroundColor = 'transparent'; $el.style.color = ''; } else { $el.style.backgroundColor = '#dbeafe'; $el.style.color = '#1e40af'; }"
+                                style="padding: 0.75rem 1rem; cursor: pointer; font-size: 0.875rem; transition: all 0.15s ease;"
+                                :style="selected === '' && 'background-color: #dbeafe; font-weight: 600; color: #1e40af;'"
+                                class="dark:text-gray-200"
+                            >
+                                -- Semua Pegawai --
+                            </div>
+                            
+                            <template x-for="[id, name] in Object.entries(filteredEmployees)" :key="id">
+                                <div 
+                                    @click="selected = id; open = false; search = ''"
+                                    @mouseenter="$el.style.backgroundColor = '#3b82f6'; $el.style.color = '#ffffff';"
+                                    @mouseleave="if (selected != id) { $el.style.backgroundColor = 'transparent'; $el.style.color = ''; } else { $el.style.backgroundColor = '#dbeafe'; $el.style.color = '#1e40af'; }"
+                                    style="padding: 0.75rem 1rem; cursor: pointer; font-size: 0.875rem; transition: all 0.15s ease;"
+                                    :style="selected == id && 'background-color: #dbeafe; font-weight: 600; color: #1e40af;'"
+                                    class="dark:text-gray-200"
+                                    x-text="name"
+                                ></div>
+                            </template>
+                            
+                            <div 
+                                x-show="Object.keys(filteredEmployees).length === 0"
+                                style="padding: 1rem 0.75rem; color: #9ca3af; text-align: center; font-size: 0.875rem;"
+                                class="dark:text-gray-400"
+                            >
+                                Tidak ada hasil
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div style="display: flex; align-items: flex-end;">

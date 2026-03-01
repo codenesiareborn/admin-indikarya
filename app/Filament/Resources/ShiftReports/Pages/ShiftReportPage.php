@@ -161,7 +161,7 @@ class ShiftReportPage extends Page implements HasTable, HasForms
         $stats = $this->getStats();
         $settings = [
             'company_name' => \App\Models\GeneralSetting::get('company_name', 'PT Indikarya Total Solution'),
-            'company_address' => \App\Models\GeneralSetting::get('company_address', ''),
+            'company_address' => \App\Models\GeneralSetting::get('company_address', 'Perum Saka Permai No C 10, Plumbon, Sardonoharjo, Ngaglik, Sleman, Yogyakarta'),
         ];
         
         $reportNumber = 'SFT-' . now()->format('Ymd-His');
@@ -178,9 +178,9 @@ class ShiftReportPage extends Page implements HasTable, HasForms
         $stats = $this->getStats();
         $settings = [
             'company_name' => \App\Models\GeneralSetting::get('company_name', 'PT Indikarya Total Solution'),
-            'company_address' => \App\Models\GeneralSetting::get('company_address', ''),
-            'company_phone' => \App\Models\GeneralSetting::get('company_phone', ''),
-            'company_email' => \App\Models\GeneralSetting::get('company_email', ''),
+            'company_address' => \App\Models\GeneralSetting::get('company_address', 'Perum Saka Permai No C 10, Plumbon, Sardonoharjo, Ngaglik, Sleman, Yogyakarta'),
+            'company_phone' => \App\Models\GeneralSetting::get('company_phone', 'Telp.(0274)4362536, Hp.085729898968'),
+            'company_email' => \App\Models\GeneralSetting::get('company_email', 'pt.indikarya@yahoo.com'),
         ];
         
         $reportNumber = 'LAP-SFT-' . now()->format('Ymd-His');

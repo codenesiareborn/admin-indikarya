@@ -6,11 +6,9 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use Maatwebsite\Excel\Concerns\WithDrawings;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
-class ShiftReportExport implements FromView, ShouldAutoSize, WithStyles, WithDrawings
+class ShiftReportExport implements FromView, ShouldAutoSize, WithStyles
 {
     protected $data;
     protected $stats;
@@ -40,20 +38,6 @@ class ShiftReportExport implements FromView, ShouldAutoSize, WithStyles, WithDra
             'reportNumber' => $this->reportNumber,
             'isExcel' => true,
         ]);
-    }
-
-    public function drawings()
-    {
-        $drawing = new Drawing();
-        $drawing->setName('Kop Surat');
-        $drawing->setDescription('Kop Surat Indikarya');
-        $drawing->setPath(public_path('kop.png'));
-        $drawing->setHeight(80);
-        $drawing->setCoordinates('A1');
-        $drawing->setOffsetX(10);
-        $drawing->setOffsetY(10);
-
-        return $drawing;
     }
 
     public function styles(Worksheet $sheet)

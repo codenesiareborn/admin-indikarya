@@ -216,7 +216,7 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
         $stats = $this->getStats();
         $settings = [
             'company_name' => GeneralSetting::get('company_name', 'PT Indikarya Total Solution'),
-            'company_address' => GeneralSetting::get('company_address', ''),
+            'company_address' => GeneralSetting::get('company_address', 'Perum Saka Permai No C 10, Plumbon, Sardonoharjo, Ngaglik, Sleman, Yogyakarta'),
         ];
         
         $startDate = $this->startDate ? \Carbon\Carbon::parse($this->startDate)->format('d/m/Y') : '-';
@@ -235,9 +235,9 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
         $stats = $this->getStats();
         $settings = [
             'company_name' => GeneralSetting::get('company_name', 'PT Indikarya Total Solution'),
-            'company_address' => GeneralSetting::get('company_address', ''),
-            'company_phone' => GeneralSetting::get('company_phone', ''),
-            'company_email' => GeneralSetting::get('company_email', ''),
+            'company_address' => GeneralSetting::get('company_address', 'Perum Saka Permai No C 10, Plumbon, Sardonoharjo, Ngaglik, Sleman, Yogyakarta'),
+            'company_phone' => GeneralSetting::get('company_phone', 'Telp.(0274)4362536, Hp.085729898968'),
+            'company_email' => GeneralSetting::get('company_email', 'pt.indikarya@yahoo.com'),
         ];
         
         $reportNumber = 'LAP-ABS-' . now()->format('Ymd-His');
