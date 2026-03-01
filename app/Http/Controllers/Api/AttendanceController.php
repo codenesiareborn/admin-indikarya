@@ -154,11 +154,28 @@ class AttendanceController extends Controller
                 // If shift_id is provided, use the service to find attendance (handles overnight)
                 $attendance = $this->shiftService->getAttendanceForCheckout($userId, $projectId, $shiftId);
             } else {
-                // Backward compatibility: search today's attendance only
+                // Backward compatibility: search today's attendance OR yesterday's overnight shift
                 $attendance = Attendance::where('user_id', $userId)
                     ->where('project_id', $projectId)
                     ->whereDate('tanggal', $today)
                     ->first();
+
+                // If not found, check for pending overnight shift from yesterday
+                if (! $attendance) {
+                    $yesterday = now()->subDay()->toDateString();
+                    $attendance = Attendance::where('user_id', $userId)
+                        ->where('project_id', $projectId)
+                        ->whereDate('tanggal', $yesterday)
+                        ->whereNotNull('check_in')
+                        ->whereNull('check_out')
+                        ->with('shift')
+                        ->first();
+
+                    // Only use yesterday's record if it's an overnight shift
+                    if ($attendance && ! $attendance->shift?->is_overnight) {
+                        $attendance = null;
+                    }
+                }
             }
 
             if (! $attendance || ! $attendance->check_in) {
