@@ -74,7 +74,6 @@ class TaskListReportPage extends Page implements HasTable, HasForms
                     ->color(fn (string $state): string => match ($state) {
                         'cleaning_services' => 'info',
                         'security_services' => 'warning',
-                        'gardening_services' => 'success',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => ucwords(str_replace('_', ' ', $state))),
@@ -203,7 +202,6 @@ class TaskListReportPage extends Page implements HasTable, HasForms
         return [
             'cleaning_services' => 'Cleaning Services',
             'security_services' => 'Security Services',
-            'gardening_services' => 'Gardening Services',
         ];
     }
 
