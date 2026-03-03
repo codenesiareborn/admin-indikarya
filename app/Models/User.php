@@ -164,6 +164,7 @@ class User extends Authenticatable
                 $query->whereNull('employee_projects.tanggal_selesai')
                     ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
             })
+            ->orderBy('employee_projects.tanggal_mulai', 'desc')  // Most recent first
             ->first();
     }
 
