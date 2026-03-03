@@ -18,6 +18,8 @@ class PatrolController extends Controller
      */
     public function submit(Request $request): JsonResponse
     {
+        $user = auth()->user();
+
         $validator = Validator::make($request->all(), [
             'project_id' => 'required|exists:projects,id',
             'patrol_area_id' => 'nullable|exists:patrol_areas,id',
@@ -27,6 +29,26 @@ class PatrolController extends Controller
             'note' => 'nullable|string|max:1000',
             'photo' => 'required|image|mimes:jpeg,jpg,png|max:5120',
         ]);
+
+        // Custom validation: check if user has active assignment to this project
+        $validator->after(function ($validator) use ($user, $request) {
+            if ($validator->errors()->has('project_id')) {
+                return;
+            }
+
+            $hasActiveAssignment = $user->projects()
+                ->where('projects.id', $request->project_id)
+                ->where('projects.status', 'aktif')
+                ->where(function ($query) {
+                    $query->whereNull('employee_projects.tanggal_selesai')
+                        ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
+                })
+                ->exists();
+
+            if (! $hasActiveAssignment) {
+                $validator->errors()->add('project_id', 'Anda tidak memiliki akses ke project ini atau project tidak aktif.');
+            }
+        });
 
         if ($validator->fails()) {
             return response()->json([
