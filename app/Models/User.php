@@ -14,7 +14,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens, HasRoles;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -94,7 +94,7 @@ class User extends Authenticatable
 
     public function getStafLabelAttribute()
     {
-        return match($this->staf) {
+        return match ($this->staf) {
             'cleaning_services' => 'Cleaning Services',
             'security_services' => 'Security Services',
             default => $this->staf,
@@ -103,7 +103,7 @@ class User extends Authenticatable
 
     public function getStatusPegawaiLabelAttribute()
     {
-        return match($this->status_pegawai) {
+        return match ($this->status_pegawai) {
             'aktif' => 'Aktif',
             'non-aktif' => 'Non-Aktif',
             'cuti' => 'Cuti',
@@ -113,7 +113,7 @@ class User extends Authenticatable
 
     public function getJenisKelaminLabelAttribute()
     {
-        return match($this->jenis_kelamin) {
+        return match ($this->jenis_kelamin) {
             'laki-laki' => 'Laki-laki',
             'perempuan' => 'Perempuan',
             default => $this->jenis_kelamin,
@@ -122,7 +122,7 @@ class User extends Authenticatable
 
     public function getRoleLabelAttribute()
     {
-        return match($this->role) {
+        return match ($this->role) {
             'super_admin' => 'Super Admin',
             'admin' => 'Admin',
             'employee' => 'Employee',
@@ -150,5 +150,43 @@ class User extends Authenticatable
     public function getNamaLengkapAttribute(): string
     {
         return $this->name;
+    }
+
+    /**
+     * Get the active project that this employee is currently assigned to.
+     * Active project = project with status 'aktif' AND (tanggal_selesai >= today OR tanggal_selesai IS NULL)
+     */
+    public function getActiveProject(): ?Project
+    {
+        return $this->projects()
+            ->where('projects.status', 'aktif')
+            ->where(function ($query) {
+                $query->whereNull('employee_projects.tanggal_selesai')
+                    ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
+            })
+            ->first();
+    }
+
+    /**
+     * Check if this employee has an active project assignment.
+     */
+    public function hasActiveProject(): bool
+    {
+        return $this->getActiveProject() !== null;
+    }
+
+    /**
+     * Scope to filter users who are available for project assignment.
+     * Available = no active project assignment.
+     */
+    public function scopeAvailableForAssignment($query)
+    {
+        return $query->whereDoesntHave('projects', function ($q) {
+            $q->where('projects.status', 'aktif')
+                ->where(function ($sq) {
+                    $sq->whereNull('employee_projects.tanggal_selesai')
+                        ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
+                });
+        });
     }
 }
