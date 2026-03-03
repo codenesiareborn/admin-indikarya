@@ -190,12 +190,18 @@ class EmployeesRelationManager extends RelationManager
                                 continue;
                             }
 
-                            // Double-check validation before attaching
+                            // Auto-close previous active project if exists (before attaching new)
                             if ($user->hasActiveProject()) {
-                                $activeProject = $user->getActiveProject();
-                                $failedEmployees[] = "{$user->name} (sudah di {$activeProject->nama_project})";
-
-                                continue;
+                                $previousProject = $user->getActiveProject();
+                                if ($previousProject && $previousProject->id !== $record->id) {
+                                    $user->projects()->updateExistingPivot($previousProject->id, [
+                                        'tanggal_selesai' => now()->subDay()->toDateString(),
+                                    ]);
+                                } elseif ($previousProject && $previousProject->id === $record->id) {
+                                    // User already assigned to this project
+                                    $failedEmployees[] = "{$user->name} (sudah di {$previousProject->nama_project})";
+                                    continue;
+                                }
                             }
 
                             $record->employees()->attach($employeeId, [
