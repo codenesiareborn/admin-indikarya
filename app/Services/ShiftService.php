@@ -171,46 +171,4 @@ class ShiftService
 
         return null;
     }
-
-    /**
-     * Validate if check-out time is within allowed window for shift
-     * For overnight shifts: allow up to 2 hours after end_time
-     *
-     * @param  string  $checkOutTime  Format: H:i
-     * @param  string|null  $attendanceDate  Date of the attendance record
-     */
-    public function isValidCheckoutTime(string $checkOutTime, int $shiftId, ?string $attendanceDate = null): bool
-    {
-        $shift = ProjectShift::find($shiftId);
-
-        if (! $shift) {
-            return true;
-        }
-
-        try {
-            $checkOut = Carbon::createFromFormat('H:i', $checkOutTime);
-            $endTime = Carbon::createFromFormat('H:i', $shift->end_time->format('H:i'));
-
-            // For overnight shifts, add 2 hours buffer to end_time
-            if ($shift->is_overnight) {
-                $endTime->addHours(2);
-
-                // If attendance date is yesterday, we need to account for the day difference
-                if ($attendanceDate && $attendanceDate !== now()->toDateString()) {
-                    // Check-out is on the next day, so it's always valid if within buffer
-                    return true;
-                }
-
-                // If checking out on the same day (rare case), ensure it's after start time
-                $startTime = Carbon::createFromFormat('H:i', $shift->start_time->format('H:i'));
-                if ($checkOut->lt($startTime)) {
-                    return true; // Before start time means it's the next day
-                }
-            }
-
-            return $checkOut->lte($endTime);
-        } catch (\Exception $e) {
-            return true;
-        }
-    }
 }
