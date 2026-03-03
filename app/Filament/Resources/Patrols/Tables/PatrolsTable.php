@@ -33,8 +33,7 @@ class PatrolsTable
                 Tables\Columns\TextColumn::make('project.nama_project')
                     ->label('Project')
                     ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 
                 Tables\Columns\TextColumn::make('area_name')
                     ->label('Area')
