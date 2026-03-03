@@ -11,51 +11,49 @@ class CheckpointService
 {
     /**
      * Upload checkpoint photo
-     * 
-     * @param UploadedFile $photo
-     * @return string
      */
     public function uploadPhoto(UploadedFile $photo): string
     {
-        $filename = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+        $filename = time().'_'.uniqid().'.'.$photo->getClientOriginalExtension();
         $path = $photo->storeAs('checkpoints', $filename, 'public');
-        
+
         return $path;
     }
 
     /**
      * Delete checkpoint photo
-     * 
-     * @param string $path
-     * @return bool
      */
     public function deletePhoto(string $path): bool
     {
         if (Storage::disk('public')->exists($path)) {
             return Storage::disk('public')->delete($path);
         }
-        
+
         return false;
     }
 
     /**
      * Validate user has access to project and room
-     * 
-     * @param int $userId
-     * @param int $projectId
-     * @param int $roomId
+     *
      * @throws \Exception
      */
     public function validateUserAccess(int $userId, int $projectId, int $roomId): void
     {
-        // Check if user is assigned to project
-        $isAssigned = DB::table('employee_projects')
-            ->where('user_id', $userId)
-            ->where('project_id', $projectId)
+        // Check if user has active assignment to this project
+        // Active assignment = project status 'aktif' AND (tanggal_selesai IS NULL OR tanggal_selesai >= today)
+        $hasActiveAssignment = DB::table('employee_projects')
+            ->join('projects', 'employee_projects.project_id', '=', 'projects.id')
+            ->where('employee_projects.user_id', $userId)
+            ->where('employee_projects.project_id', $projectId)
+            ->where('projects.status', 'aktif')
+            ->where(function ($query) {
+                $query->whereNull('employee_projects.tanggal_selesai')
+                    ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
+            })
             ->exists();
 
-        if (!$isAssigned) {
-            throw new \Exception('Anda tidak memiliki akses ke project ini.');
+        if (! $hasActiveAssignment) {
+            throw new \Exception('Anda tidak memiliki akses ke project ini atau project sudah kadaluarsa.');
         }
 
         // Check if room belongs to project
@@ -63,7 +61,7 @@ class CheckpointService
             ->where('project_id', $projectId)
             ->first();
 
-        if (!$room) {
+        if (! $room) {
             throw new \Exception('Ruangan tidak ditemukan dalam project ini.');
         }
 
@@ -74,31 +72,33 @@ class CheckpointService
 
     /**
      * Validate user has access to project
-     * 
-     * @param int $userId
-     * @param int $projectId
+     *
      * @throws \Exception
      */
     public function validateUserProjectAccess(int $userId, int $projectId): void
     {
-        $isAssigned = DB::table('employee_projects')
-            ->where('user_id', $userId)
-            ->where('project_id', $projectId)
+        // Check if user has active assignment to this project
+        // Active assignment = project status 'aktif' AND (tanggal_selesai IS NULL OR tanggal_selesai >= today)
+        $hasActiveAssignment = DB::table('employee_projects')
+            ->join('projects', 'employee_projects.project_id', '=', 'projects.id')
+            ->where('employee_projects.user_id', $userId)
+            ->where('employee_projects.project_id', $projectId)
+            ->where('projects.status', 'aktif')
+            ->where(function ($query) {
+                $query->whereNull('employee_projects.tanggal_selesai')
+                    ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
+            })
             ->exists();
 
-        if (!$isAssigned) {
-            throw new \Exception('Anda tidak memiliki akses ke project ini.');
+        if (! $hasActiveAssignment) {
+            throw new \Exception('Anda tidak memiliki akses ke project ini atau project sudah kadaluarsa.');
         }
     }
 
     /**
      * Calculate distance between two GPS coordinates (in meters)
      * Using Haversine formula
-     * 
-     * @param float $lat1
-     * @param float $lon1
-     * @param float $lat2
-     * @param float $lon2
+     *
      * @return float Distance in meters
      */
     public function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
@@ -120,13 +120,8 @@ class CheckpointService
     /**
      * Validate if coordinates are within allowed radius of project location
      * Note: This is a placeholder. You'll need to add location fields to projects table
-     * 
-     * @param float $userLat
-     * @param float $userLon
-     * @param float $projectLat
-     * @param float $projectLon
-     * @param float $allowedRadius (in meters, default 100m)
-     * @return bool
+     *
+     * @param  float  $allowedRadius  (in meters, default 100m)
      */
     public function validateLocationRadius(
         float $userLat,
@@ -136,19 +131,16 @@ class CheckpointService
         float $allowedRadius = 100
     ): bool {
         $distance = $this->calculateDistance($userLat, $userLon, $projectLat, $projectLon);
-        
+
         return $distance <= $allowedRadius;
     }
 
     /**
      * Get full URL for checkpoint photo
-     * 
-     * @param string|null $path
-     * @return string|null
      */
     public function getPhotoUrl(?string $path): ?string
     {
-        if (!$path) {
+        if (! $path) {
             return null;
         }
 

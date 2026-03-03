@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Api;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class SubmitCheckpointRequest extends FormRequest
@@ -29,15 +29,20 @@ class SubmitCheckpointRequest extends FormRequest
                 'integer',
                 'exists:projects,id',
                 function ($attribute, $value, $fail) {
-                    // Validate user is assigned to this project
+                    // Validate user has active assignment to this project
+                    // Active assignment = project status 'aktif' AND (tanggal_selesai IS NULL OR tanggal_selesai >= today)
                     $user = auth()->user();
-                    $isAssigned = \DB::table('employee_projects')
-                        ->where('user_id', $user->id)
-                        ->where('project_id', $value)
+                    $hasActiveAssignment = $user->projects()
+                        ->where('projects.id', $value)
+                        ->where('projects.status', 'aktif')
+                        ->where(function ($query) {
+                            $query->whereNull('employee_projects.tanggal_selesai')
+                                ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
+                        })
                         ->exists();
-                    
-                    if (!$isAssigned) {
-                        $fail('Anda tidak memiliki akses ke project ini.');
+
+                    if (! $hasActiveAssignment) {
+                        $fail('Anda tidak memiliki akses ke project ini atau project sudah kadaluarsa.');
                     }
                 },
             ],
@@ -49,7 +54,7 @@ class SubmitCheckpointRequest extends FormRequest
                     // Validate room belongs to the specified project
                     $projectId = $this->input('project_id');
                     $room = \App\Models\ProjectRoom::find($value);
-                    
+
                     if ($room && $room->project_id != $projectId) {
                         $fail('Ruangan tidak ditemukan dalam project ini.');
                     }
@@ -99,8 +104,6 @@ class SubmitCheckpointRequest extends FormRequest
 
     /**
      * Get custom messages for validator errors.
-     *
-     * @return array
      */
     public function messages(): array
     {
@@ -129,7 +132,6 @@ class SubmitCheckpointRequest extends FormRequest
     /**
      * Handle a failed validation attempt.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return void
      *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException

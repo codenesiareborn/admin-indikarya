@@ -25,9 +25,6 @@ class CheckpointController extends Controller
 
     /**
      * Submit a checkpoint with photo, GPS, and checklist
-     * 
-     * @param SubmitCheckpointRequest $request
-     * @return JsonResponse
      */
     public function submit(SubmitCheckpointRequest $request): JsonResponse
     {
@@ -35,7 +32,7 @@ class CheckpointController extends Controller
             DB::beginTransaction();
 
             $user = auth()->user();
-            
+
             // Validate user has access to this project and room
             $this->checkpointService->validateUserAccess(
                 $user->id,
@@ -90,7 +87,7 @@ class CheckpointController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             // Delete uploaded photo if transaction fails
             if (isset($photoPath)) {
                 $this->checkpointService->deletePhoto($photoPath);
@@ -105,14 +102,11 @@ class CheckpointController extends Controller
 
     /**
      * Get today's checkpoints for the authenticated user
-     * 
-     * @param Request $request
-     * @return JsonResponse
      */
     public function today(Request $request): JsonResponse
     {
         $user = auth()->user();
-        
+
         $checkpoints = TaskSubmission::with(['room', 'project', 'items.task'])
             ->where('user_id', $user->id)
             ->whereDate('tanggal', now()->toDateString())
@@ -127,9 +121,6 @@ class CheckpointController extends Controller
 
     /**
      * Get checkpoint history with pagination
-     * 
-     * @param Request $request
-     * @return JsonResponse
      */
     public function history(Request $request): JsonResponse
     {
@@ -156,21 +147,30 @@ class CheckpointController extends Controller
 
     /**
      * Get all rooms for a project
-     * 
-     * @param Request $request
-     * @param int $projectId
-     * @return JsonResponse
+     * If no project_id provided, uses user's active project
      */
-    public function getRooms(Request $request, int $projectId): JsonResponse
+    public function getRooms(Request $request, ?int $projectId = null): JsonResponse
     {
         $user = auth()->user();
 
-        // Validate user has access to this project
-        $this->checkpointService->validateUserProjectAccess($user->id, $projectId);
+        // If no project_id provided, get from user's active project
+        if (! $projectId) {
+            $userProject = $user->getActiveProject();
+            if (! $userProject) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User tidak memiliki project aktif',
+                ], 404);
+            }
+            $projectId = $userProject->id;
+        } else {
+            // Validate that user has active assignment to this project
+            $this->checkpointService->validateUserProjectAccess($user->id, $projectId);
+        }
 
         $rooms = ProjectRoom::with(['tasks' => function ($query) {
-                $query->where('status', 'aktif')->orderBy('urutan');
-            }])
+            $query->where('status', 'aktif')->orderBy('urutan');
+        }])
             ->where('project_id', $projectId)
             ->where('status', 'aktif')
             ->orderBy('lantai')
@@ -185,17 +185,14 @@ class CheckpointController extends Controller
 
     /**
      * Get room detail with tasks
-     * 
-     * @param int $roomId
-     * @return JsonResponse
      */
     public function getRoomDetail(int $roomId): JsonResponse
     {
         $user = auth()->user();
 
         $room = ProjectRoom::with(['tasks' => function ($query) {
-                $query->where('status', 'aktif')->orderBy('urutan');
-            }, 'project'])
+            $query->where('status', 'aktif')->orderBy('urutan');
+        }, 'project'])
             ->findOrFail($roomId);
 
         // Validate user has access to this room's project
@@ -209,14 +206,28 @@ class CheckpointController extends Controller
 
     /**
      * Get checkpoint summary for today (count by room)
-     * 
-     * @param Request $request
-     * @return JsonResponse
+     * If no project_id provided, uses user's active project
      */
     public function todaySummary(Request $request): JsonResponse
     {
         $user = auth()->user();
         $projectId = $request->input('project_id');
+
+        // If no project_id provided, get from user's active project
+        if (! $projectId) {
+            $userProject = $user->getActiveProject();
+            if (! $userProject) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User tidak memiliki project aktif',
+                ], 404);
+            }
+            $projectId = $userProject->id;
+        } else {
+            // Validate that user has active assignment to this project (for backward compatibility)
+            // Note: For summary, we allow viewing summary from any project user was assigned to
+            // This is OK since it's just a read operation
+        }
 
         $query = TaskSubmission::with(['room'])
             ->where('user_id', $user->id)
@@ -226,7 +237,7 @@ class CheckpointController extends Controller
             $query->where('project_id', $projectId);
         }
 
-        $checkpoints = $query->get();
+        $checkpoints = $query->orderBy('submitted_at', 'desc')->get();
 
         $summary = [
             'total_checkpoints' => $checkpoints->count(),
@@ -252,20 +263,17 @@ class CheckpointController extends Controller
 
     /**
      * Get checkpoint detail
-     * 
-     * @param int $id
-     * @return JsonResponse
      */
     public function show(int $id): JsonResponse
     {
         $user = auth()->user();
-        
+
         $checkpoint = TaskSubmission::with(['room', 'project', 'items.task'])
             ->findOrFail($id);
 
         // Security check: Ensure user owns this checkpoint
         if ($checkpoint->user_id !== $user->id) {
-             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
         return response()->json([
