@@ -115,9 +115,25 @@ class PatrolController extends Controller
         $user = auth()->user();
         $perPage = $request->input('per_page', 15);
 
-        $patrols = Patrol::with(['user', 'project', 'patrolArea'])
-            ->where('user_id', $user->id)
-            ->orderBy('patrol_date', 'desc')
+        $query = Patrol::with(['user', 'project', 'patrolArea'])
+            ->where('user_id', $user->id);
+
+        // Filter by today
+        if ($request->boolean('today')) {
+            $query->whereDate('patrol_date', now()->toDateString());
+        }
+
+        // Filter by specific date
+        if ($request->has('date')) {
+            $query->whereDate('patrol_date', $request->input('date'));
+        }
+
+        // Filter by project_id
+        if ($request->has('project_id')) {
+            $query->where('project_id', $request->input('project_id'));
+        }
+
+        $patrols = $query->orderBy('patrol_date', 'desc')
             ->orderBy('patrol_time', 'desc')
             ->paginate($perPage);
 
