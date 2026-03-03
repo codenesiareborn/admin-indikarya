@@ -5,8 +5,8 @@ namespace App\Filament\Resources\Employees\Pages;
 use App\Exports\EmployeeTemplateExport;
 use App\Filament\Resources\Employees\EmployeeResource;
 use App\Imports\EmployeeImport;
-use Filament\Actions\CreateAction;
 use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
@@ -24,9 +24,9 @@ class ListEmployees extends ListRecords
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
                 ->action(function () {
-                    return Excel::download(new EmployeeTemplateExport(), 'template_pegawai.xlsx');
+                    return Excel::download(new EmployeeTemplateExport, 'template_pegawai.xlsx');
                 }),
-            
+
             Action::make('import')
                 ->label('Import Excel')
                 ->icon('heroicon-o-arrow-up-tray')
@@ -40,7 +40,7 @@ class ListEmployees extends ListRecords
                 ])
                 ->action(function (array $data) {
                     try {
-                        $import = new EmployeeImport();
+                        $import = new EmployeeImport;
                         Excel::import($import, $data['file']);
 
                         $successCount = $import->getSuccessCount();
@@ -49,9 +49,9 @@ class ListEmployees extends ListRecords
 
                         if ($failureCount > 0) {
                             $errorMessage = "Berhasil: {$successCount}, Gagal: {$failureCount}. ";
-                            $errorMessage .= "Error: " . implode('; ', array_slice($errors, 0, 3));
+                            $errorMessage .= 'Error: '.implode('; ', array_slice($errors, 0, 3));
                             if (count($errors) > 3) {
-                                $errorMessage .= " (dan " . (count($errors) - 3) . " error lainnya)";
+                                $errorMessage .= ' (dan '.(count($errors) - 3).' error lainnya)';
                             }
 
                             Notification::make()
@@ -70,12 +70,12 @@ class ListEmployees extends ListRecords
                     } catch (\Exception $e) {
                         Notification::make()
                             ->title('Import Gagal')
-                            ->body('Error: ' . $e->getMessage())
+                            ->body('Error: '.$e->getMessage())
                             ->danger()
                             ->send();
                     }
                 }),
-            
+
             CreateAction::make(),
         ];
     }

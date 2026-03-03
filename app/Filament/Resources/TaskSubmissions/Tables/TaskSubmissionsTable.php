@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\TaskSubmissions\Tables;
 
 use App\Models\TaskSubmission;
-use Filament\Actions\ViewAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -39,7 +39,7 @@ class TaskSubmissionsTable
                 Tables\Columns\TextColumn::make('room.nama_ruangan')
                     ->label('Ruangan')
                     ->searchable()
-                    ->description(fn (TaskSubmission $record): string => 'Lantai ' . ($record->room?->lantai ?? '-')),
+                    ->description(fn (TaskSubmission $record): string => 'Lantai '.($record->room?->lantai ?? '-')),
 
                 Tables\Columns\TextColumn::make('completed_count')
                     ->label('Selesai')

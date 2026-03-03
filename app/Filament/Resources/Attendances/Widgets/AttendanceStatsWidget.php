@@ -11,7 +11,7 @@ class AttendanceStatsWidget extends BaseWidget
 {
     #[Reactive]
     public ?int $projectId = null;
-    
+
     #[Reactive]
     public ?string $filterMonth = null;
 
@@ -24,18 +24,18 @@ class AttendanceStatsWidget extends BaseWidget
                 ->description('Total hadir tepat waktu')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-            
+
             Stat::make('Terlambat', $stats['terlambat'])
                 ->description('Total terlambat')
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('warning'),
-            
+
             Stat::make('Tidak Hadir', $stats['tidak_hadir'])
                 ->description('Alpha, Izin, Sakit')
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
-            
-            Stat::make('Presentase Kehadiran', $stats['presentase'] . '%')
+
+            Stat::make('Presentase Kehadiran', $stats['presentase'].'%')
                 ->description('Tingkat kehadiran bulan ini')
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('info'),
@@ -44,7 +44,7 @@ class AttendanceStatsWidget extends BaseWidget
 
     protected function calculateStats(): array
     {
-        if (!$this->projectId || !$this->filterMonth) {
+        if (! $this->projectId || ! $this->filterMonth) {
             return [
                 'hadir' => 0,
                 'terlambat' => 0,
@@ -63,9 +63,9 @@ class AttendanceStatsWidget extends BaseWidget
         $hadir = $attendances->where('status', 'hadir')->count();
         $terlambat = $attendances->where('status', 'terlambat')->count();
         $tidakHadir = $attendances->whereIn('status', ['alpha', 'izin', 'sakit'])->count();
-        
+
         $totalHariKerja = $attendances->count();
-        $presentase = $totalHariKerja > 0 
+        $presentase = $totalHariKerja > 0
             ? round((($hadir + $terlambat) / $totalHariKerja) * 100, 1)
             : 0;
 

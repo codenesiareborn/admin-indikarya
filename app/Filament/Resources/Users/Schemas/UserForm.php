@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
 
 class UserForm
@@ -19,7 +19,7 @@ class UserForm
                             ->required()
                             ->maxLength(255)
                             ->columnSpan(1),
-                        
+
                         Forms\Components\TextInput::make('email')
                             ->label('Email Address')
                             ->email()
@@ -27,7 +27,7 @@ class UserForm
                             ->unique(ignoreRecord: true)
                             ->maxLength(255)
                             ->columnSpan(1),
-                        
+
                         Forms\Components\TextInput::make('password')
                             ->password()
                             ->revealable()
@@ -40,7 +40,7 @@ class UserForm
                             ->columnSpan(1),
                     ])
                     ->columns(2),
-                
+
                 Section::make('Role & Permissions')
                     ->schema([
                         Forms\Components\Select::make('role_name')
@@ -48,12 +48,12 @@ class UserForm
                             ->options(function () {
                                 $user = auth()->user();
                                 $query = \Spatie\Permission\Models\Role::query();
-                                
+
                                 // Non-super_admin users cannot assign super_admin role
-                                if (!$user || !$user->hasRole('super_admin')) {
+                                if (! $user || ! $user->hasRole('super_admin')) {
                                     $query->where('name', '!=', 'super_admin');
                                 }
-                                
+
                                 return $query->pluck('name', 'name')
                                     ->mapWithKeys(fn ($name) => [$name => ucwords(str_replace('_', ' ', $name))])
                                     ->toArray();
@@ -70,7 +70,7 @@ class UserForm
                                 }
                             }),
                     ]),
-                
+
                 Section::make('Status')
                     ->schema([
                         Forms\Components\Toggle::make('is_active')

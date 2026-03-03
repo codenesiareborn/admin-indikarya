@@ -44,19 +44,17 @@ class AttendancesTable
                 TextColumn::make('check_in_photo')
                     ->label('Foto Masuk')
                     ->formatStateUsing(fn ($state) => $state ? 'Lihat Foto' : '-')
-                    ->url(fn ($record) => $record->check_in_photo ? asset('storage/' . $record->check_in_photo) : null)
+                    ->url(fn ($record) => $record->check_in_photo ? asset('storage/'.$record->check_in_photo) : null)
                     ->openUrlInNewTab()
                     ->color('info')
                     ->icon('heroicon-o-photo'),
                 TextColumn::make('check_in_location')
                     ->label('Lokasi Masuk')
-                    ->formatStateUsing(fn ($record) => 
-                        $record->check_in_latitude && $record->check_in_longitude
+                    ->formatStateUsing(fn ($record) => $record->check_in_latitude && $record->check_in_longitude
                             ? 'Lihat Maps'
                             : '-'
                     )
-                    ->url(fn ($record) => 
-                        $record->check_in_latitude && $record->check_in_longitude
+                    ->url(fn ($record) => $record->check_in_latitude && $record->check_in_longitude
                             ? "https://www.google.com/maps?q={$record->check_in_latitude},{$record->check_in_longitude}"
                             : null
                     )
@@ -71,19 +69,17 @@ class AttendancesTable
                 TextColumn::make('check_out_photo')
                     ->label('Foto Keluar')
                     ->formatStateUsing(fn ($state) => $state ? 'Lihat Foto' : '-')
-                    ->url(fn ($record) => $record->check_out_photo ? asset('storage/' . $record->check_out_photo) : null)
+                    ->url(fn ($record) => $record->check_out_photo ? asset('storage/'.$record->check_out_photo) : null)
                     ->openUrlInNewTab()
                     ->color('info')
                     ->icon('heroicon-o-photo'),
                 TextColumn::make('check_out_location')
                     ->label('Lokasi Keluar')
-                    ->formatStateUsing(fn ($record) => 
-                        $record->check_out_latitude && $record->check_out_longitude
+                    ->formatStateUsing(fn ($record) => $record->check_out_latitude && $record->check_out_longitude
                             ? 'Lihat Maps'
                             : '-'
                     )
-                    ->url(fn ($record) => 
-                        $record->check_out_latitude && $record->check_out_longitude
+                    ->url(fn ($record) => $record->check_out_latitude && $record->check_out_longitude
                             ? "https://www.google.com/maps?q={$record->check_out_latitude},{$record->check_out_longitude}"
                             : null
                     )

@@ -2,19 +2,17 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Http\Middleware\Authenticate;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -34,9 +32,9 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->brandName('Indikarya Total Solution')
             ->darkMode(false)
-->renderHook(
-    'panels::head.end',
-    fn (): string => '
+            ->renderHook(
+                'panels::head.end',
+                fn (): string => '
         <style>
             /* Add logo to login page */
             .fi-simple-main::before {
@@ -62,11 +60,11 @@ class AdminPanelProvider extends PanelProvider
             }
         </style>
     '
-)
-->renderHook(
-    'panels::head.end',
-    fn (): string => '
-        <link href="' . asset('css/custom.css') . '" rel="stylesheet">
+            )
+            ->renderHook(
+                'panels::head.end',
+                fn (): string => '
+        <link href="'.asset('css/custom.css').'" rel="stylesheet">
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 // Inject text "Indikarya Total Solution" ke header
@@ -87,7 +85,7 @@ class AdminPanelProvider extends PanelProvider
             });
         </script>
     ',
-)
+            )
             ->colors([
                 'primary' => Color::Blue,
             ])
@@ -141,4 +139,3 @@ class AdminPanelProvider extends PanelProvider
             ]);
     }
 }
-

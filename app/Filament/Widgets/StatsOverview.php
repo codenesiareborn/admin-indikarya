@@ -14,7 +14,7 @@ class StatsOverview extends BaseWidget
     protected function getStats(): array
     {
         $today = now()->format('Y-m-d');
-        
+
         $hadir = Attendance::whereDate('tanggal', $today)->where('status', 'hadir')->count();
         $terlambat = Attendance::whereDate('tanggal', $today)->where('status', 'terlambat')->count();
         $izinSakit = Attendance::whereDate('tanggal', $today)->whereIn('status', ['izin', 'sakit'])->count();

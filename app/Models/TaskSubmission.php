@@ -63,7 +63,10 @@ class TaskSubmission extends Model
     public function getCompletionRateAttribute(): float
     {
         $total = $this->total_tasks;
-        if ($total === 0) return 0;
+        if ($total === 0) {
+            return 0;
+        }
+
         return round(($this->completed_count / $total) * 100, 1);
     }
 }

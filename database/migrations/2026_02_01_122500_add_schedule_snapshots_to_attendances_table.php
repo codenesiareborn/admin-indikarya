@@ -16,7 +16,7 @@ return new class extends Migration
             // This ensures history remains consistent even if project schedule changes
             $table->time('jam_masuk_snapshot')->nullable()->after('check_out_address');
             $table->time('jam_pulang_snapshot')->nullable()->after('jam_masuk_snapshot');
-            
+
             // Index for faster queries when filtering by schedule
             $table->index(['jam_masuk_snapshot', 'jam_pulang_snapshot'], 'idx_attendance_schedules');
         });

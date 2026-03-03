@@ -2,8 +2,8 @@
 
 namespace App\Exports;
 
-use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -11,10 +11,15 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class ShiftReportExport implements FromView, ShouldAutoSize, WithStyles
 {
     protected $data;
+
     protected $stats;
+
     protected $settings;
+
     protected $startDate;
+
     protected $endDate;
+
     protected $reportNumber;
 
     public function __construct($data, $stats, $settings, $startDate, $endDate, $reportNumber)

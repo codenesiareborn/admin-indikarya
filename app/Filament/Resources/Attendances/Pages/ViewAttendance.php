@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Attendances\Pages;
 
 use App\Filament\Resources\Attendances\AttendanceResource;
 use App\Models\Attendance;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Resources\Pages\ViewRecord;
@@ -28,15 +27,15 @@ class ViewAttendance extends ViewRecord
                             ->schema([
                                 TextEntry::make('employee.nip')
                                     ->label('NIP'),
-                                
+
                                 TextEntry::make('employee.name')
                                     ->label('Nama Pegawai'),
-                                
+
                                 TextEntry::make('project.nama_project')
                                     ->label('Project'),
                             ]),
                     ]),
-                
+
                 Section::make('Informasi Presensi')
                     ->schema([
                         Grid::make(3)
@@ -68,7 +67,7 @@ class ViewAttendance extends ViewRecord
                             ->label('Keterangan')
                             ->placeholder('Tidak ada keterangan'),
                     ]),
-                
+
                 Section::make('Check In')
                     ->schema([
                         Grid::make(2)
@@ -77,16 +76,14 @@ class ViewAttendance extends ViewRecord
                                     ->label('Jam Masuk')
                                     ->time('H:i:s')
                                     ->placeholder('-'),
-                                
+
                                 TextEntry::make('check_in_location_link')
                                     ->label('Lokasi Check In')
-                                    ->state(fn (Attendance $record) => 
-                                        $record->check_in_latitude && $record->check_in_longitude
+                                    ->state(fn (Attendance $record) => $record->check_in_latitude && $record->check_in_longitude
                                             ? 'Lihat di Google Maps'
                                             : '-'
                                     )
-                                    ->url(fn (Attendance $record) => 
-                                        $record->check_in_latitude && $record->check_in_longitude
+                                    ->url(fn (Attendance $record) => $record->check_in_latitude && $record->check_in_longitude
                                             ? "https://www.google.com/maps?q={$record->check_in_latitude},{$record->check_in_longitude}"
                                             : null
                                     )
@@ -94,12 +91,12 @@ class ViewAttendance extends ViewRecord
                                     ->color('success')
                                     ->icon('heroicon-o-map-pin'),
                             ]),
-                        
+
                         ViewEntry::make('check_in_photo')
                             ->label('Foto Check In')
                             ->view('filament.resources.attendances.components.photo-display'),
                     ]),
-                
+
                 Section::make('Check Out')
                     ->schema([
                         Grid::make(2)
@@ -108,16 +105,14 @@ class ViewAttendance extends ViewRecord
                                     ->label('Jam Keluar')
                                     ->time('H:i:s')
                                     ->placeholder('-'),
-                                
+
                                 TextEntry::make('check_out_location_link')
                                     ->label('Lokasi Check Out')
-                                    ->state(fn (Attendance $record) => 
-                                        $record->check_out_latitude && $record->check_out_longitude
+                                    ->state(fn (Attendance $record) => $record->check_out_latitude && $record->check_out_longitude
                                             ? 'Lihat di Google Maps'
                                             : '-'
                                     )
-                                    ->url(fn (Attendance $record) => 
-                                        $record->check_out_latitude && $record->check_out_longitude
+                                    ->url(fn (Attendance $record) => $record->check_out_latitude && $record->check_out_longitude
                                             ? "https://www.google.com/maps?q={$record->check_out_latitude},{$record->check_out_longitude}"
                                             : null
                                     )
@@ -125,12 +120,12 @@ class ViewAttendance extends ViewRecord
                                     ->color('success')
                                     ->icon('heroicon-o-map-pin'),
                             ]),
-                        
+
                         ViewEntry::make('check_out_photo')
                             ->label('Foto Check Out')
                             ->view('filament.resources.attendances.components.photo-display'),
                     ]),
-                
+
                 Section::make('Informasi Sistem')
                     ->schema([
                         Grid::make(2)
@@ -138,7 +133,7 @@ class ViewAttendance extends ViewRecord
                                 TextEntry::make('created_at')
                                     ->label('Dibuat Pada')
                                     ->dateTime('d F Y, H:i:s'),
-                                
+
                                 TextEntry::make('updated_at')
                                     ->label('Diperbarui Pada')
                                     ->dateTime('d F Y, H:i:s'),

@@ -35,7 +35,7 @@ class DailyQuoteSeeder extends Seeder
                 'title' => 'Kesempatan',
                 'content' => 'Kesempatan tidak datang dua kali. Manfaatkan setiap kesempatan yang ada dengan sebaik-baiknya.',
             ],
-            
+
             // Inspirasi
             [
                 'title' => 'Mimpi Besar',
@@ -57,7 +57,7 @@ class DailyQuoteSeeder extends Seeder
                 'title' => 'Belajar',
                 'content' => 'Pendidikan adalah senjata paling ampuh yang bisa kamu gunakan untuk mengubah dunia.',
             ],
-            
+
             // Kerja
             [
                 'title' => 'Kerja Keras',
@@ -79,7 +79,7 @@ class DailyQuoteSeeder extends Seeder
                 'title' => 'Tanggung Jawab',
                 'content' => 'Tanggung jawab adalah harga dari kesuksesan. Lakukan tugasmu dengan sepenuh hati.',
             ],
-            
+
             // Keselamatan Kerja
             [
                 'title' => 'Keselamatan Utama',
@@ -101,7 +101,7 @@ class DailyQuoteSeeder extends Seeder
                 'title' => 'Waspada',
                 'content' => 'Tetap waspada dan fokus saat bekerja. Keselamatan adalah prioritas utama.',
             ],
-            
+
             // Tambahan
             [
                 'title' => 'Hari Baru',
@@ -133,6 +133,6 @@ class DailyQuoteSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('✅ Created ' . count($quotes) . ' daily quotes');
+        $this->command->info('✅ Created '.count($quotes).' daily quotes');
     }
 }

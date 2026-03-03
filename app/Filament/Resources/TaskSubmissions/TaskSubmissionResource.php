@@ -71,6 +71,7 @@ class TaskSubmissionResource extends Resource
 
         if ($user && $user->isPic()) {
             $projectIds = $user->getPicProjectIds();
+
             return $query->whereIn('project_id', $projectIds);
         }
 

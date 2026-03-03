@@ -2,15 +2,15 @@
 
 namespace Database\Seeders;
 
+use App\Models\Attendance;
+use App\Models\Patrol;
+use App\Models\PatrolArea;
 use App\Models\Project;
 use App\Models\ProjectRoom;
 use App\Models\TaskList;
 use App\Models\User;
-use App\Models\Attendance;
-use App\Models\Patrol;
-use App\Models\PatrolArea;
-use Illuminate\Database\Seeder;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class ProjectSeeder extends Seeder
 {
@@ -76,12 +76,12 @@ class ProjectSeeder extends Seeder
 
         foreach ($projects as $index => $projectData) {
             $this->command->info("Creating project: {$projectData['nama_project']}");
-            
+
             $project = Project::create($projectData);
 
             // Create Rooms
             $rooms = $this->createRooms($project);
-            
+
             // Create Tasks for each room
             foreach ($rooms as $room) {
                 $this->createTasks($room);
@@ -99,7 +99,7 @@ class ProjectSeeder extends Seeder
                 $this->createPatrols($project, $employees, $patrolAreas);
             }
 
-            $this->command->info("✅ Project {$projectData['nama_project']} completed with rooms, tasks, attendance" . ($project->jenis_project === 'security_services' ? ', and patrols' : ''));
+            $this->command->info("✅ Project {$projectData['nama_project']} completed with rooms, tasks, attendance".($project->jenis_project === 'security_services' ? ', and patrols' : ''));
         }
     }
 
@@ -165,11 +165,11 @@ class ProjectSeeder extends Seeder
     private function createAttendance(Project $project, array $employees): void
     {
         $startDate = Carbon::parse($project->tanggal_mulai);
-        
+
         // Generate 30 days attendance
         for ($day = 0; $day < 30; $day++) {
             $date = $startDate->copy()->addDays($day);
-            
+
             foreach ($employees as $employee) {
                 // Random status distribution
                 $rand = rand(1, 100);
@@ -221,13 +221,13 @@ class ProjectSeeder extends Seeder
         ];
 
         $areas = [];
-        $projectCode = 'P' . $project->id . '-';
-        
+        $projectCode = 'P'.$project->id.'-';
+
         foreach ($areaTemplates as $areaData) {
             $areas[] = PatrolArea::firstOrCreate(
                 [
                     'project_id' => $project->id,
-                    'kode_area' => $projectCode . $areaData['kode_area'],
+                    'kode_area' => $projectCode.$areaData['kode_area'],
                 ],
                 [
                     'nama_area' => $areaData['nama_area'],
@@ -244,23 +244,23 @@ class ProjectSeeder extends Seeder
     private function createPatrols(Project $project, array $employees, array $patrolAreas): void
     {
         $startDate = Carbon::parse($project->tanggal_mulai);
-        
+
         // Generate 30 days patrol data
         for ($day = 0; $day < 30; $day++) {
             $date = $startDate->copy()->addDays($day);
-            
+
             // Each day, security patrols multiple times
             $patrolTimes = ['08:00', '12:00', '16:00', '20:00', '00:00'];
-            
+
             foreach ($patrolTimes as $time) {
                 // Pick a random employee for this patrol round
                 $randomEmployee = $employees[array_rand($employees)];
-                
+
                 foreach ($patrolAreas as $area) {
                     // 85% aman, 15% tidak aman
                     $status = rand(1, 100) <= 85 ? 'Aman' : 'Tidak Aman';
                     $patrolTime = Carbon::parse($time)->addMinutes(rand(0, 10));
-                    
+
                     $notes = [
                         'Aman' => [
                             'Kondisi aman, tidak ada masalah.',
@@ -277,9 +277,9 @@ class ProjectSeeder extends Seeder
                             'CCTV tidak berfungsi di area ini.',
                         ],
                     ];
-                    
+
                     $note = $notes[$status][array_rand($notes[$status])];
-                    
+
                     Patrol::create([
                         'user_id' => $randomEmployee['id'],
                         'project_id' => $project->id,

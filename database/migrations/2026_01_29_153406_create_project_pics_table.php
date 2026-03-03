@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->date('assigned_at')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['project_id', 'user_id']);
         });
     }

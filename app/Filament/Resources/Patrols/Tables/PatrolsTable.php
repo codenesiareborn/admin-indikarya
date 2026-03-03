@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\Patrols\Tables;
 
 use App\Models\Patrol;
-use Filament\Actions\ViewAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -19,27 +19,27 @@ class PatrolsTable
                     ->label('Tanggal')
                     ->date('d M Y')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('patrol_time')
                     ->label('Waktu')
                     ->time('H:i')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Petugas')
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('project.nama_project')
                     ->label('Project')
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('area_name')
                     ->label('Area')
                     ->searchable()
                     ->description(fn (Patrol $record): string => $record->area_code ?? ''),
-                
+
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
@@ -48,21 +48,21 @@ class PatrolsTable
                         'Tidak Aman' => 'danger',
                         default => 'gray',
                     }),
-                
+
                 Tables\Columns\TextColumn::make('photo')
                     ->label('Foto')
                     ->formatStateUsing(fn ($state) => $state ? 'Lihat Foto' : '-')
-                    ->url(fn ($record) => $record->photo ? asset('storage/' . $record->photo) : null)
+                    ->url(fn ($record) => $record->photo ? asset('storage/'.$record->photo) : null)
                     ->openUrlInNewTab()
                     ->color('info')
                     ->icon('heroicon-o-photo'),
-                
+
                 Tables\Columns\TextColumn::make('note')
                     ->label('Catatan')
                     ->limit(30)
                     ->placeholder('-')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 Tables\Columns\TextColumn::make('submitted_at')
                     ->label('Dikirim')
                     ->dateTime('d M Y, H:i')
@@ -74,13 +74,13 @@ class PatrolsTable
                 Tables\Filters\SelectFilter::make('project_id')
                     ->label('Project')
                     ->relationship('project', 'nama_project'),
-                
+
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'Aman' => 'Aman',
                         'Tidak Aman' => 'Tidak Aman',
                     ]),
-                
+
                 Tables\Filters\Filter::make('patrol_date')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('from')

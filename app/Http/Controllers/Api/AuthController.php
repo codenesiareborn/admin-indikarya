@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\LoginRequest;
-use App\Http\Requests\Api\UpdateProfileRequest;
 use App\Http\Requests\Api\UpdatePasswordRequest;
-use App\Http\Resources\UserResource;
+use App\Http\Requests\Api\UpdateProfileRequest;
 use App\Http\Resources\ProjectResource;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,7 +26,7 @@ class AuthController extends Controller
         $user = User::where('nip', $validated['nip'])->first();
 
         // Check if user exists and password is correct
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
+        if (! $user || ! Hash::check($validated['password'], $user->password)) {
             return response()->json([
                 'success' => false,
                 'message' => 'NIP atau password salah',
@@ -149,7 +149,7 @@ class AuthController extends Controller
         $validated = $request->validated();
 
         // Check if current password is correct
-        if (!Hash::check($validated['current_password'], $user->password)) {
+        if (! Hash::check($validated['current_password'], $user->password)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Password saat ini tidak benar',

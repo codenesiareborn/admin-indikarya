@@ -12,8 +12,8 @@ class AttendanceService
     /**
      * Calculate attendance status based on check-in time and scheduled time
      *
-     * @param string $checkInTime Format: H:i (e.g., "08:15")
-     * @param string $scheduledTime Format: H:i (e.g., "08:00")
+     * @param  string  $checkInTime  Format: H:i (e.g., "08:15")
+     * @param  string  $scheduledTime  Format: H:i (e.g., "08:00")
      * @return string 'hadir' or 'terlambat'
      */
     public function calculateStatus(string $checkInTime, string $scheduledTime): string
@@ -21,10 +21,10 @@ class AttendanceService
         try {
             $checkIn = Carbon::createFromFormat('H:i', $checkInTime);
             $scheduled = Carbon::createFromFormat('H:i', $scheduledTime);
-            
+
             // Grace period 5 minutes
             $scheduled->addMinutes(5);
-            
+
             return $checkIn->lte($scheduled) ? 'hadir' : 'terlambat';
         } catch (\Exception $e) {
             // If parsing fails, default to 'hadir'
@@ -35,8 +35,7 @@ class AttendanceService
     /**
      * Upload photo to storage
      *
-     * @param UploadedFile $file
-     * @param string $type 'check_in' or 'check_out'
+     * @param  string  $type  'check_in' or 'check_out'
      * @return string Path to uploaded file
      */
     public function uploadPhoto(UploadedFile $file, string $type = 'check_in'): string
@@ -46,33 +45,32 @@ class AttendanceService
         $timestamp = now()->timestamp;
         $extension = $file->getClientOriginalExtension();
         $filename = "{$type}_{$date}_{$timestamp}_{$this->generateRandomString(8)}.{$extension}";
-        
+
         // Store in public disk under attendances directory
         $path = $file->storeAs('attendances', $filename, 'public');
-        
+
         return $path;
     }
 
     /**
-     * Validate if user is assigned to project
-     *
-     * @param int $userId
-     * @param int $projectId
-     * @return bool
+     * Validate if user has active assignment to project
      */
     public function validateUserProject(int $userId, int $projectId): bool
     {
         return \DB::table('employee_projects')
-            ->where('user_id', $userId)
-            ->where('project_id', $projectId)
+            ->join('projects', 'employee_projects.project_id', '=', 'projects.id')
+            ->where('employee_projects.user_id', $userId)
+            ->where('employee_projects.project_id', $projectId)
+            ->where('projects.status', 'aktif')
+            ->where(function ($query) {
+                $query->whereNull('employee_projects.tanggal_selesai')
+                    ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
+            })
             ->exists();
     }
 
     /**
      * Generate random string
-     *
-     * @param int $length
-     * @return string
      */
     private function generateRandomString(int $length = 8): string
     {
@@ -81,16 +79,13 @@ class AttendanceService
 
     /**
      * Delete photo from storage
-     *
-     * @param string $path
-     * @return bool
      */
     public function deletePhoto(string $path): bool
     {
         if (Storage::disk('public')->exists($path)) {
             return Storage::disk('public')->delete($path);
         }
-        
+
         return false;
     }
 }

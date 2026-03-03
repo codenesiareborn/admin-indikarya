@@ -16,11 +16,10 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 
-
 class TasksRelationManager extends RelationManager
 {
     protected static string $relationship = 'tasks';
-    
+
     protected static ?string $title = 'Task List';
 
     public function isReadOnly(): bool
@@ -52,17 +51,16 @@ class TasksRelationManager extends RelationManager
                     ->options(fn () => $this->getOwnerRecord()->rooms()->pluck('nama_ruangan', 'id'))
                     ->required()
                     ->searchable(),
-                
+
                 TextInput::make('nama_task')
                     ->label('Nama Task')
                     ->required()
                     ->maxLength(255),
-                
-                
+
                 Textarea::make('deskripsi')
                     ->label('Deskripsi')
                     ->rows(3),
-                
+
                 Select::make('status')
                     ->label('Status')
                     ->options([
@@ -83,17 +81,17 @@ class TasksRelationManager extends RelationManager
                     ->label('No')
                     ->sortable()
                     ->badge(),
-                
+
                 TextColumn::make('nama_task')
                     ->label('Nama Task')
                     ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('deskripsi')
                     ->label('Deskripsi')
                     ->limit(30)
                     ->placeholder('-'),
-                
+
                 TextColumn::make('status_label')
                     ->label('Status')
                     ->badge()
@@ -102,7 +100,7 @@ class TasksRelationManager extends RelationManager
                         'Non-Aktif' => 'danger',
                         default => 'gray',
                     }),
-                
+
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y')
@@ -122,7 +120,7 @@ class TasksRelationManager extends RelationManager
                 SelectFilter::make('project_room_id')
                     ->label('Ruangan')
                     ->options(fn () => $this->getOwnerRecord()->rooms()->pluck('nama_ruangan', 'id')),
-                
+
                 SelectFilter::make('status')
                     ->options([
                         'aktif' => 'Aktif',

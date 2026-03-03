@@ -25,7 +25,7 @@ class CheckpointResource extends JsonResource
             'tanggal' => $this->tanggal?->format('Y-m-d'),
             'submitted_at' => $this->submitted_at?->format('Y-m-d H:i:s'),
             'submitted_time' => $this->submitted_at?->format('H:i:s'),
-            'foto_url' => $this->foto ? url('storage/' . $this->foto) : null,
+            'foto_url' => $this->foto ? url('storage/'.$this->foto) : null,
             'catatan' => $this->catatan,
             'keterangan' => $this->keterangan,
             'tasks' => TaskSubmissionItemResource::collection($this->whenLoaded('items')),

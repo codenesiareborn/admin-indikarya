@@ -4,14 +4,13 @@ namespace App\Filament\Resources\ShiftReports;
 
 use App\Filament\Resources\ShiftReports\Pages\ListShiftReports;
 use App\Filament\Resources\ShiftReports\Pages\ShiftReportPage;
-use App\Filament\Resources\ShiftReports\Tables\ShiftReportsTable;
 use App\Models\ShiftReport;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class ShiftReportResource extends Resource
@@ -46,16 +45,16 @@ class ShiftReportResource extends Resource
                     ->label('Nama Personil')
                     ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('project.nama_project')
                     ->label('Project')
                     ->sortable(),
-                
+
                 TextColumn::make('shift_date')
                     ->label('Tanggal')
                     ->date('d M Y')
                     ->sortable(),
-                
+
                 TextColumn::make('shift_time')
                     ->label('Waktu')
                     ->time('H:i')
@@ -96,16 +95,17 @@ class ShiftReportResource extends Resource
     {
         $query = parent::getEloquentQuery();
         $user = auth()->user();
-        
+
         if ($user && ($user->hasRole('super_admin') || $user->hasRole('admin'))) {
             return $query;
         }
-        
+
         if ($user && $user->isPic()) {
             $projectIds = $user->getPicProjectIds();
+
             return $query->whereIn('project_id', $projectIds);
         }
-        
+
         return $query;
     }
 }

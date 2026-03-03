@@ -34,7 +34,7 @@ class ShiftReportController extends Controller
             DB::beginTransaction();
 
             $user = auth()->user();
-            
+
             // Create shift report record
             $shiftReport = ShiftReport::create([
                 'user_id' => $user->id,
@@ -60,7 +60,7 @@ class ShiftReportController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menyimpan laporan shift: ' . $e->getMessage(),
+                'message' => 'Gagal menyimpan laporan shift: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -71,7 +71,7 @@ class ShiftReportController extends Controller
     public function today(Request $request): JsonResponse
     {
         $user = auth()->user();
-        
+
         $shiftReports = ShiftReport::with(['user', 'project'])
             ->where('user_id', $user->id)
             ->whereDate('shift_date', now()->toDateString())
@@ -116,14 +116,14 @@ class ShiftReportController extends Controller
     public function show(int $id): JsonResponse
     {
         $user = auth()->user();
-        
+
         $shiftReport = ShiftReport::with(['user', 'project'])
             ->findOrFail($id);
 
         if ($shiftReport->user_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized'
+                'message' => 'Unauthorized',
             ], 403);
         }
 
@@ -139,13 +139,13 @@ class ShiftReportController extends Controller
     public function destroy(int $id): JsonResponse
     {
         $user = auth()->user();
-        
+
         $shiftReport = ShiftReport::findOrFail($id);
 
         if ($shiftReport->user_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized'
+                'message' => 'Unauthorized',
             ], 403);
         }
 
@@ -159,7 +159,7 @@ class ShiftReportController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menghapus laporan shift: ' . $e->getMessage(),
+                'message' => 'Gagal menghapus laporan shift: '.$e->getMessage(),
             ], 500);
         }
     }

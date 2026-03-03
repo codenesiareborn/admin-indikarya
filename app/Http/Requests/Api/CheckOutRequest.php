@@ -30,14 +30,20 @@ class CheckOutRequest extends FormRequest
                 'integer',
                 'exists:projects,id',
                 function ($attribute, $value, $fail) {
-                    // Check if user is assigned to this project
-                    $isAssigned = DB::table('employee_projects')
-                        ->where('user_id', auth()->id())
-                        ->where('project_id', $value)
+                    // Check if user has active assignment to this project
+                    $hasActiveAssignment = DB::table('employee_projects')
+                        ->join('projects', 'employee_projects.project_id', '=', 'projects.id')
+                        ->where('employee_projects.user_id', auth()->id())
+                        ->where('employee_projects.project_id', $value)
+                        ->where('projects.status', 'aktif')
+                        ->where(function ($query) {
+                            $query->whereNull('employee_projects.tanggal_selesai')
+                                ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
+                        })
                         ->exists();
 
-                    if (! $isAssigned) {
-                        $fail('Anda tidak di-assign ke project ini.');
+                    if (! $hasActiveAssignment) {
+                        $fail('Anda tidak memiliki assignment aktif ke project ini.');
                     }
                 },
             ],
@@ -46,20 +52,26 @@ class CheckOutRequest extends FormRequest
                 'integer',
                 'exists:project_shifts,id',
                 function ($attribute, $value, $fail) {
-                    // If shift_id provided, verify user is assigned to project
+                    // If shift_id provided, verify user has active assignment to project
                     if ($value) {
                         $shiftProject = DB::table('project_shifts')
                             ->where('id', $value)
                             ->value('project_id');
 
                         if ($shiftProject) {
-                            $isAssigned = DB::table('employee_projects')
-                                ->where('user_id', auth()->id())
-                                ->where('project_id', $shiftProject)
+                            $hasActiveAssignment = DB::table('employee_projects')
+                                ->join('projects', 'employee_projects.project_id', '=', 'projects.id')
+                                ->where('employee_projects.user_id', auth()->id())
+                                ->where('employee_projects.project_id', $shiftProject)
+                                ->where('projects.status', 'aktif')
+                                ->where(function ($query) {
+                                    $query->whereNull('employee_projects.tanggal_selesai')
+                                        ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
+                                })
                                 ->exists();
 
-                            if (! $isAssigned) {
-                                $fail('Anda tidak di-assign ke project ini.');
+                            if (! $hasActiveAssignment) {
+                                $fail('Anda tidak memiliki assignment aktif ke project ini.');
                             }
                         }
                     }

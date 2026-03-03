@@ -2,11 +2,10 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\Project;
 use App\Models\Attendance;
-use App\Models\ProjectShift;
+use App\Models\Project;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -31,7 +30,7 @@ class AutoMarkAlpha extends Command
      */
     public function handle()
     {
-        $processDate = $this->option('date') 
+        $processDate = $this->option('date')
             ? Carbon::parse($this->option('date'))
             : now()->setTimezone('Asia/Jakarta');
 
@@ -44,6 +43,7 @@ class AutoMarkAlpha extends Command
 
         if ($projects->isEmpty()) {
             $this->info('No active projects with auto mark alpha enabled.');
+
             return 0;
         }
 
@@ -69,7 +69,7 @@ class AutoMarkAlpha extends Command
 
             DB::commit();
             $this->info("Successfully marked {$totalMarked} employees as alpha.");
-            
+
             Log::info('Auto mark alpha completed', [
                 'date' => $processDate->format('Y-m-d'),
                 'total_marked' => $totalMarked,
@@ -79,7 +79,7 @@ class AutoMarkAlpha extends Command
         } catch (\Exception $e) {
             DB::rollBack();
             $this->error("Error: {$e->getMessage()}");
-            
+
             Log::error('Auto mark alpha failed', [
                 'date' => $processDate->format('Y-m-d'),
                 'error' => $e->getMessage(),

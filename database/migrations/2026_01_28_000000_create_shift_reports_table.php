@@ -20,7 +20,7 @@ return new class extends Migration
             $table->time('shift_time');
             $table->timestamp('submitted_at');
             $table->timestamps();
-            
+
             $table->index(['user_id', 'shift_date']);
             $table->index('project_id');
         });

@@ -17,8 +17,8 @@ class CreateEmployee extends CreateRecord
 
     protected function afterCreate(): void
     {
-        $password = session()->pull('employee_password_' . $this->record->id);
-        
+        $password = session()->pull('employee_password_'.$this->record->id);
+
         if ($password) {
             Notification::make()
                 ->success()

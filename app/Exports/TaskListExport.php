@@ -2,9 +2,9 @@
 
 namespace App\Exports;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromView;
-use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -12,10 +12,15 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class TaskListExport implements FromView, ShouldAutoSize, WithStyles
 {
     protected Collection $data;
+
     protected array $stats;
+
     protected array $settings;
+
     protected string $startDate;
+
     protected string $endDate;
+
     protected string $reportNumber;
 
     public function __construct(Collection $data, array $stats, array $settings, string $startDate, string $endDate, string $reportNumber)

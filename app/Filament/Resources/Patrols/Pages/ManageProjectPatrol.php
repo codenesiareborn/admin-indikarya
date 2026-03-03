@@ -6,25 +6,22 @@ use App\Filament\Resources\Patrols\PatrolResource;
 use App\Models\Patrol;
 use App\Models\Project;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Components\DatePicker;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Resources\Pages\Page;
-use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Actions\ViewAction;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class ManageProjectPatrol extends Page implements HasTable, HasForms
+class ManageProjectPatrol extends Page implements HasForms, HasTable
 {
-    use InteractsWithTable;
     use InteractsWithForms;
+    use InteractsWithTable;
 
     protected static string $resource = PatrolResource::class;
 
@@ -33,14 +30,17 @@ class ManageProjectPatrol extends Page implements HasTable, HasForms
     protected string $view = 'filament.resources.patrols.pages.manage-project-patrol';
 
     public ?int $projectId = null;
+
     public ?Project $project = null;
+
     public ?string $filterDate = null;
+
     public ?string $filterMonth = null;
 
     public function mount(): void
     {
         $this->projectId = request()->query('project');
-        
+
         if ($this->projectId) {
             $this->project = Project::find($this->projectId);
         }
@@ -51,7 +51,7 @@ class ManageProjectPatrol extends Page implements HasTable, HasForms
 
     public function getTitle(): string
     {
-        return $this->project 
+        return $this->project
             ? "Laporan Patroli - {$this->project->nama_project}"
             : 'Laporan Patroli Project';
     }
@@ -75,17 +75,17 @@ class ManageProjectPatrol extends Page implements HasTable, HasForms
                     ->label('Waktu')
                     ->time('H:i')
                     ->sortable(),
-                
+
                 TextColumn::make('user.name')
                     ->label('Petugas')
                     ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('area_name')
                     ->label('Area')
                     ->searchable()
                     ->description(fn (Patrol $record): string => $record->area_code ?? ''),
-                
+
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
@@ -94,18 +94,18 @@ class ManageProjectPatrol extends Page implements HasTable, HasForms
                         'Tidak Aman' => 'danger',
                         default => 'gray',
                     }),
-                
+
                 ImageColumn::make('photo')
                     ->label('Foto')
                     ->disk('public')
                     ->height(50)
                     ->defaultImageUrl(url('/images/no-image.png')),
-                
+
                 TextColumn::make('note')
                     ->label('Catatan')
                     ->limit(40)
                     ->placeholder('-'),
-                
+
                 TextColumn::make('submitted_at')
                     ->label('Dikirim')
                     ->dateTime('H:i:s')
@@ -133,7 +133,7 @@ class ManageProjectPatrol extends Page implements HasTable, HasForms
 
     public function getStats(): array
     {
-        if (!$this->projectId || !$this->filterMonth) {
+        if (! $this->projectId || ! $this->filterMonth) {
             return [
                 'total' => 0,
                 'aman' => 0,
@@ -152,8 +152,8 @@ class ManageProjectPatrol extends Page implements HasTable, HasForms
         $total = $patrols->count();
         $aman = $patrols->where('status', 'Aman')->count();
         $tidakAman = $patrols->where('status', 'Tidak Aman')->count();
-        
-        $presentase = $total > 0 
+
+        $presentase = $total > 0
             ? round(($aman / $total) * 100, 1)
             : 0;
 

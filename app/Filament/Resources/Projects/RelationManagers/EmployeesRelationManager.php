@@ -200,6 +200,7 @@ class EmployeesRelationManager extends RelationManager
                                 } elseif ($previousProject && $previousProject->id === $record->id) {
                                     // User already assigned to this project
                                     $failedEmployees[] = "{$user->name} (sudah di {$previousProject->nama_project})";
+
                                     continue;
                                 }
                             }

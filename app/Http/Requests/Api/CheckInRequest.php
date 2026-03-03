@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Api;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\DB;
 
@@ -30,14 +30,20 @@ class CheckInRequest extends FormRequest
                 'integer',
                 'exists:projects,id',
                 function ($attribute, $value, $fail) {
-                    // Check if user is assigned to this project
-                    $isAssigned = DB::table('employee_projects')
-                        ->where('user_id', auth()->id())
-                        ->where('project_id', $value)
+                    // Check if user has active assignment to this project
+                    $hasActiveAssignment = DB::table('employee_projects')
+                        ->join('projects', 'employee_projects.project_id', '=', 'projects.id')
+                        ->where('employee_projects.user_id', auth()->id())
+                        ->where('employee_projects.project_id', $value)
+                        ->where('projects.status', 'aktif')
+                        ->where(function ($query) {
+                            $query->whereNull('employee_projects.tanggal_selesai')
+                                ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
+                        })
                         ->exists();
-                    
-                    if (!$isAssigned) {
-                        $fail('Anda tidak di-assign ke project ini.');
+
+                    if (! $hasActiveAssignment) {
+                        $fail('Anda tidak memiliki assignment aktif ke project ini.');
                     }
                 },
             ],
@@ -53,8 +59,8 @@ class CheckInRequest extends FormRequest
                         ->where('project_id', $projectId)
                         ->where('is_active', true)
                         ->exists();
-                    
-                    if (!$isValidShift) {
+
+                    if (! $isValidShift) {
                         $fail('Shift tidak valid atau tidak aktif untuk project ini.');
                     }
                 },
@@ -94,7 +100,6 @@ class CheckInRequest extends FormRequest
     /**
      * Handle a failed validation attempt.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return void
      *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException
@@ -105,7 +110,7 @@ class CheckInRequest extends FormRequest
             response()->json([
                 'success' => false,
                 'message' => 'Validasi gagal',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422)
         );
     }

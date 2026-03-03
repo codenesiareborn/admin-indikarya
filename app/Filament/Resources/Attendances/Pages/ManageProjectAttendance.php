@@ -5,32 +5,26 @@ namespace App\Filament\Resources\Attendances\Pages;
 use App\Filament\Resources\Attendances\AttendanceResource;
 use App\Models\Attendance;
 use App\Models\Project;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Form;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Resources\Pages\Page;
-use Filament\Schemas\Schema;
-use Filament\Support\Colors\Color;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Actions\Action;
-use Filament\Widgets\StatsOverviewWidget\Stat;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\Attendances\Widgets\AttendanceStatsWidget;
 
-class ManageProjectAttendance extends Page implements HasTable, HasForms
+class ManageProjectAttendance extends Page implements HasForms, HasTable
 {
-    use InteractsWithTable;
     use InteractsWithForms;
+    use InteractsWithTable;
 
     protected static string $resource = AttendanceResource::class;
 
@@ -39,14 +33,17 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
     protected string $view = 'filament.resources.attendances.pages.manage-project-attendance';
 
     public ?int $projectId = null;
+
     public ?Project $project = null;
+
     public ?string $filterDate = null;
+
     public ?string $filterMonth = null;
 
     public function mount(): void
     {
         $this->projectId = request()->query('project');
-        
+
         if ($this->projectId) {
             $this->project = Project::find($this->projectId);
         }
@@ -57,7 +54,7 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
 
     public function getTitle(): string
     {
-        return $this->project 
+        return $this->project
             ? "Manage Presensi - {$this->project->nama_project}"
             : 'Manage Presensi Project';
     }
@@ -81,81 +78,77 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
                     ->label('NIK')
                     ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('employee.name')
                     ->label('Nama Pegawai')
                     ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('tanggal')
                     ->label('Tanggal')
                     ->date('d M Y')
                     ->sortable(),
-                
+
                 TextColumn::make('shift_name_display')
                     ->label('Shift')
                     ->badge()
                     ->color('info')
                     ->sortable(),
-                
+
                 TextColumn::make('check_in')
                     ->label('Check In')
                     ->time('H:i')
                     ->placeholder('-'),
-                
+
                 TextColumn::make('check_in_photo')
                     ->label('Foto Masuk')
                     ->formatStateUsing(fn ($state) => $state ? basename($state) : '-')
-                    ->url(fn ($record) => $record->check_in_photo ? asset('storage/' . $record->check_in_photo) : null)
+                    ->url(fn ($record) => $record->check_in_photo ? asset('storage/'.$record->check_in_photo) : null)
                     ->openUrlInNewTab()
                     ->color('info')
                     ->icon('heroicon-o-photo'),
-                
+
                 TextColumn::make('check_in_location')
                     ->label('Lokasi Masuk')
-                    ->formatStateUsing(fn ($record) => 
-                        $record->check_in_latitude && $record->check_in_longitude
-                            ? '(' . number_format($record->check_in_latitude, 2) . ', ' . number_format($record->check_in_longitude, 2) . ')'
+                    ->formatStateUsing(fn ($record) => $record->check_in_latitude && $record->check_in_longitude
+                            ? '('.number_format($record->check_in_latitude, 2).', '.number_format($record->check_in_longitude, 2).')'
                             : '-'
                     )
-                    ->url(fn ($record) => 
-                        $record->check_in_latitude && $record->check_in_longitude
+                    ->url(fn ($record) => $record->check_in_latitude && $record->check_in_longitude
                             ? "https://www.google.com/maps?q={$record->check_in_latitude},{$record->check_in_longitude}"
                             : null
                     )
                     ->openUrlInNewTab()
                     ->color('success')
                     ->icon('heroicon-o-map-pin'),
-                
+
                 TextColumn::make('check_out')
                     ->label('Check Out')
                     ->time('H:i')
                     ->placeholder('-'),
-                
+
                 TextColumn::make('check_out_photo')
                     ->label('Foto Keluar')
                     ->formatStateUsing(fn ($state) => $state ? basename($state) : '-')
-                    ->url(fn ($record) => $record->check_out_photo ? asset('storage/' . $record->check_out_photo) : null)
+                    ->url(fn ($record) => $record->check_out_photo ? asset('storage/'.$record->check_out_photo) : null)
                     ->openUrlInNewTab()
                     ->color('info')
                     ->icon('heroicon-o-photo'),
-                
+
                 TextColumn::make('check_out_location')
                     ->label('Lokasi Keluar')
-                    ->formatStateUsing(fn ($record) => 
-                        $record->check_out_latitude && $record->check_out_longitude
-                            ? '(' . number_format($record->check_out_latitude, 2) . ', ' . number_format($record->check_out_longitude, 2) . ')'
+                    ->formatStateUsing(fn ($record) => $record->check_out_latitude && $record->check_out_longitude
+                            ? '('.number_format($record->check_out_latitude, 2).', '.number_format($record->check_out_longitude, 2).')'
                             : '-'
                     )
-                    ->url(fn ($record) => 
-                        $record->check_out_latitude && $record->check_out_longitude
+                    ->url(fn ($record) => $record->check_out_latitude && $record->check_out_longitude
                             ? "https://www.google.com/maps?q={$record->check_out_latitude},{$record->check_out_longitude}"
                             : null
                     )
                     ->openUrlInNewTab()
                     ->color('success')
                     ->icon('heroicon-o-map-pin'),
-                
+
                 TextColumn::make('status_label')
                     ->label('Status')
                     ->badge()
@@ -238,7 +231,7 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
 
     public function getStats(): array
     {
-        if (!$this->projectId || !$this->filterMonth) {
+        if (! $this->projectId || ! $this->filterMonth) {
             return [
                 'hadir' => 0,
                 'terlambat' => 0,
@@ -257,9 +250,9 @@ class ManageProjectAttendance extends Page implements HasTable, HasForms
         $hadir = $attendances->where('status', 'hadir')->count();
         $terlambat = $attendances->where('status', 'terlambat')->count();
         $tidakHadir = $attendances->whereIn('status', ['alpha', 'izin', 'sakit', 'libur'])->count();
-        
+
         $totalHariKerja = $attendances->count();
-        $presentase = $totalHariKerja > 0 
+        $presentase = $totalHariKerja > 0
             ? round((($hadir + $terlambat) / $totalHariKerja) * 100, 1)
             : 0;
 

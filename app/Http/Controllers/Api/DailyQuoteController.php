@@ -15,7 +15,7 @@ class DailyQuoteController extends Controller
     {
         $quote = DailyQuote::inRandomOrder()->first();
 
-        if (!$quote) {
+        if (! $quote) {
             return response()->json([
                 'success' => false,
                 'message' => 'No quotes available',
@@ -69,7 +69,7 @@ class DailyQuoteController extends Controller
     {
         $quote = DailyQuote::find($id);
 
-        if (!$quote) {
+        if (! $quote) {
             return response()->json([
                 'success' => false,
                 'message' => 'Quote not found',

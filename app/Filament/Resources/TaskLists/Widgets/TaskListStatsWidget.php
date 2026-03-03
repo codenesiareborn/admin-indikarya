@@ -11,7 +11,7 @@ class TaskListStatsWidget extends BaseWidget
 {
     #[Reactive]
     public ?int $projectId = null;
-    
+
     #[Reactive]
     public ?string $filterDate = null;
 
@@ -24,22 +24,22 @@ class TaskListStatsWidget extends BaseWidget
                 ->description('Jumlah submit hari ini')
                 ->descriptionIcon('heroicon-m-document-check')
                 ->color('primary'),
-            
+
             Stat::make('Task Selesai', $stats['total_tasks_completed'])
                 ->description('Total task dikerjakan')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-            
+
             Stat::make('Task Belum Selesai', $stats['total_tasks_pending'])
                 ->description('Task belum dikerjakan')
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('warning'),
-            
-            Stat::make('Completion Rate', $stats['completion_rate'] . '%')
+
+            Stat::make('Completion Rate', $stats['completion_rate'].'%')
                 ->description('Persentase penyelesaian')
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color($stats['completion_rate'] >= 80 ? 'success' : ($stats['completion_rate'] >= 50 ? 'warning' : 'danger')),
-            
+
             Stat::make('Pegawai Aktif', $stats['active_employees'])
                 ->description('Jumlah pegawai submit hari ini')
                 ->descriptionIcon('heroicon-m-users')
@@ -49,7 +49,7 @@ class TaskListStatsWidget extends BaseWidget
 
     protected function calculateStats(): array
     {
-        if (!$this->projectId || !$this->filterDate) {
+        if (! $this->projectId || ! $this->filterDate) {
             return [
                 'total_submissions' => 0,
                 'total_tasks_completed' => 0,

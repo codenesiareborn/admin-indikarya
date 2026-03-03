@@ -19,18 +19,18 @@ class DailyQuotesTable
                     ->searchable()
                     ->sortable()
                     ->placeholder('-'),
-                
+
                 TextColumn::make('content')
                     ->label('Isi Kata Kata')
                     ->searchable()
                     ->limit(100)
                     ->wrap(),
-                
+
                 TextColumn::make('creator.name')
                     ->label('Dibuat Oleh')
                     ->sortable()
                     ->placeholder('Admin'),
-                
+
                 TextColumn::make('created_at')
                     ->label('Tanggal Dibuat')
                     ->dateTime('d M Y H:i')

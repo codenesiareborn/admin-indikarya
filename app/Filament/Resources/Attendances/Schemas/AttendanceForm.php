@@ -4,8 +4,8 @@ namespace App\Filament\Resources\Attendances\Schemas;
 
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Schema;
 
@@ -44,12 +44,12 @@ class AttendanceForm
                     ->default(null),
                 Select::make('status')
                     ->options([
-            'hadir' => 'Hadir',
-            'terlambat' => 'Terlambat',
-            'izin' => 'Izin',
-            'sakit' => 'Sakit',
-            'alpha' => 'Alpha',
-        ])
+                        'hadir' => 'Hadir',
+                        'terlambat' => 'Terlambat',
+                        'izin' => 'Izin',
+                        'sakit' => 'Sakit',
+                        'alpha' => 'Alpha',
+                    ])
                     ->default('alpha')
                     ->required(),
                 Textarea::make('keterangan')

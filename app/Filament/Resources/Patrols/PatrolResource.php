@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\Patrols;
 
 use App\Filament\Resources\Patrols\Pages\ListPatrols;
-use App\Filament\Resources\Patrols\Pages\ViewPatrol;
 use App\Filament\Resources\Patrols\Pages\ManageProjectPatrol;
+use App\Filament\Resources\Patrols\Pages\ViewPatrol;
 use App\Filament\Resources\Patrols\Tables\PatrolsTable;
 use App\Models\Patrol;
 use BackedEnum;
@@ -62,16 +62,17 @@ class PatrolResource extends Resource
     {
         $query = parent::getEloquentQuery();
         $user = auth()->user();
-        
+
         if ($user && ($user->hasRole('super_admin') || $user->hasRole('admin'))) {
             return $query;
         }
-        
+
         if ($user && $user->isPic()) {
             $projectIds = $user->getPicProjectIds();
+
             return $query->whereIn('project_id', $projectIds);
         }
-        
+
         return $query;
     }
 }

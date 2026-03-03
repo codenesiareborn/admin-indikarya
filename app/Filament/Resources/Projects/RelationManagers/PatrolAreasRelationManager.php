@@ -6,9 +6,9 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -18,7 +18,7 @@ use Filament\Tables\Table;
 class PatrolAreasRelationManager extends RelationManager
 {
     protected static string $relationship = 'patrolAreas';
-    
+
     protected static ?string $title = 'Area Patroli';
 
     public function isReadOnly(): bool
@@ -51,18 +51,18 @@ class PatrolAreasRelationManager extends RelationManager
                     ->maxLength(50)
                     ->unique(ignoreRecord: true)
                     ->placeholder('Contoh: PA-001'),
-                
+
                 TextInput::make('nama_area')
                     ->label('Nama Area')
                     ->required()
                     ->maxLength(255)
                     ->placeholder('Contoh: Lobby Utama'),
-                
+
                 Textarea::make('deskripsi')
                     ->label('Deskripsi')
                     ->rows(3)
                     ->placeholder('Deskripsi singkat area patroli'),
-                
+
                 Select::make('status')
                     ->label('Status')
                     ->options([
@@ -71,7 +71,7 @@ class PatrolAreasRelationManager extends RelationManager
                     ])
                     ->default('aktif')
                     ->required(),
-                
+
                 TextInput::make('urutan')
                     ->label('Urutan')
                     ->numeric()
@@ -92,25 +92,25 @@ class PatrolAreasRelationManager extends RelationManager
                     ->sortable()
                     ->alignCenter()
                     ->width(60),
-                
+
                 TextColumn::make('kode_area')
                     ->label('Kode Area')
                     ->searchable()
                     ->sortable()
                     ->copyable()
                     ->weight('bold'),
-                
+
                 TextColumn::make('nama_area')
                     ->label('Nama Area')
                     ->searchable()
                     ->sortable()
                     ->wrap(),
-                
+
                 TextColumn::make('deskripsi')
                     ->label('Deskripsi')
                     ->limit(50)
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 TextColumn::make('status_label')
                     ->label('Status')
                     ->badge()
@@ -120,14 +120,14 @@ class PatrolAreasRelationManager extends RelationManager
                         default => 'gray',
                     })
                     ->sortable(),
-                
+
                 TextColumn::make('patrols_count')
                     ->label('Jumlah Patroli')
                     ->counts('patrols')
                     ->sortable()
                     ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y')

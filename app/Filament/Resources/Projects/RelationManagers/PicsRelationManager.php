@@ -14,7 +14,7 @@ use Filament\Tables\Table;
 class PicsRelationManager extends RelationManager
 {
     protected static string $relationship = 'pics';
-    
+
     protected static ?string $title = 'PIC / Admin OPD';
 
     public function isReadOnly(): bool
@@ -51,16 +51,16 @@ class PicsRelationManager extends RelationManager
                     ->label('Nama')
                     ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('email')
                     ->label('Email')
                     ->searchable(),
-                
+
                 TextColumn::make('roles.name')
                     ->label('Role')
                     ->badge()
                     ->formatStateUsing(fn ($state) => ucwords(str_replace('_', ' ', $state))),
-                
+
                 TextColumn::make('pivot.assigned_at')
                     ->label('Tanggal Assign')
                     ->date('d M Y')

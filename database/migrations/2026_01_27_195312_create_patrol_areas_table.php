@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('status', ['aktif', 'non-aktif'])->default('aktif');
             $table->integer('urutan')->default(0);
             $table->timestamps();
-            
+
             $table->index(['project_id', 'status']);
         });
     }

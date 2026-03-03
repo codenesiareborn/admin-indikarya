@@ -24,7 +24,7 @@ return new class extends Migration
             $table->time('patrol_time');
             $table->timestamp('submitted_at');
             $table->timestamps();
-            
+
             $table->index(['user_id', 'patrol_date']);
             $table->index('project_id');
         });
