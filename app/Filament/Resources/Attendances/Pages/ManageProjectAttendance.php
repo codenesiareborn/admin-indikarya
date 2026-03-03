@@ -7,7 +7,6 @@ use App\Models\Attendance;
 use App\Models\Project;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -16,7 +15,6 @@ use Filament\Resources\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -210,18 +208,6 @@ class ManageProjectAttendance extends Page implements HasForms, HasTable
                 SelectFilter::make('shift_id')
                     ->label('Shift')
                     ->relationship('shift', 'name'),
-                Filter::make('tanggal')
-                    ->form([
-                        DatePicker::make('date')
-                            ->label('Tanggal')
-                            ->default(now()),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query->when(
-                            $data['date'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('tanggal', $date),
-                        );
-                    }),
             ])
             ->defaultSort('tanggal', 'desc')
             ->toolbarActions([
