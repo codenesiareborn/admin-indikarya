@@ -225,7 +225,7 @@ class EmployeesRelationManager extends RelationManager
                                 ->send();
                         }
 
-                        $action->redirect($this->getUrl());
+                        $action->halt();
                     }),
             ])
             ->actions([
