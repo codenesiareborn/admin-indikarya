@@ -13,7 +13,6 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Validation\Rule;
 
 class EmployeesRelationManager extends RelationManager
 {
@@ -146,7 +145,7 @@ class EmployeesRelationManager extends RelationManager
                         $action->getRecordSelect()
                             ->multiple()
                             ->rules([
-                                Rule::callback(function ($attribute, $value, $fail) {
+                                function ($attribute, $value, $fail) {
                                     if (empty($value)) {
                                         return;
                                     }
@@ -161,7 +160,7 @@ class EmployeesRelationManager extends RelationManager
                                             $fail("Pegawai {$user->name} sudah memiliki project aktif: {$activeProject->nama_project}");
                                         }
                                     }
-                                }),
+                                },
                             ])
                             ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->nip} - {$record->name} ({$record->staf_label})"),
                         DatePicker::make('tanggal_mulai')
