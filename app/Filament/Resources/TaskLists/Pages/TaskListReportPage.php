@@ -230,10 +230,16 @@ class TaskListReportPage extends Page implements HasTable, HasForms
             'company_address' => \App\Models\GeneralSetting::get('company_address', 'Perum Saka Permai No C 10, Plumbon, Sardonoharjo, Ngaglik, Sleman, Yogyakarta'),
         ];
         
+        $projectName = 'Semua Project';
+        if ($this->projectId) {
+            $project = \App\Models\Project::find($this->projectId);
+            $projectName = $project?->nama_project ?? '-';
+        }
+        
         $reportNumber = 'TL-' . now()->format('Ymd-His');
         
         return \Maatwebsite\Excel\Facades\Excel::download(
-            new \App\Exports\TaskListExport($submissions, $stats, $settings, $this->startDate, $this->endDate, $reportNumber),
+            new \App\Exports\TaskListExport($submissions, $stats, $settings, $this->startDate, $this->endDate, $reportNumber, $projectName),
             'laporan-tasklist-' . now()->format('Y-m-d') . '.xlsx'
         );
     }
@@ -249,6 +255,12 @@ class TaskListReportPage extends Page implements HasTable, HasForms
             'company_email' => \App\Models\GeneralSetting::get('company_email', 'pt.indikarya@yahoo.com'),
         ];
         
+        $projectName = 'Semua Project';
+        if ($this->projectId) {
+            $project = \App\Models\Project::find($this->projectId);
+            $projectName = $project?->nama_project ?? '-';
+        }
+        
         $reportNumber = 'LAP-TL-' . now()->format('Ymd-His');
         
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.tasklist-report', [
@@ -258,6 +270,7 @@ class TaskListReportPage extends Page implements HasTable, HasForms
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
             'reportNumber' => $reportNumber,
+            'projectName' => $projectName,
         ]);
         
         $pdf->setPaper('a4', 'landscape');

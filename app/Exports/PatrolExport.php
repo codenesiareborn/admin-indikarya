@@ -17,8 +17,9 @@ class PatrolExport implements FromView, ShouldAutoSize, WithStyles
     protected string $startDate;
     protected string $endDate;
     protected string $reportNumber;
+    protected string $projectName;
 
-    public function __construct(Collection $data, array $stats, array $settings, string $startDate, string $endDate, string $reportNumber)
+    public function __construct(Collection $data, array $stats, array $settings, string $startDate, string $endDate, string $reportNumber, string $projectName)
     {
         $this->data = $data;
         $this->stats = $stats;
@@ -26,6 +27,7 @@ class PatrolExport implements FromView, ShouldAutoSize, WithStyles
         $this->startDate = $startDate;
         $this->endDate = $endDate;
         $this->reportNumber = $reportNumber;
+        $this->projectName = $projectName;
     }
 
     public function view(): View
@@ -37,6 +39,7 @@ class PatrolExport implements FromView, ShouldAutoSize, WithStyles
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
             'reportNumber' => $this->reportNumber,
+            'projectName' => $this->projectName,
             'isExcel' => true,
         ]);
     }

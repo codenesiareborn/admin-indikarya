@@ -231,10 +231,16 @@ class PatrolReportPage extends Page implements HasTable, HasForms
             'company_address' => \App\Models\GeneralSetting::get('company_address', 'Perum Saka Permai No C 10, Plumbon, Sardonoharjo, Ngaglik, Sleman, Yogyakarta'),
         ];
         
+        $projectName = 'Semua Project';
+        if ($this->projectId) {
+            $project = \App\Models\Project::find($this->projectId);
+            $projectName = $project?->nama_project ?? '-';
+        }
+        
         $reportNumber = 'PTR-' . now()->format('Ymd-His');
         
         return \Maatwebsite\Excel\Facades\Excel::download(
-            new \App\Exports\PatrolExport($patrols, $stats, $settings, $this->startDate, $this->endDate, $reportNumber),
+            new \App\Exports\PatrolExport($patrols, $stats, $settings, $this->startDate, $this->endDate, $reportNumber, $projectName),
             'laporan-patroli-' . now()->format('Y-m-d') . '.xlsx'
         );
     }
@@ -250,6 +256,12 @@ class PatrolReportPage extends Page implements HasTable, HasForms
             'company_email' => \App\Models\GeneralSetting::get('company_email', 'pt.indikarya@yahoo.com'),
         ];
         
+        $projectName = 'Semua Project';
+        if ($this->projectId) {
+            $project = \App\Models\Project::find($this->projectId);
+            $projectName = $project?->nama_project ?? '-';
+        }
+        
         $reportNumber = 'LAP-PTR-' . now()->format('Ymd-His');
         
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.patrol-report', [
@@ -259,6 +271,7 @@ class PatrolReportPage extends Page implements HasTable, HasForms
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
             'reportNumber' => $reportNumber,
+            'projectName' => $projectName,
         ]);
         
         $pdf->setPaper('a4', 'landscape');

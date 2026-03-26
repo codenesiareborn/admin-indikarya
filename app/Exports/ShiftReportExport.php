@@ -16,8 +16,9 @@ class ShiftReportExport implements FromView, ShouldAutoSize, WithStyles
     protected $startDate;
     protected $endDate;
     protected $reportNumber;
+    protected $projectName;
 
-    public function __construct($data, $stats, $settings, $startDate, $endDate, $reportNumber)
+    public function __construct($data, $stats, $settings, $startDate, $endDate, $reportNumber, $projectName)
     {
         $this->data = $data;
         $this->stats = $stats;
@@ -25,6 +26,7 @@ class ShiftReportExport implements FromView, ShouldAutoSize, WithStyles
         $this->startDate = $startDate;
         $this->endDate = $endDate;
         $this->reportNumber = $reportNumber;
+        $this->projectName = $projectName;
     }
 
     public function view(): View
@@ -36,6 +38,7 @@ class ShiftReportExport implements FromView, ShouldAutoSize, WithStyles
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
             'reportNumber' => $this->reportNumber,
+            'projectName' => $this->projectName,
             'isExcel' => true,
         ]);
     }

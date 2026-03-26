@@ -219,12 +219,18 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
             'company_address' => GeneralSetting::get('company_address', 'Perum Saka Permai No C 10, Plumbon, Sardonoharjo, Ngaglik, Sleman, Yogyakarta'),
         ];
         
+        $projectName = 'Semua Project';
+        if ($this->projectId) {
+            $project = \App\Models\Project::find($this->projectId);
+            $projectName = $project?->nama_project ?? '-';
+        }
+        
         $startDate = $this->startDate ? \Carbon\Carbon::parse($this->startDate)->format('d/m/Y') : '-';
         $endDate = $this->endDate ? \Carbon\Carbon::parse($this->endDate)->format('d/m/Y') : '-';
         $reportNumber = 'ATT-' . now()->format('Ymd-His');
         
         return Excel::download(
-            new AttendanceExport($attendances, $stats, $settings, $startDate, $endDate, $reportNumber),
+            new AttendanceExport($attendances, $stats, $settings, $startDate, $endDate, $reportNumber, $projectName),
             'laporan-presensi-' . now()->format('Y-m-d') . '.xlsx'
         );
     }
@@ -240,6 +246,12 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
             'company_email' => GeneralSetting::get('company_email', 'pt.indikarya@yahoo.com'),
         ];
         
+        $projectName = 'Semua Project';
+        if ($this->projectId) {
+            $project = \App\Models\Project::find($this->projectId);
+            $projectName = $project?->nama_project ?? '-';
+        }
+        
         $reportNumber = 'LAP-ABS-' . now()->format('Ymd-His');
         
         $pdf = Pdf::loadView('reports.attendance-report', [
@@ -249,6 +261,7 @@ class AttendanceReportPage extends Page implements HasTable, HasForms
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
             'reportNumber' => $reportNumber,
+            'projectName' => $projectName,
         ]);
         
         $pdf->setPaper('a4', 'landscape');

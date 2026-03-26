@@ -164,10 +164,16 @@ class ShiftReportPage extends Page implements HasTable, HasForms
             'company_address' => \App\Models\GeneralSetting::get('company_address', 'Perum Saka Permai No C 10, Plumbon, Sardonoharjo, Ngaglik, Sleman, Yogyakarta'),
         ];
         
+        $projectName = 'Semua Project';
+        if ($this->projectId) {
+            $project = \App\Models\Project::find($this->projectId);
+            $projectName = $project?->nama_project ?? '-';
+        }
+        
         $reportNumber = 'SFT-' . now()->format('Ymd-His');
         
         return \Maatwebsite\Excel\Facades\Excel::download(
-            new \App\Exports\ShiftReportExport($reports, $stats, $settings, $this->startDate, $this->endDate, $reportNumber),
+            new \App\Exports\ShiftReportExport($reports, $stats, $settings, $this->startDate, $this->endDate, $reportNumber, $projectName),
             'laporan-shift-' . now()->format('Y-m-d') . '.xlsx'
         );
     }
@@ -183,6 +189,12 @@ class ShiftReportPage extends Page implements HasTable, HasForms
             'company_email' => \App\Models\GeneralSetting::get('company_email', 'pt.indikarya@yahoo.com'),
         ];
         
+        $projectName = 'Semua Project';
+        if ($this->projectId) {
+            $project = \App\Models\Project::find($this->projectId);
+            $projectName = $project?->nama_project ?? '-';
+        }
+        
         $reportNumber = 'LAP-SFT-' . now()->format('Ymd-His');
         
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.shift-report', [
@@ -192,6 +204,7 @@ class ShiftReportPage extends Page implements HasTable, HasForms
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
             'reportNumber' => $reportNumber,
+            'projectName' => $projectName,
         ]);
         
         $pdf->setPaper('a4', 'landscape');

@@ -98,6 +98,7 @@
     <div class="report-title">
         <h1>LAPORAN PATROLI</h1>
         <p>Periode: {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</p>
+        <p>Project: {{ $projectName ?? 'Semua Project' }}</p>
         <p>No. Laporan: {{ $reportNumber }}</p>
     </div>
 
