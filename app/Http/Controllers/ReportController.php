@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Exports\AttendanceExport;
+use App\Exports\ShiftReportExport;
 use App\Exports\TaskListExport;
 use App\Models\Attendance;
 use App\Models\GeneralSetting;
 use App\Models\Patrol;
-use App\Models\TaskSubmission;
 use App\Models\ShiftReport;
-use App\Exports\ShiftReportExport;
+use App\Models\TaskSubmission;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -40,11 +40,11 @@ class ReportController extends Controller
 
         $stats = $this->getAttendanceStats($data);
         $settings = GeneralSetting::getAllSettings();
-        $reportNumber = 'LAP-ABS-' . now()->format('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        $reportNumber = 'LAP-ABS-'.now()->format('Y').'-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $filename = "laporan-presensi-{$startDate}-{$endDate}.xlsx";
         $path = "exports/{$filename}";
-        
+
         // Save to storage first
         Excel::store(
             new AttendanceExport($data, $stats, $settings, $startDate, $endDate, $reportNumber),
@@ -57,7 +57,7 @@ class ReportController extends Controller
         // Return with explicit headers
         return response()->download($fullPath, $filename, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',
@@ -86,13 +86,13 @@ class ReportController extends Controller
 
         $stats = $this->getAttendanceStats($data);
         $settings = GeneralSetting::getAllSettings();
-        $reportNumber = 'LAP-ABS-' . now()->format('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        $reportNumber = 'LAP-ABS-'.now()->format('Y').'-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $filename = "laporan-presensi-{$startDate}-{$endDate}.pdf";
         $fullPath = storage_path("app/public/exports/{$filename}");
 
         // Ensure directory exists
-        if (!file_exists(dirname($fullPath))) {
+        if (! file_exists(dirname($fullPath))) {
             mkdir(dirname($fullPath), 0755, true);
         }
 
@@ -111,7 +111,7 @@ class ReportController extends Controller
         // Return with explicit headers
         return response()->download($fullPath, $filename, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',
@@ -140,7 +140,7 @@ class ReportController extends Controller
 
         $stats = $this->getTaskListStats($data);
         $settings = GeneralSetting::getAllSettings();
-        $reportNumber = 'LAP-TSK-' . now()->format('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        $reportNumber = 'LAP-TSK-'.now()->format('Y').'-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $filename = "laporan-tasklist-{$startDate}-{$endDate}.xlsx";
         $path = "exports/{$filename}";
@@ -157,7 +157,7 @@ class ReportController extends Controller
         // Return with explicit headers
         return response()->download($fullPath, $filename, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',
@@ -186,13 +186,13 @@ class ReportController extends Controller
 
         $stats = $this->getTaskListStats($data);
         $settings = GeneralSetting::getAllSettings();
-        $reportNumber = 'LAP-TSK-' . now()->format('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        $reportNumber = 'LAP-TSK-'.now()->format('Y').'-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $filename = "laporan-tasklist-{$startDate}-{$endDate}.pdf";
         $fullPath = storage_path("app/public/exports/{$filename}");
 
         // Ensure directory exists
-        if (!file_exists(dirname($fullPath))) {
+        if (! file_exists(dirname($fullPath))) {
             mkdir(dirname($fullPath), 0755, true);
         }
 
@@ -211,7 +211,7 @@ class ReportController extends Controller
         // Return with explicit headers
         return response()->download($fullPath, $filename, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',
@@ -251,6 +251,7 @@ class ReportController extends Controller
             'active_employees' => $submissions->pluck('user_id')->unique()->count(),
         ];
     }
+
     /**
      * Download Patrol Report as Excel
      */
@@ -273,11 +274,11 @@ class ReportController extends Controller
 
         $stats = $this->getPatrolStats($data);
         $settings = GeneralSetting::getAllSettings();
-        $reportNumber = 'LAP-PTR-' . now()->format('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        $reportNumber = 'LAP-PTR-'.now()->format('Y').'-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $filename = "laporan-patroli-{$startDate}-{$endDate}.xlsx";
         $path = "exports/{$filename}";
-        
+
         // Save to storage first
         Excel::store(
             new \App\Exports\PatrolExport($data, $stats, $settings, $startDate, $endDate, $reportNumber),
@@ -290,7 +291,7 @@ class ReportController extends Controller
         // Return with explicit headers
         return response()->download($fullPath, $filename, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',
@@ -319,13 +320,13 @@ class ReportController extends Controller
 
         $stats = $this->getPatrolStats($data);
         $settings = GeneralSetting::getAllSettings();
-        $reportNumber = 'LAP-PTR-' . now()->format('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        $reportNumber = 'LAP-PTR-'.now()->format('Y').'-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $filename = "laporan-patroli-{$startDate}-{$endDate}.pdf";
         $fullPath = storage_path("app/public/exports/{$filename}");
 
         // Ensure directory exists
-        if (!file_exists(dirname($fullPath))) {
+        if (! file_exists(dirname($fullPath))) {
             mkdir(dirname($fullPath), 0755, true);
         }
 
@@ -344,7 +345,7 @@ class ReportController extends Controller
         // Return with explicit headers
         return response()->download($fullPath, $filename, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',
@@ -369,6 +370,7 @@ class ReportController extends Controller
             'active_officers' => $data->pluck('user_id')->unique()->count(),
         ];
     }
+
     /**
      * Download Shift Report as Excel
      */
@@ -387,11 +389,11 @@ class ReportController extends Controller
 
         $stats = $this->getShiftStats($data);
         $settings = GeneralSetting::getAllSettings();
-        $reportNumber = 'LAP-SFT-' . now()->format('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        $reportNumber = 'LAP-SFT-'.now()->format('Y').'-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $filename = "laporan-shift-{$startDate}-{$endDate}.xlsx";
         $path = "exports/{$filename}";
-        
+
         Excel::store(
             new ShiftReportExport($data, $stats, $settings, $startDate, $endDate, $reportNumber),
             $path,
@@ -402,7 +404,7 @@ class ReportController extends Controller
 
         return response()->download($fullPath, $filename, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',
@@ -427,12 +429,12 @@ class ReportController extends Controller
 
         $stats = $this->getShiftStats($data);
         $settings = GeneralSetting::getAllSettings();
-        $reportNumber = 'LAP-SFT-' . now()->format('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        $reportNumber = 'LAP-SFT-'.now()->format('Y').'-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $filename = "laporan-shift-{$startDate}-{$endDate}.pdf";
         $fullPath = storage_path("app/public/exports/{$filename}");
 
-        if (!file_exists(dirname($fullPath))) {
+        if (! file_exists(dirname($fullPath))) {
             mkdir(dirname($fullPath), 0755, true);
         }
 
@@ -449,7 +451,7 @@ class ReportController extends Controller
 
         return response()->download($fullPath, $filename, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',

@@ -7,7 +7,6 @@ use App\Http\Resources\ProjectShiftResource;
 use App\Models\Project;
 use App\Services\ShiftService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ProjectShiftController extends Controller
 {
@@ -26,7 +25,7 @@ class ProjectShiftController extends Controller
         try {
             $project = Project::find($projectId);
 
-            if (!$project) {
+            if (! $project) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Project not found',
@@ -35,7 +34,7 @@ class ProjectShiftController extends Controller
 
             // Get current day
             $currentDay = strtolower(now()->format('l'));
-            
+
             // Get active shifts for today
             $shifts = $this->shiftService->getActiveShifts($projectId, $currentDay);
 
@@ -47,7 +46,7 @@ class ProjectShiftController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error fetching shifts: ' . $e->getMessage(),
+                'message' => 'Error fetching shifts: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -60,7 +59,7 @@ class ProjectShiftController extends Controller
         try {
             $project = Project::find($projectId);
 
-            if (!$project) {
+            if (! $project) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Project not found',
@@ -77,7 +76,7 @@ class ProjectShiftController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error fetching shifts: ' . $e->getMessage(),
+                'message' => 'Error fetching shifts: '.$e->getMessage(),
             ], 500);
         }
     }

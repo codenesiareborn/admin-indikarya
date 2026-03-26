@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Project;
 use App\Models\ShiftReport;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class ShiftReportSeeder extends Seeder
@@ -16,6 +16,7 @@ class ShiftReportSeeder extends Seeder
 
         if ($projects->isEmpty() || $employees->isEmpty()) {
             $this->command->info('No projects or employees found. Skipping ShiftReportSeeder.');
+
             return;
         }
 
@@ -33,11 +34,11 @@ class ShiftReportSeeder extends Seeder
         // Generate shift reports for the last 14 days
         foreach (range(0, 13) as $daysAgo) {
             $date = now()->subDays($daysAgo)->format('Y-m-d');
-            
+
             foreach ($projects as $project) {
                 // Random 1-3 employees submit shift reports per project per day
                 $randomEmployees = $employees->random(min(rand(1, 3), $employees->count()));
-                
+
                 foreach ($randomEmployees as $employee) {
                     // Check if report already exists
                     $existingReport = ShiftReport::where('user_id', $employee->id)
@@ -45,7 +46,9 @@ class ShiftReportSeeder extends Seeder
                         ->whereDate('shift_date', $date)
                         ->exists();
 
-                    if ($existingReport) continue;
+                    if ($existingReport) {
+                        continue;
+                    }
 
                     // Random shift time (morning: 06-08, afternoon: 14-16, night: 22-00)
                     $shiftHours = [6, 7, 8, 14, 15, 16, 22, 23];
@@ -53,7 +56,7 @@ class ShiftReportSeeder extends Seeder
                     $shiftTime = sprintf('%02d:%02d:00', $hour, rand(0, 59));
 
                     $submittedHour = $hour + rand(0, 2); // Submitted within 0-2 hours after shift start
-                    $submittedAt = $date . ' ' . sprintf('%02d:%02d:%02d', min($submittedHour, 23), rand(0, 59), rand(0, 59));
+                    $submittedAt = $date.' '.sprintf('%02d:%02d:%02d', min($submittedHour, 23), rand(0, 59), rand(0, 59));
 
                     ShiftReport::create([
                         'user_id' => $employee->id,

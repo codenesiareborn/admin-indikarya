@@ -3,28 +3,25 @@
 namespace App\Filament\Resources\TaskLists\Pages;
 
 use App\Filament\Resources\TaskLists\TaskListResource;
-use App\Filament\Resources\TaskLists\Widgets\TaskListStatsWidget;
 use App\Models\Project;
 use App\Models\ProjectRoom;
 use App\Models\TaskSubmission;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Resources\Pages\Page;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class ManageProjectTaskList extends Page implements HasTable, HasForms
+class ManageProjectTaskList extends Page implements HasForms, HasTable
 {
-    use InteractsWithTable;
     use InteractsWithForms;
+    use InteractsWithTable;
 
     protected static string $resource = TaskListResource::class;
 
@@ -33,14 +30,17 @@ class ManageProjectTaskList extends Page implements HasTable, HasForms
     protected string $view = 'filament.resources.tasklists.pages.manage-project-tasklist';
 
     public ?int $projectId = null;
+
     public ?Project $project = null;
+
     public ?string $filterDate = null;
+
     public ?int $filterRoom = null;
 
     public function mount(): void
     {
         $this->projectId = request()->query('project');
-        
+
         if ($this->projectId) {
             $this->project = Project::find($this->projectId);
         }
@@ -51,7 +51,7 @@ class ManageProjectTaskList extends Page implements HasTable, HasForms
 
     public function getTitle(): string
     {
-        return $this->project 
+        return $this->project
             ? "Task List Report - {$this->project->nama_project}"
             : 'Task List Report';
     }
@@ -76,40 +76,40 @@ class ManageProjectTaskList extends Page implements HasTable, HasForms
                     ->label('Nama Pegawai')
                     ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('room.nama_ruangan')
                     ->label('Area/Ruangan')
                     ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('tanggal')
                     ->label('Tanggal')
                     ->date('d M Y')
                     ->sortable(),
-                
+
                 TextColumn::make('submitted_at')
                     ->label('Jam Submit')
                     ->dateTime('H:i:s')
                     ->sortable(),
-                
+
                 TextColumn::make('task_completion')
                     ->label('Task Selesai')
                     ->state(fn (TaskSubmission $record) => "{$record->completed_count}/{$record->total_tasks}")
                     ->badge()
                     ->color(fn (TaskSubmission $record) => $record->completion_rate >= 100 ? 'success' : ($record->completion_rate >= 50 ? 'warning' : 'danger')),
-                
+
                 TextColumn::make('completion_rate')
                     ->label('Persentase')
                     ->state(fn (TaskSubmission $record) => "{$record->completion_rate}%")
                     ->badge()
                     ->color(fn (TaskSubmission $record) => $record->completion_rate >= 100 ? 'success' : ($record->completion_rate >= 50 ? 'warning' : 'danger')),
-                
+
                 ImageColumn::make('foto')
                     ->label('Foto')
                     ->disk('public')
                     ->height(50)
                     ->defaultImageUrl(url('/images/no-image.png')),
-                
+
                 TextColumn::make('catatan')
                     ->label('Catatan')
                     ->limit(30)
@@ -118,7 +118,7 @@ class ManageProjectTaskList extends Page implements HasTable, HasForms
             ->filters([
                 SelectFilter::make('project_room_id')
                     ->label('Area/Ruangan')
-                    ->options(fn () => $this->project 
+                    ->options(fn () => $this->project
                         ? ProjectRoom::where('project_id', $this->projectId)->pluck('nama_ruangan', 'id')
                         : []
                     ),
@@ -131,7 +131,7 @@ class ManageProjectTaskList extends Page implements HasTable, HasForms
 
     public function getStats(): array
     {
-        if (!$this->projectId || !$this->filterDate) {
+        if (! $this->projectId || ! $this->filterDate) {
             return [
                 'total_submissions' => 0,
                 'total_tasks_completed' => 0,
@@ -162,7 +162,7 @@ class ManageProjectTaskList extends Page implements HasTable, HasForms
 
     public function getRooms(): array
     {
-        if (!$this->projectId) {
+        if (! $this->projectId) {
             return [];
         }
 

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('attendances', function (Blueprint $table) {
             $table->foreignId('shift_id')->nullable()->after('project_id')->constrained('project_shifts')->nullOnDelete();
             $table->string('shift_name_snapshot')->nullable()->after('jam_pulang_snapshot');
-            
+
             $table->index(['shift_id']);
         });
     }

@@ -65,16 +65,17 @@ class AttendanceResource extends Resource
     {
         $query = parent::getEloquentQuery();
         $user = auth()->user();
-        
+
         if ($user && ($user->hasRole('super_admin') || $user->hasRole('admin'))) {
             return $query;
         }
-        
+
         if ($user && $user->isPic()) {
             $projectIds = $user->getPicProjectIds();
+
             return $query->whereIn('project_id', $projectIds);
         }
-        
+
         return $query;
     }
 }

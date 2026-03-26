@@ -6,21 +6,23 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class EmployeeImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
+class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 {
     private int $successCount = 0;
+
     private int $failureCount = 0;
+
     private array $errors = [];
 
     public function collection(Collection $rows)
     {
         foreach ($rows as $index => $row) {
             $rowNumber = $index + 2; // +2 karena index 0 dan ada header row
-            
+
             try {
                 // Validasi data
                 $validator = Validator::make($row->toArray(), [
@@ -56,6 +58,7 @@ class EmployeeImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                     $this->failureCount++;
                     $errorMessages = implode(', ', $validator->errors()->all());
                     $this->errors[] = "Baris {$rowNumber}: {$errorMessages}";
+
                     continue;
                 }
 
@@ -79,7 +82,7 @@ class EmployeeImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                 $this->successCount++;
             } catch (\Exception $e) {
                 $this->failureCount++;
-                $this->errors[] = "Baris {$rowNumber}: " . $e->getMessage();
+                $this->errors[] = "Baris {$rowNumber}: ".$e->getMessage();
             }
         }
     }

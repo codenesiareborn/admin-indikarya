@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\Employees\Pages;
 
 use App\Filament\Resources\Employees\EmployeeResource;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Hash;
@@ -23,13 +23,13 @@ class EditEmployee extends EditRecord
                 ->color('warning')
                 ->requiresConfirmation()
                 ->action(function () {
-                    $password = Str::random(4) . rand(1000, 9999);
-                    
+                    $password = Str::random(4).rand(1000, 9999);
+
                     if ($this->record->user) {
                         $this->record->user->update([
                             'password' => Hash::make($password),
                         ]);
-                        
+
                         Notification::make()
                             ->success()
                             ->title('Password berhasil direset!')

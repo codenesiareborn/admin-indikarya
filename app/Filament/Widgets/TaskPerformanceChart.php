@@ -4,11 +4,11 @@ namespace App\Filament\Widgets;
 
 use App\Models\TaskSubmission;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 class TaskPerformanceChart extends ChartWidget
 {
     protected ?string $heading = '5 Project dengan Performa Task Terbaik';
+
     protected static ?int $sort = 3;
 
     protected function getData(): array
@@ -20,10 +20,10 @@ class TaskPerformanceChart extends ChartWidget
             ->map(function ($submissions) {
                 // Hitung rata-rata completion rate per project
                 $avgRate = $submissions->avg(fn ($submission) => $submission->completion_rate);
-                
+
                 return [
                     'name' => $submissions->first()->project->nama_project ?? 'Unknown Project',
-                    'rate' => round($avgRate, 1)
+                    'rate' => round($avgRate, 1),
                 ];
             })
             ->sortByDesc('rate')

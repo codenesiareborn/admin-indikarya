@@ -4,7 +4,6 @@ namespace App\Filament\Resources\TaskLists\Pages;
 
 use App\Filament\Resources\TaskLists\TaskListResource;
 use App\Models\TaskSubmission;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Resources\Pages\ViewRecord;
@@ -40,49 +39,49 @@ class ViewTaskSubmission extends ViewRecord
                             ->schema([
                                 TextEntry::make('employee.nip')
                                     ->label('NIK'),
-                                
+
                                 TextEntry::make('employee.name')
                                     ->label('Nama Pegawai'),
-                                
+
                                 TextEntry::make('tanggal')
                                     ->label('Tanggal')
                                     ->date('d F Y'),
                             ]),
-                        
+
                         Grid::make(3)
                             ->schema([
                                 TextEntry::make('project.nama_project')
                                     ->label('Project'),
-                                
+
                                 TextEntry::make('room.nama_ruangan')
                                     ->label('Area/Ruangan'),
-                                
+
                                 TextEntry::make('submitted_at')
                                     ->label('Jam Submit')
                                     ->dateTime('H:i:s'),
                             ]),
-                        
+
                         Grid::make(2)
                             ->schema([
                                 TextEntry::make('completion_rate')
                                     ->label('Persentase Selesai')
-                                    ->state(fn (TaskSubmission $record) => $record->completion_rate . '%')
+                                    ->state(fn (TaskSubmission $record) => $record->completion_rate.'%')
                                     ->badge()
                                     ->color(fn (TaskSubmission $record) => $record->completion_rate >= 100 ? 'success' : ($record->completion_rate >= 50 ? 'warning' : 'danger')),
-                                
+
                                 TextEntry::make('task_summary')
                                     ->label('Task Selesai')
-                                    ->state(fn (TaskSubmission $record) => $record->completed_count . ' / ' . $record->total_tasks . ' task'),
+                                    ->state(fn (TaskSubmission $record) => $record->completed_count.' / '.$record->total_tasks.' task'),
                             ]),
                     ]),
-                
+
                 Section::make('Foto Dokumentasi')
                     ->schema([
                         ViewEntry::make('foto')
                             ->label('')
                             ->view('filament.resources.tasklists.components.photo-display'),
                     ]),
-                
+
                 Section::make('Catatan')
                     ->schema([
                         TextEntry::make('catatan')
@@ -90,8 +89,8 @@ class ViewTaskSubmission extends ViewRecord
                             ->placeholder('Tidak ada catatan')
                             ->columnSpanFull(),
                     ])
-                    ->visible(fn (TaskSubmission $record) => !empty($record->catatan)),
-                    
+                    ->visible(fn (TaskSubmission $record) => ! empty($record->catatan)),
+
                 Section::make('Daftar Task')
                     ->schema([
                         ViewEntry::make('items')

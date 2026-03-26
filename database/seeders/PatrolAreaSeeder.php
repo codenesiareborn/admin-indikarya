@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\Project;
 use App\Models\PatrolArea;
+use App\Models\Project;
+use Illuminate\Database\Seeder;
 
 class PatrolAreaSeeder extends Seeder
 {
@@ -22,31 +21,31 @@ class PatrolAreaSeeder extends Seeder
         foreach ($securityProjects as $project) {
             $areas = [
                 [
-                    'kode_area' => 'PT-AD-' . str_pad($project->id, 2, '0', STR_PAD_LEFT),
+                    'kode_area' => 'PT-AD-'.str_pad($project->id, 2, '0', STR_PAD_LEFT),
                     'nama_area' => 'Area Depan',
                     'deskripsi' => 'Area depan gedung/lokasi',
                     'urutan' => 1,
                 ],
                 [
-                    'kode_area' => 'PT-AB-' . str_pad($project->id, 2, '0', STR_PAD_LEFT),
+                    'kode_area' => 'PT-AB-'.str_pad($project->id, 2, '0', STR_PAD_LEFT),
                     'nama_area' => 'Area Belakang',
                     'deskripsi' => 'Area belakang gedung/lokasi',
                     'urutan' => 2,
                 ],
                 [
-                    'kode_area' => 'PT-AS-' . str_pad($project->id, 2, '0', STR_PAD_LEFT),
+                    'kode_area' => 'PT-AS-'.str_pad($project->id, 2, '0', STR_PAD_LEFT),
                     'nama_area' => 'Area Samping',
                     'deskripsi' => 'Area samping gedung/lokasi',
                     'urutan' => 3,
                 ],
                 [
-                    'kode_area' => 'PT-AT-' . str_pad($project->id, 2, '0', STR_PAD_LEFT),
+                    'kode_area' => 'PT-AT-'.str_pad($project->id, 2, '0', STR_PAD_LEFT),
                     'nama_area' => 'Area Tengah',
                     'deskripsi' => 'Area tengah gedung/lokasi',
                     'urutan' => 4,
                 ],
                 [
-                    'kode_area' => 'PT-AP-' . str_pad($project->id, 2, '0', STR_PAD_LEFT),
+                    'kode_area' => 'PT-AP-'.str_pad($project->id, 2, '0', STR_PAD_LEFT),
                     'nama_area' => 'Area Parkir',
                     'deskripsi' => 'Area parkir kendaraan',
                     'urutan' => 5,

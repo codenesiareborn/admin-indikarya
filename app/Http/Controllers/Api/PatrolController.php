@@ -18,6 +18,8 @@ class PatrolController extends Controller
      */
     public function submit(Request $request): JsonResponse
     {
+        $user = auth()->user();
+
         $validator = Validator::make($request->all(), [
             'project_id' => 'required|exists:projects,id',
             'patrol_area_id' => 'nullable|exists:patrol_areas,id',
@@ -27,6 +29,26 @@ class PatrolController extends Controller
             'note' => 'nullable|string|max:1000',
             'photo' => 'required|image|mimes:jpeg,jpg,png|max:5120',
         ]);
+
+        // Custom validation: check if user has active assignment to this project
+        $validator->after(function ($validator) use ($user, $request) {
+            if ($validator->errors()->has('project_id')) {
+                return;
+            }
+
+            $hasActiveAssignment = $user->projects()
+                ->where('projects.id', $request->project_id)
+                ->where('projects.status', 'aktif')
+                ->where(function ($query) {
+                    $query->whereNull('employee_projects.tanggal_selesai')
+                        ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
+                })
+                ->exists();
+
+            if (! $hasActiveAssignment) {
+                $validator->errors()->add('project_id', 'Anda tidak memiliki akses ke project ini atau project tidak aktif.');
+            }
+        });
 
         if ($validator->fails()) {
             return response()->json([
@@ -40,12 +62,12 @@ class PatrolController extends Controller
             DB::beginTransaction();
 
             $user = auth()->user();
-            
+
             // Upload photo
             $photoPath = null;
             if ($request->hasFile('photo')) {
                 $photo = $request->file('photo');
-                $filename = 'patrol_' . time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                $filename = 'patrol_'.time().'_'.uniqid().'.'.$photo->getClientOriginalExtension();
                 $photoPath = $photo->storeAs('patrols', $filename, 'public');
             }
 
@@ -76,14 +98,14 @@ class PatrolController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             if (isset($photoPath)) {
                 Storage::disk('public')->delete($photoPath);
             }
 
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menyimpan patrol: ' . $e->getMessage(),
+                'message' => 'Gagal menyimpan patrol: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -94,7 +116,7 @@ class PatrolController extends Controller
     public function today(Request $request): JsonResponse
     {
         $user = auth()->user();
-        
+
         $patrols = Patrol::with(['user', 'project', 'patrolArea'])
             ->where('user_id', $user->id)
             ->whereDate('patrol_date', now()->toDateString())
@@ -115,9 +137,25 @@ class PatrolController extends Controller
         $user = auth()->user();
         $perPage = $request->input('per_page', 15);
 
-        $patrols = Patrol::with(['user', 'project', 'patrolArea'])
-            ->where('user_id', $user->id)
-            ->orderBy('patrol_date', 'desc')
+        $query = Patrol::with(['user', 'project', 'patrolArea'])
+            ->where('user_id', $user->id);
+
+        // Filter by today
+        if ($request->boolean('today')) {
+            $query->whereDate('patrol_date', now()->toDateString());
+        }
+
+        // Filter by specific date
+        if ($request->has('date')) {
+            $query->whereDate('patrol_date', $request->input('date'));
+        }
+
+        // Filter by project_id
+        if ($request->has('project_id')) {
+            $query->where('project_id', $request->input('project_id'));
+        }
+
+        $patrols = $query->orderBy('patrol_date', 'desc')
             ->orderBy('patrol_time', 'desc')
             ->paginate($perPage);
 
@@ -139,14 +177,14 @@ class PatrolController extends Controller
     public function show(int $id): JsonResponse
     {
         $user = auth()->user();
-        
+
         $patrol = Patrol::with(['user', 'project', 'patrolArea'])
             ->findOrFail($id);
 
         if ($patrol->user_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized'
+                'message' => 'Unauthorized',
             ], 403);
         }
 
@@ -164,16 +202,33 @@ class PatrolController extends Controller
         $user = auth()->user();
         $projectId = $request->input('project_id');
 
-        // If no project_id provided, get from user's first project
-        if (!$projectId) {
-            $userProject = $user->projects()->first();
-            if (!$userProject) {
+        // If no project_id provided, get from user's active project
+        if (! $projectId) {
+            $userProject = $user->getActiveProject();
+            if (! $userProject) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'User tidak memiliki project',
+                    'message' => 'User tidak memiliki project aktif',
                 ], 404);
             }
             $projectId = $userProject->id;
+        } else {
+            // Validate that user is assigned to this project and it's active
+            $hasActiveAssignment = $user->projects()
+                ->where('projects.id', $projectId)
+                ->where('projects.status', 'aktif')
+                ->where(function ($query) {
+                    $query->whereNull('employee_projects.tanggal_selesai')
+                        ->orWhere('employee_projects.tanggal_selesai', '>=', now()->toDateString());
+                })
+                ->exists();
+
+            if (! $hasActiveAssignment) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Project tidak aktif atau user tidak memiliki akses',
+                ], 403);
+            }
         }
 
         $areas = \App\Models\PatrolArea::where('project_id', $projectId)

@@ -23,7 +23,7 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'nama' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|max:255|unique:users,email,' . $this->user()->id,
+            'email' => 'sometimes|email|max:255|unique:users,email,'.$this->user()->id,
             'no_telp' => 'sometimes|string|max:20',
             'alamat' => 'sometimes|string|max:500',
         ];

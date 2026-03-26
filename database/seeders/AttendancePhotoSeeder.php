@@ -12,7 +12,7 @@ class AttendancePhotoSeeder extends Seeder
     {
         // Create a simple placeholder image (1x1 pixel PNG)
         $placeholderImage = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
-        
+
         // Create folder if not exists
         Storage::disk('public')->makeDirectory('attendances');
 
@@ -24,19 +24,20 @@ class AttendancePhotoSeeder extends Seeder
 
         if ($attendances->isEmpty()) {
             $this->command->info('No attendances without photos found.');
+
             return;
         }
 
         $count = 0;
         foreach ($attendances as $attendance) {
             // Generate unique filenames
-            $checkInFilename = "attendances/check_in_{$attendance->id}_" . time() . ".png";
-            $checkOutFilename = "attendances/check_out_{$attendance->id}_" . time() . ".png";
-            
+            $checkInFilename = "attendances/check_in_{$attendance->id}_".time().'.png';
+            $checkOutFilename = "attendances/check_out_{$attendance->id}_".time().'.png';
+
             // Save placeholder images
             Storage::disk('public')->put($checkInFilename, $placeholderImage);
             Storage::disk('public')->put($checkOutFilename, $placeholderImage);
-            
+
             // Update attendance record
             $attendance->update([
                 'check_in_photo' => $checkInFilename,
@@ -46,7 +47,7 @@ class AttendancePhotoSeeder extends Seeder
                 'check_out_latitude' => -6.2088 + (rand(-100, 100) / 10000),
                 'check_out_longitude' => 106.8456 + (rand(-100, 100) / 10000),
             ]);
-            
+
             $count++;
         }
 

@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\Projects\Schemas;
 
 use Filament\Forms;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class ProjectForm
 {
@@ -19,7 +19,7 @@ class ProjectForm
                             ->label('Nama Project')
                             ->required()
                             ->maxLength(255),
-                        
+
                         Forms\Components\Select::make('jenis_project')
                             ->label('Jenis Project')
                             ->options([
@@ -27,12 +27,12 @@ class ProjectForm
                                 'security_services' => 'Security Services',
                             ])
                             ->required(),
-                        
+
                         Forms\Components\Textarea::make('alamat_lengkap')
                             ->label('Alamat Lengkap')
                             ->required()
                             ->rows(3),
-                        
+
                         Forms\Components\TextInput::make('nilai_kontrak')
                             ->label('Nilai Kontrak (Rp)')
                             ->numeric()
@@ -40,14 +40,14 @@ class ProjectForm
                             ->required()
                             ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.'))
                             ->dehydrateStateUsing(fn ($state) => str_replace('.', '', $state)),
-                        
+
                         Grid::make(2)
                             ->schema([
                                 Forms\Components\DatePicker::make('tanggal_mulai')
                                     ->label('Tanggal Mulai')
                                     ->required()
                                     ->native(false),
-                                
+
                                 Forms\Components\DatePicker::make('tanggal_selesai')
                                     ->label('Tanggal Selesai')
                                     ->required()
@@ -55,20 +55,20 @@ class ProjectForm
                                     ->afterOrEqual('tanggal_mulai'),
                             ]),
                     ]),
-                
+
                 Section::make('Pengaturan Presensi')
                     ->schema([
                         Forms\Components\Toggle::make('auto_mark_alpha')
                             ->label('Aktifkan Status Kehadiran')
                             ->helperText('Jika aktif, sistem akan otomatis menandai alpha untuk pegawai yang tidak hadir')
                             ->default(false),
-                        
+
                         Forms\Components\Placeholder::make('shifts_info')
                             ->label('Kelola Shift')
                             ->content(fn ($record) => $record ? 'Kelola shift di menu Project Shifts' : 'Simpan project terlebih dahulu untuk mengelola shift')
                             ->visible(fn ($record) => true),
                     ]),
-                
+
                 Section::make('Status Project')
                     ->schema([
                         Forms\Components\Select::make('status')

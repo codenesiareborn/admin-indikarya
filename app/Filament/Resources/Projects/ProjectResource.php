@@ -65,17 +65,17 @@ class ProjectResource extends Resource
     {
         $query = parent::getEloquentQuery();
         $user = auth()->user();
-        
+
         // If user is super_admin or admin, show all projects
         if ($user && ($user->hasRole('super_admin') || $user->hasRole('admin'))) {
             return $query;
         }
-        
+
         // If user is PIC, filter to only assigned projects
         if ($user && $user->isPic()) {
             return $query->whereHas('pics', fn (Builder $q) => $q->where('user_id', $user->id));
         }
-        
+
         return $query;
     }
 

@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\Employees\Schemas;
 
 use Filament\Forms;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class EmployeeForm
 {
@@ -19,13 +19,13 @@ class EmployeeForm
                             ->label('Nama Lengkap')
                             ->required()
                             ->maxLength(255),
-                        
+
                         Forms\Components\TextInput::make('nip')
                             ->label('NIP')
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
-                        
+
                         Forms\Components\TextInput::make('password')
                             ->label('Password')
                             ->password()
@@ -35,7 +35,7 @@ class EmployeeForm
                             ->minLength(8)
                             ->maxLength(255)
                             ->helperText('Minimal 8 karakter. Kosongkan jika tidak ingin mengubah password.'),
-                        
+
                         Grid::make(2)
                             ->schema([
                                 Forms\Components\Select::make('staf')
@@ -45,7 +45,7 @@ class EmployeeForm
                                         'security_services' => 'Security Services',
                                     ])
                                     ->required(),
-                                
+
                                 Forms\Components\Select::make('jenis_kelamin')
                                     ->label('Jenis Kelamin')
                                     ->options([
@@ -54,19 +54,19 @@ class EmployeeForm
                                     ])
                                     ->required(),
                             ]),
-                        
+
                         Forms\Components\TextInput::make('email')
                             ->label('Email')
                             ->email()
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
-                        
+
                         Forms\Components\TextInput::make('no_hp')
                             ->label('No HP')
                             ->tel()
                             ->maxLength(20),
-                        
+
                         Grid::make(2)
                             ->schema([
                                 Forms\Components\DatePicker::make('tanggal_lahir')
@@ -75,7 +75,7 @@ class EmployeeForm
                                     ->native(false)
                                     ->maxDate(now())
                                     ->displayFormat('d/m/Y'),
-                                
+
                                 Forms\Components\DatePicker::make('tanggal_masuk')
                                     ->label('Tanggal Masuk Perusahaan')
                                     ->required()
@@ -83,13 +83,13 @@ class EmployeeForm
                                     ->default(now())
                                     ->displayFormat('d/m/Y'),
                             ]),
-                        
+
                         Forms\Components\Textarea::make('alamat')
                             ->label('Alamat')
                             ->required()
                             ->rows(3),
                     ]),
-                
+
                 Section::make('Status Pegawai')
                     ->schema([
                         Forms\Components\Select::make('status_pegawai')
@@ -101,7 +101,7 @@ class EmployeeForm
                             ])
                             ->default('aktif')
                             ->required(),
-                        
+
                         Forms\Components\Hidden::make('role')
                             ->default('employee'),
                     ]),

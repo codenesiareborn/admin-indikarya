@@ -3,18 +3,19 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Attendance;
-use Filament\Widgets\ChartWidget;
 use Carbon\Carbon;
+use Filament\Widgets\ChartWidget;
 
 class AttendanceTrendChart extends ChartWidget
 {
     protected ?string $heading = 'Tren Kehadiran (7 Hari Terakhir)';
+
     protected static ?int $sort = 2; // Tampil setelah Stats Overview
 
     protected function getData(): array
     {
         $dates = collect(range(6, 0))->map(fn ($days) => Carbon::now()->subDays($days)->format('Y-m-d'));
-        
+
         $data = Attendance::where('status', 'hadir')
             ->whereDate('tanggal', '>=', Carbon::now()->subDays(6))
             ->get()

@@ -192,14 +192,8 @@ class AttendanceController extends Controller
                 ], 409);
             }
 
-            // Validate check-out time is within allowed window
+            // Get current time for check-out
             $checkOutTime = now()->format('H:i');
-            if (! $this->shiftService->isValidCheckoutTime($checkOutTime, $attendance->shift_id, $attendance->tanggal->toDateString())) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Waktu check-out melebihi batas toleransi yang diizinkan',
-                ], 400);
-            }
 
             // Upload photo
             $photoPath = $this->attendanceService->uploadPhoto(

@@ -58,7 +58,7 @@ class Attendance extends Model
 
     public function getStatusLabelAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'hadir' => 'Hadir',
             'terlambat' => 'Terlambat',
             'izin' => 'Izin',
@@ -71,15 +71,15 @@ class Attendance extends Model
 
     public function getCheckInPhotoUrlAttribute()
     {
-        return $this->check_in_photo 
-            ? asset('storage/' . $this->check_in_photo) 
+        return $this->check_in_photo
+            ? asset('storage/'.$this->check_in_photo)
             : null;
     }
 
     public function getCheckOutPhotoUrlAttribute()
     {
-        return $this->check_out_photo 
-            ? asset('storage/' . $this->check_out_photo) 
+        return $this->check_out_photo
+            ? asset('storage/'.$this->check_out_photo)
             : null;
     }
 
@@ -92,6 +92,7 @@ class Attendance extends Model
                 'maps_url' => "https://www.google.com/maps?q={$this->check_in_latitude},{$this->check_in_longitude}",
             ];
         }
+
         return null;
     }
 
@@ -104,14 +105,15 @@ class Attendance extends Model
                 'maps_url' => "https://www.google.com/maps?q={$this->check_out_latitude},{$this->check_out_longitude}",
             ];
         }
+
         return null;
     }
 
     public function getShiftNameDisplayAttribute(): string
     {
         // Priority: shift_name_snapshot > shift relation name > '-'
-        return $this->shift_name_snapshot 
-            ?? $this->shift?->name 
+        return $this->shift_name_snapshot
+            ?? $this->shift?->name
             ?? '-';
     }
 }

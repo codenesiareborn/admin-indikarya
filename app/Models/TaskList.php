@@ -28,7 +28,7 @@ class TaskList extends Model
 
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'aktif' => 'Aktif',
             'non-aktif' => 'Non-Aktif',
             default => $this->status,

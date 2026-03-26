@@ -3,8 +3,6 @@
 namespace App\Filament\Resources\Patrols\Pages;
 
 use App\Filament\Resources\Patrols\PatrolResource;
-use App\Models\Patrol;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Resources\Pages\ViewRecord;
@@ -29,30 +27,30 @@ class ViewPatrol extends ViewRecord
                                 TextEntry::make('patrol_date')
                                     ->label('Tanggal Patroli')
                                     ->date('d F Y'),
-                                
+
                                 TextEntry::make('patrol_time')
                                     ->label('Waktu Patroli')
                                     ->time('H:i'),
                             ]),
-                        
+
                         Grid::make(2)
                             ->schema([
                                 TextEntry::make('user.name')
                                     ->label('Nama Petugas'),
-                                
+
                                 TextEntry::make('project.nama_project')
                                     ->label('Project'),
                             ]),
-                        
+
                         Grid::make(2)
                             ->schema([
                                 TextEntry::make('area_name')
                                     ->label('Nama Area'),
-                                
+
                                 TextEntry::make('area_code')
                                     ->label('Kode Area'),
                             ]),
-                        
+
                         TextEntry::make('status')
                             ->label('Status')
                             ->badge()
@@ -61,14 +59,14 @@ class ViewPatrol extends ViewRecord
                                 'Tidak Aman' => 'danger',
                                 default => 'gray',
                             }),
-                        
+
                         TextEntry::make('note')
                             ->label('Catatan')
                             ->placeholder('Tidak ada catatan')
                             ->columnSpanFull(),
                     ])
                     ->columnSpanFull(),
-                
+
                 Section::make('Foto Patroli')
                     ->schema([
                         ViewEntry::make('photo')
@@ -76,7 +74,7 @@ class ViewPatrol extends ViewRecord
                             ->view('filament.resources.patrols.components.photo-display'),
                     ])
                     ->columnSpanFull(),
-                
+
                 Section::make('Informasi Sistem')
                     ->schema([
                         Grid::make(2)
@@ -84,7 +82,7 @@ class ViewPatrol extends ViewRecord
                                 TextEntry::make('submitted_at')
                                     ->label('Dikirim Pada')
                                     ->dateTime('d F Y, H:i:s'),
-                                
+
                                 TextEntry::make('created_at')
                                     ->label('Dibuat Pada')
                                     ->dateTime('d F Y, H:i:s'),

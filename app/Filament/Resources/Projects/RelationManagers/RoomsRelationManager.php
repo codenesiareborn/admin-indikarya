@@ -2,16 +2,13 @@
 
 namespace App\Filament\Resources\Projects\RelationManagers;
 
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateAction;
-use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -21,7 +18,7 @@ use Filament\Tables\Table;
 class RoomsRelationManager extends RelationManager
 {
     protected static string $relationship = 'rooms';
-    
+
     protected static ?string $title = 'Area & Ruangan';
 
     public function isReadOnly(): bool
@@ -52,15 +49,15 @@ class RoomsRelationManager extends RelationManager
                     ->label('Nama Ruangan')
                     ->required()
                     ->maxLength(255),
-                
+
                 TextInput::make('lantai')
                     ->label('Lantai')
                     ->maxLength(255),
-                
+
                 Textarea::make('deskripsi')
                     ->label('Deskripsi')
                     ->rows(3),
-                
+
                 Select::make('status')
                     ->label('Status')
                     ->options([
@@ -81,12 +78,12 @@ class RoomsRelationManager extends RelationManager
                     ->label('Nama Ruangan')
                     ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('lantai')
                     ->label('Lantai')
                     ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('status_label')
                     ->label('Status')
                     ->badge()
@@ -96,7 +93,7 @@ class RoomsRelationManager extends RelationManager
                         default => 'gray',
                     })
                     ->sortable(),
-                
+
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y')

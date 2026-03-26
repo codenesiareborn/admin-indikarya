@@ -16,21 +16,21 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->date('tanggal');
-            
+
             $table->time('check_in')->nullable();
             $table->string('check_in_photo')->nullable();
             $table->decimal('check_in_latitude', 10, 8)->nullable();
             $table->decimal('check_in_longitude', 11, 8)->nullable();
-            
+
             $table->time('check_out')->nullable();
             $table->string('check_out_photo')->nullable();
             $table->decimal('check_out_latitude', 10, 8)->nullable();
             $table->decimal('check_out_longitude', 11, 8)->nullable();
-            
+
             $table->enum('status', ['hadir', 'terlambat', 'izin', 'sakit', 'alpha'])->default('alpha');
             $table->text('keterangan')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['user_id', 'project_id', 'tanggal']);
             $table->index(['project_id', 'tanggal']);
         });

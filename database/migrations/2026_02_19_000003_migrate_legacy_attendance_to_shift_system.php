@@ -1,10 +1,7 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 use App\Models\Attendance;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -13,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // For legacy data: set shift_name_snapshot to "Main Shift" 
+        // For legacy data: set shift_name_snapshot to "Main Shift"
         // shift_id remains null for legacy data (no master shift record created)
         $attendanceUpdated = Attendance::whereNull('shift_name_snapshot')
             ->update([

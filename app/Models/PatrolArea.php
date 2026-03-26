@@ -29,7 +29,7 @@ class PatrolArea extends Model
 
     public function getStatusLabelAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'aktif' => 'Aktif',
             'non-aktif' => 'Non-Aktif',
             default => $this->status,

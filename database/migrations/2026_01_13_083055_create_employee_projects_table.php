@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('tanggal_mulai')->nullable();
             $table->date('tanggal_selesai')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['user_id', 'project_id']);
         });
     }

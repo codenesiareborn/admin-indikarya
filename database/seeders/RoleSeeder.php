@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
 {
@@ -35,23 +35,23 @@ class RoleSeeder extends Seeder
             'view_any_project',
             'create_project',
             'update_project',
-            
+
             // Employees
             'view_employee',
             'view_any_employee',
-            
+
             // Attendance
             'view_attendance',
             'view_any_attendance',
             'create_attendance',
             'update_attendance',
-            
+
             // Task Lists
             'view_task::list',
             'view_any_task::list',
             'create_task::list',
             'update_task::list',
-            
+
             // Task Submissions
             'view_task::submission',
             'view_any_task::submission',
@@ -65,16 +65,16 @@ class RoleSeeder extends Seeder
             // Projects - view only
             'view_project',
             'view_any_project',
-            
+
             // Attendance - view and create own
             'view_attendance',
             'view_any_attendance',
             'create_attendance',
-            
+
             // Task Lists - view only
             'view_task::list',
             'view_any_task::list',
-            
+
             // Task Submissions - view and create own
             'view_task::submission',
             'view_any_task::submission',

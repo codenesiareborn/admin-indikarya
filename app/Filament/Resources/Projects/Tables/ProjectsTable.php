@@ -3,13 +3,12 @@
 namespace App\Filament\Resources\Projects\Tables;
 
 use App\Models\Project;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Number;
 
 class ProjectsTable
 {
@@ -21,7 +20,7 @@ class ProjectsTable
                     ->label('Nama Project')
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('jenis_project_label')
                     ->label('Jenis Project')
                     ->badge()
@@ -30,22 +29,22 @@ class ProjectsTable
                         'Security Services' => 'warning',
                     })
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('nilai_kontrak')
                     ->label('Nilai Kontrak')
                     ->money('IDR')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('tanggal_mulai')
                     ->label('Tanggal Mulai')
                     ->date('d M Y')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('tanggal_selesai')
                     ->label('Tanggal Selesai')
                     ->date('d M Y')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('status_label')
                     ->label('Status')
                     ->badge()
@@ -55,35 +54,35 @@ class ProjectsTable
                         'Selesai' => 'primary',
                     })
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('id')
                     ->label('Presensi')
                     ->formatStateUsing(fn () => 'Cek Presensi')
                     ->url(fn (Project $record): string => route('filament.admin.resources.attendances.manage-project', ['project' => $record->id]))
                     ->color('info')
                     ->icon('heroicon-o-calendar-days'),
-                
+
                 Tables\Columns\TextColumn::make('task_list_link')
                     ->label('Task List')
                     ->state(fn () => 'Cek Task List')
                     ->url(fn (Project $record): string => route('filament.admin.resources.task-lists.manage-project', ['project' => $record->id]))
                     ->color('success')
                     ->icon('heroicon-o-clipboard-document-check'),
-                
+
                 Tables\Columns\TextColumn::make('patrol_link')
                     ->label('Patroli')
                     ->state(fn () => 'Cek Patroli')
                     ->url(fn (Project $record): string => route('filament.admin.resources.patrols.manage-project', ['project' => $record->id]))
                     ->color('warning')
                     ->icon('heroicon-o-shield-check'),
-                
+
                 Tables\Columns\TextColumn::make('shift_link')
                     ->label('Shift')
                     ->state(fn () => 'Cek Shift')
                     ->url(fn (Project $record): string => \App\Filament\Resources\ShiftReports\ShiftReportResource::getUrl('report', ['project_id' => $record->id]))
                     ->color('success')
                     ->icon('heroicon-o-clipboard-document-list'),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal Dibuat')
                     ->dateTime('d M Y, H:i')
@@ -97,7 +96,7 @@ class ProjectsTable
                         'cleaning_services' => 'Cleaning Services',
                         'security_services' => 'Security Services',
                     ]),
-                
+
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'draft' => 'Draft',

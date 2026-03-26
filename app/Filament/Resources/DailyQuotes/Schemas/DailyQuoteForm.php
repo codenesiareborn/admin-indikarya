@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\DailyQuotes\Schemas;
 
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
 class DailyQuoteForm
@@ -17,7 +17,7 @@ class DailyQuoteForm
                     ->maxLength(255)
                     ->placeholder('Contoh: Semangat Pagi')
                     ->columnSpanFull(),
-                
+
                 Textarea::make('content')
                     ->label('Isi Kata Kata')
                     ->required()

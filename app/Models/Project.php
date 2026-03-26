@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Project extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'nama_project',
         'jenis_project',
@@ -82,12 +85,12 @@ class Project extends Model
 
     public function getNilaiKontrakRupiahAttribute()
     {
-        return 'Rp ' . number_format($this->nilai_kontrak, 2, ',', '.');
+        return 'Rp '.number_format($this->nilai_kontrak, 2, ',', '.');
     }
 
     public function getJenisProjectLabelAttribute()
     {
-        return match($this->jenis_project) {
+        return match ($this->jenis_project) {
             'cleaning_services' => 'Cleaning Services',
             'security_services' => 'Security Services',
             default => $this->jenis_project,
@@ -96,7 +99,7 @@ class Project extends Model
 
     public function getStatusLabelAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'draft' => 'Draft',
             'aktif' => 'Aktif',
             'selesai' => 'Selesai',

@@ -3,11 +3,11 @@
 namespace App\Filament\Resources\Projects\Pages;
 
 use App\Filament\Resources\Projects\ProjectResource;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Grid;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 
 class ViewProject extends ViewRecord
@@ -25,7 +25,7 @@ class ViewProject extends ViewRecord
                                 TextEntry::make('nama_project')
                                     ->label('Nama Project')
                                     ->weight(FontWeight::Bold),
-                                
+
                                 TextEntry::make('jenis_project_label')
                                     ->label('Jenis Project')
                                     ->badge()
@@ -35,7 +35,7 @@ class ViewProject extends ViewRecord
                                         default => 'gray',
                                     }),
                             ]),
-                        
+
                         Grid::make(2)
                             ->schema([
                                 TextEntry::make('status_label')
@@ -47,29 +47,29 @@ class ViewProject extends ViewRecord
                                         'Selesai' => 'primary',
                                         default => 'gray',
                                     }),
-                                
+
                                 TextEntry::make('alamat_lengkap')
                                     ->label('Alamat Lengkap'),
                             ]),
-                        
+
                         TextEntry::make('nilai_kontrak')
                             ->label('Nilai Kontrak')
                             ->money('IDR')
                             ->weight(FontWeight::Bold),
-                        
+
                         Grid::make(2)
                             ->schema([
                                 TextEntry::make('tanggal_mulai')
                                     ->label('Tanggal Mulai')
                                     ->date('d F Y'),
-                                
+
                                 TextEntry::make('tanggal_selesai')
                                     ->label('Tanggal Selesai')
                                     ->date('d F Y'),
                             ]),
                     ])
                     ->columnSpanFull(),
-                
+
                 Section::make('Pengaturan Presensi')
                     ->schema([
                         TextEntry::make('enable_attendance_status')
@@ -85,18 +85,19 @@ class ViewProject extends ViewRecord
                                 if ($shifts->isEmpty()) {
                                     return 'Tidak ada shift aktif';
                                 }
+
                                 return $shifts->map(fn ($s) => "{$s->name}: {$s->schedule_label}")->join(', ');
                             }),
                     ])
                     ->columns(1)
                     ->columnSpanFull(),
-                
+
                 Section::make('Informasi Sistem')
                     ->schema([
                         TextEntry::make('created_at')
                             ->label('Dibuat Pada')
                             ->dateTime('d F Y, H:i'),
-                        
+
                         TextEntry::make('updated_at')
                             ->label('Terakhir Diupdate')
                             ->dateTime('d F Y, H:i'),
