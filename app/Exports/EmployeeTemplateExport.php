@@ -5,9 +5,10 @@ namespace App\Exports;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class EmployeeTemplateExport implements FromArray, WithHeadings, WithStyles
+class EmployeeTemplateExport implements FromArray, WithHeadings, WithStyles, WithTitle
 {
     public function array(): array
     {
@@ -20,8 +21,8 @@ class EmployeeTemplateExport implements FromArray, WithHeadings, WithStyles
                 '081234567890',
                 'laki-laki',
                 'cleaning_services',
-                '1990-05-15',
-                '2024-01-10',
+                '15-05-1990',
+                '10-01-2024',
                 'Jl. Gatot Subroto No. 45, Jakarta Selatan',
                 'aktif',
                 'employee',
@@ -33,8 +34,8 @@ class EmployeeTemplateExport implements FromArray, WithHeadings, WithStyles
                 '081298765432',
                 'perempuan',
                 'security_services',
-                '1995-08-22',
-                '2024-02-15',
+                '22-08-1995',
+                '15-02-2024',
                 'Jl. Thamrin No. 88, Jakarta Pusat',
                 'aktif',
                 'employee',
@@ -64,5 +65,10 @@ class EmployeeTemplateExport implements FromArray, WithHeadings, WithStyles
         return [
             1 => ['font' => ['bold' => true, 'size' => 12]],
         ];
+    }
+
+    public function title(): string
+    {
+        return 'Template Pegawai (DD-MM-YYYY)';
     }
 }

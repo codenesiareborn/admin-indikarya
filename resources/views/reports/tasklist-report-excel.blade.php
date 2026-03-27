@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Laporan Task List</title>
+    <title>Laporan Jobdesk</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -105,7 +105,7 @@
         @endif
     </div>
 
-    <div class="report-title">LAPORAN TASK LIST</div>
+    <div class="report-title">LAPORAN JOBDESK</div>
 
     <table class="meta-info">
         <tr>

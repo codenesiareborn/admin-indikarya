@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Laporan Task List</title>
+    <title>Laporan Jobdesk</title>
     <style>
         * {
             margin: 0;
@@ -97,7 +97,7 @@
     </div>
 
     <div class="report-title">
-        <h1>LAPORAN TASK LIST</h1>
+        <h1>LAPORAN JOBDESK</h1>
         <p>Periode: {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</p>
         <p>Project: {{ $projectName ?? 'Semua Project' }}</p>
         <p>No. Laporan: {{ $reportNumber }}</p>

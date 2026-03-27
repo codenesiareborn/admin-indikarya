@@ -31,6 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->brandName('Indikarya Total Solution')
+            ->favicon(asset('favicon.png'))
             ->darkMode(false)
             ->renderHook(
                 'panels::head.end',
@@ -104,7 +105,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-document-chart-bar')
                     ->group('Laporan')
                     ->sort(10),
-                NavigationItem::make('Laporan Task List')
+                NavigationItem::make('Laporan Jobdesk')
                     ->url('/admin/task-lists/report')
                     ->icon('heroicon-o-clipboard-document-list')
                     ->group('Laporan')

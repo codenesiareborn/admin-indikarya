@@ -25,13 +25,13 @@ class TaskListStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-document-check')
                 ->color('primary'),
 
-            Stat::make('Task Selesai', $stats['total_tasks_completed'])
-                ->description('Total task dikerjakan')
+            Stat::make('Jobdesk Selesai', $stats['total_tasks_completed'])
+                ->description('Total jobdesk dikerjakan')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
 
-            Stat::make('Task Belum Selesai', $stats['total_tasks_pending'])
-                ->description('Task belum dikerjakan')
+            Stat::make('Jobdesk Belum Selesai', $stats['total_tasks_pending'])
+                ->description('Jobdesk belum dikerjakan')
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('warning'),
 

@@ -25,7 +25,9 @@ class TaskListReportPage extends Page implements HasTable, HasForms
 
     protected static string $resource = TaskListResource::class;
 
-    protected static ?string $title = 'Laporan Task List';
+    protected static ?string $navigationLabel = 'Laporan Jobdesk';
+
+    protected static ?string $title = 'Laporan Jobdesk';
 
     protected string $view = 'filament.resources.tasklists.pages.tasklist-report';
 
@@ -37,6 +39,11 @@ class TaskListReportPage extends Page implements HasTable, HasForms
     public ?string $employeeId = null;
     public array $employees = [];
     public ?string $employeeSearch = null;
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Laporan Jobdesk';
+    }
 
     public function mount(): void
     {
@@ -240,7 +247,7 @@ class TaskListReportPage extends Page implements HasTable, HasForms
         
         return \Maatwebsite\Excel\Facades\Excel::download(
             new \App\Exports\TaskListExport($submissions, $stats, $settings, $this->startDate, $this->endDate, $reportNumber, $projectName),
-            'laporan-tasklist-' . now()->format('Y-m-d') . '.xlsx'
+            'laporan-jobdesk-' . now()->format('Y-m-d') . '.xlsx'
         );
     }
 
@@ -277,6 +284,6 @@ class TaskListReportPage extends Page implements HasTable, HasForms
         
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'laporan-tasklist-' . now()->format('Y-m-d') . '.pdf');
+        }, 'laporan-jobdesk-' . now()->format('Y-m-d') . '.pdf');
     }
 }
