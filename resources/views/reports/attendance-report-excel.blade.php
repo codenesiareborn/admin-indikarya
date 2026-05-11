@@ -190,7 +190,7 @@
             @forelse($data as $index => $attendance)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $attendance->employee->nip ?? '-' }}</td>
+                    <td data-type="s" style='mso-number-format:"\@";'>{{ $attendance->employee->nip ?? '-' }}</td>
                     <td>{{ $attendance->employee->name ?? '-' }}</td>
                     <td>{{ $attendance->project->nama_project ?? '-' }}</td>
                     <td>{{ $attendance->shift_name_display ?? '-' }}</td>

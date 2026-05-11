@@ -6,10 +6,12 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class TaskListExport implements FromView, ShouldAutoSize, WithStyles
+class TaskListExport implements FromView, ShouldAutoSize, WithColumnFormatting, WithStyles
 {
     protected Collection $data;
 
@@ -22,6 +24,7 @@ class TaskListExport implements FromView, ShouldAutoSize, WithStyles
     protected string $endDate;
 
     protected string $reportNumber;
+
     protected string $projectName;
 
     public function __construct(Collection $data, array $stats, array $settings, string $startDate, string $endDate, string $reportNumber, string $projectName)
@@ -54,6 +57,13 @@ class TaskListExport implements FromView, ShouldAutoSize, WithStyles
         return [
             1 => ['font' => ['bold' => true, 'size' => 16]],
             2 => ['font' => ['bold' => true, 'size' => 12]],
+        ];
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'B' => NumberFormat::FORMAT_TEXT,
         ];
     }
 }

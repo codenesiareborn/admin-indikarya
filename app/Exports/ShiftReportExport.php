@@ -5,10 +5,12 @@ namespace App\Exports;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ShiftReportExport implements FromView, ShouldAutoSize, WithStyles
+class ShiftReportExport implements FromView, ShouldAutoSize, WithColumnFormatting, WithStyles
 {
     protected $data;
 
@@ -21,6 +23,7 @@ class ShiftReportExport implements FromView, ShouldAutoSize, WithStyles
     protected $endDate;
 
     protected $reportNumber;
+
     protected $projectName;
 
     public function __construct($data, $stats, $settings, $startDate, $endDate, $reportNumber, $projectName)
@@ -48,11 +51,18 @@ class ShiftReportExport implements FromView, ShouldAutoSize, WithStyles
         ]);
     }
 
-    public function styles(Worksheet $sheet)
+    public function styles(Worksheet $sheet): array
     {
         return [
             1 => ['font' => ['bold' => true, 'size' => 16]],
             2 => ['font' => ['bold' => true, 'size' => 12]],
+        ];
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'D' => NumberFormat::FORMAT_TEXT,
         ];
     }
 }

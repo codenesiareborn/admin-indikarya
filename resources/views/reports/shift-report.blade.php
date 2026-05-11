@@ -171,7 +171,7 @@
                     <td>{{ $index + 1 }}</td>
                     <td>{{ \Carbon\Carbon::parse($item->shift_date)->format('d/m/Y') }}</td>
                     <td>{{ \Carbon\Carbon::parse($item->shift_time)->format('H:i') }}</td>
-                    <td>
+                    <td data-type="s" style='mso-number-format:"\@";'>
                         <strong>{{ $item->user->name ?? '-' }}</strong><br/>
                         <small class="text-gray-500">{{ $item->user->nip ?? '-' }}</small>
                     </td>

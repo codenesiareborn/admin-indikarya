@@ -1,0 +1,26 @@
+[mcp_servers.ScraplingServer]
+args = ["mcp"]
+command = "scrapling"
+
+[mcp_servers.filesystem]
+args = [
+    "-y",
+    "@modelcontextprotocol/server-filesystem",
+    "/Users/almafazi/Documents/indikarya-admin",
+    "/Users/almafazi/Documents/indikarya-monitoring",
+]
+command = "npx"
+
+[mcp_servers.laravel-boost]
+args = [
+    "artisan",
+    "boost:mcp",
+]
+command = "php"
+
+[mcp_servers.sequential-thinking]
+args = [
+    "-y",
+    "@modelcontextprotocol/server-sequential-thinking",
+]
+command = "npx"

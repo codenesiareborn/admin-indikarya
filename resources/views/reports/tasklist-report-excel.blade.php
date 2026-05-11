@@ -172,7 +172,7 @@
             @forelse($data as $index => $submission)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $submission->employee->nip ?? '-' }}</td>
+                    <td data-type="s" style='mso-number-format:"\@";'>{{ $submission->employee->nip ?? '-' }}</td>
                     <td>{{ $submission->employee->nama_lengkap ?? '-' }}</td>
                     <td>{{ $submission->project->nama_project ?? '-' }}</td>
                     <td>{{ $submission->room->nama_ruangan ?? '-' }}</td>

@@ -179,7 +179,7 @@
             @forelse($data as $index => $patrol)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $patrol->user->nip ?? '-' }}</td>
+                    <td data-type="s" style='mso-number-format:"\@";'>{{ $patrol->user->nip ?? '-' }}</td>
                     <td>{{ $patrol->user->name ?? '-' }}</td>
                     <td>{{ $patrol->project->nama_project ?? '-' }}</td>
                     <td>{{ $patrol->area_name ?? '-' }}</td>
