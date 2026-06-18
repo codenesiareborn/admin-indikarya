@@ -25,7 +25,7 @@ class ManageProjectTaskList extends Page implements HasForms, HasTable
 
     protected static string $resource = TaskListResource::class;
 
-    protected static ?string $title = 'Manage Task List Project';
+    protected static ?string $title = 'Kelola Jobdesk Project';
 
     protected string $view = 'filament.resources.tasklists.pages.manage-project-tasklist';
 
@@ -52,8 +52,8 @@ class ManageProjectTaskList extends Page implements HasForms, HasTable
     public function getTitle(): string
     {
         return $this->project
-            ? "Task List Report - {$this->project->nama_project}"
-            : 'Task List Report';
+            ? "Jobdesk Project - {$this->project->nama_project}"
+            : 'Jobdesk Project';
     }
 
     public function getSubheading(): ?string

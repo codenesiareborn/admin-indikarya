@@ -5,20 +5,22 @@ namespace App\Filament\Resources\Patrols\Pages;
 use App\Filament\Resources\Patrols\PatrolResource;
 use App\Models\Patrol;
 use App\Models\Project;
-use Filament\Actions\Action;
+use App\Models\PatrolArea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Resources\Pages\Page;
+use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Actions\Action;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class PatrolReportPage extends Page implements HasForms, HasTable
+class PatrolReportPage extends Page implements HasTable, HasForms
 {
-    use InteractsWithForms;
     use InteractsWithTable;
+    use InteractsWithForms;
 
     protected static string $resource = PatrolResource::class;
 
@@ -27,26 +29,19 @@ class PatrolReportPage extends Page implements HasForms, HasTable
     protected string $view = 'filament.resources.patrols.pages.patrol-report';
 
     public ?string $startDate = null;
-
     public ?string $endDate = null;
-
     public ?string $projectId = null;
-
     public ?string $projectType = null;
-
     public ?string $status = null;
-
     public ?string $employeeId = null;
-
     public array $employees = [];
-
     public ?string $employeeSearch = null;
 
     public function mount(): void
     {
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate = now()->format('Y-m-d');
-
+        
         // Cache employees list
         $this->employees = $this->getEmployees();
     }
@@ -61,12 +56,12 @@ class PatrolReportPage extends Page implements HasForms, HasTable
                     ->label('NIP')
                     ->searchable()
                     ->sortable(),
-
+                
                 TextColumn::make('user.name')
                     ->label('Nama Petugas')
                     ->searchable()
                     ->sortable(),
-
+                
                 TextColumn::make('project.nama_project')
                     ->label('Project')
                     ->sortable(),
@@ -78,25 +73,26 @@ class PatrolReportPage extends Page implements HasForms, HasTable
                     ->color(fn (string $state): string => match ($state) {
                         'cleaning_services' => 'info',
                         'security_services' => 'warning',
+                        'gardening_services' => 'success',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => ucwords(str_replace('_', ' ', $state))),
-
+                
                 TextColumn::make('area_name')
                     ->label('Area')
                     ->searchable()
                     ->sortable(),
-
+                
                 TextColumn::make('patrol_date')
                     ->label('Tanggal')
                     ->date('d M Y')
                     ->sortable(),
-
+                
                 TextColumn::make('patrol_time')
                     ->label('Waktu')
                     ->time('H:i')
                     ->sortable(),
-
+                
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
@@ -105,11 +101,11 @@ class PatrolReportPage extends Page implements HasForms, HasTable
                         'Tidak Aman' => 'danger',
                         default => 'gray',
                     }),
-
+                
                 TextColumn::make('photo')
                     ->label('Foto')
                     ->formatStateUsing(fn ($state) => $state ? basename($state) : '-')
-                    ->url(fn ($record) => $record->photo ? asset('storage/'.$record->photo) : null)
+                    ->url(fn ($record) => $record->photo ? asset('storage/' . $record->photo) : null)
                     ->openUrlInNewTab()
                     ->color('info')
                     ->icon('heroicon-o-photo'),
@@ -130,28 +126,28 @@ class PatrolReportPage extends Page implements HasForms, HasTable
     protected function getFilteredQuery(): Builder
     {
         $user = auth()->user();
-
+        
         $query = Patrol::query()
             ->with(['user', 'project', 'patrolArea'])
             ->when($this->employeeSearch, function (Builder $q) {
                 $q->whereHas('user', function (Builder $subQ) {
-                    $subQ->where('nip', 'like', '%'.$this->employeeSearch.'%')
-                        ->orWhere('name', 'like', '%'.$this->employeeSearch.'%');
+                    $subQ->where('nip', 'like', '%' . $this->employeeSearch . '%')
+                        ->orWhere('name', 'like', '%' . $this->employeeSearch . '%');
                 });
             })
             ->when($this->startDate, fn (Builder $q) => $q->whereDate('patrol_date', '>=', $this->startDate))
             ->when($this->endDate, fn (Builder $q) => $q->whereDate('patrol_date', '<=', $this->endDate))
             ->when($this->projectId, fn (Builder $q) => $q->where('project_id', $this->projectId))
             ->when($this->status, fn (Builder $q) => $q->where('status', $this->status))
-            ->when($this->projectType, fn (Builder $q) => $q->whereHas('project', fn ($q) => $q->where('jenis_project', $this->projectType)))
+            ->when($this->projectType, fn (Builder $q) => $q->whereHas('project', fn($q) => $q->where('jenis_project', $this->projectType)))
             ->when($this->employeeId, fn (Builder $q) => $q->where('user_id', $this->employeeId));
-
+        
         // Filter untuk PIC - hanya tampilkan data dari project yang di-assign
-        if ($user && $user->isPic() && ! $user->hasRole('super_admin') && ! $user->hasRole('admin')) {
+        if ($user && $user->isPic() && !$user->hasRole('super_admin') && !$user->hasRole('admin')) {
             $projectIds = $user->getPicProjectIds();
             $query->whereIn('project_id', $projectIds);
         }
-
+        
         return $query;
     }
 
@@ -159,15 +155,15 @@ class PatrolReportPage extends Page implements HasForms, HasTable
     {
         $query = $this->getFilteredQuery();
         $patrols = $query->get();
-
+        
         $total = $patrols->count();
         $aman = $patrols->where('status', 'Aman')->count();
         $tidakAman = $patrols->where('status', 'Tidak Aman')->count();
-
-        $presentase = $total > 0
+        
+        $presentase = $total > 0 
             ? round(($aman / $total) * 100, 1)
             : 0;
-
+        
         return [
             'total' => $total,
             'aman' => $aman,
@@ -181,17 +177,17 @@ class PatrolReportPage extends Page implements HasForms, HasTable
     {
         $user = auth()->user();
         $query = Project::query();
-
+        
         if ($this->projectType) {
             $query->where('jenis_project', $this->projectType);
         }
-
+        
         // Filter untuk PIC - hanya tampilkan project yang di-assign
-        if ($user && $user->isPic() && ! $user->hasRole('super_admin') && ! $user->hasRole('admin')) {
+        if ($user && $user->isPic() && !$user->hasRole('super_admin') && !$user->hasRole('admin')) {
             $projectIds = $user->getPicProjectIds();
             $query->whereIn('id', $projectIds);
         }
-
+        
         return $query->pluck('nama_project', 'id')->toArray();
     }
 
@@ -208,6 +204,7 @@ class PatrolReportPage extends Page implements HasForms, HasTable
         return [
             'cleaning_services' => 'Cleaning Services',
             'security_services' => 'Security Services',
+            'gardening_services' => 'Gardening Services',
         ];
     }
 
@@ -233,12 +230,18 @@ class PatrolReportPage extends Page implements HasForms, HasTable
             'company_name' => \App\Models\GeneralSetting::get('company_name', 'PT Indikarya Total Solution'),
             'company_address' => \App\Models\GeneralSetting::get('company_address', 'Perum Saka Permai No C 10, Plumbon, Sardonoharjo, Ngaglik, Sleman, Yogyakarta'),
         ];
-
-        $reportNumber = 'PTR-'.now()->format('Ymd-His');
-
+        
+        $projectName = 'Semua Project';
+        if ($this->projectId) {
+            $project = \App\Models\Project::find($this->projectId);
+            $projectName = $project?->nama_project ?? '-';
+        }
+        
+        $reportNumber = 'PTR-' . now()->format('Ymd-His');
+        
         return \Maatwebsite\Excel\Facades\Excel::download(
-            new \App\Exports\PatrolExport($patrols, $stats, $settings, $this->startDate, $this->endDate, $reportNumber),
-            'laporan-patroli-'.now()->format('Y-m-d').'.xlsx'
+            new \App\Exports\PatrolExport($patrols, $stats, $settings, $this->startDate, $this->endDate, $reportNumber, $projectName),
+            'laporan-patroli-' . now()->format('Y-m-d') . '.xlsx'
         );
     }
 
@@ -252,9 +255,15 @@ class PatrolReportPage extends Page implements HasForms, HasTable
             'company_phone' => \App\Models\GeneralSetting::get('company_phone', 'Telp.(0274)4362536, Hp.085729898968'),
             'company_email' => \App\Models\GeneralSetting::get('company_email', 'pt.indikarya@yahoo.com'),
         ];
-
-        $reportNumber = 'LAP-PTR-'.now()->format('Ymd-His');
-
+        
+        $projectName = 'Semua Project';
+        if ($this->projectId) {
+            $project = \App\Models\Project::find($this->projectId);
+            $projectName = $project?->nama_project ?? '-';
+        }
+        
+        $reportNumber = 'LAP-PTR-' . now()->format('Ymd-His');
+        
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.patrol-report', [
             'data' => $patrols,
             'stats' => $stats,
@@ -262,12 +271,13 @@ class PatrolReportPage extends Page implements HasForms, HasTable
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
             'reportNumber' => $reportNumber,
+            'projectName' => $projectName,
         ]);
-
+        
         $pdf->setPaper('a4', 'landscape');
-
+        
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'laporan-patroli-'.now()->format('Y-m-d').'.pdf');
+        }, 'laporan-patroli-' . now()->format('Y-m-d') . '.pdf');
     }
 }

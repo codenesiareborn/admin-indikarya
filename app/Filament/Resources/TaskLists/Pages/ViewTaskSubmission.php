@@ -16,7 +16,7 @@ class ViewTaskSubmission extends ViewRecord
 {
     protected static string $resource = TaskListResource::class;
 
-    protected static ?string $title = 'Detail Task Submission';
+    protected static ?string $title = 'Detail Pengumpulan Jobdesk';
 
     public function resolveRecord(int|string $key): TaskSubmission
     {
@@ -26,7 +26,7 @@ class ViewTaskSubmission extends ViewRecord
 
     public function getRecordTitle(): string|Htmlable
     {
-        return 'Detail Task Submission';
+        return 'Detail Pengumpulan Jobdesk';
     }
 
     public function infolist(Schema $schema): Schema

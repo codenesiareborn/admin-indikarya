@@ -127,12 +127,17 @@
             <td>{{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</td>
         </tr>
         <tr>
-            <td><strong>Tanggal Cetak</strong></td>
+            <td><strong>Project</strong></td>
             <td>:</td>
-            <td>{{ now()->format('d/m/Y H:i') }}</td>
+            <td>{{ $projectName ?? 'Semua Project' }}</td>
             <td><strong>Dicetak Oleh</strong></td>
             <td>:</td>
             <td>{{ auth()->user()->name ?? 'Administrator' }}</td>
+        </tr>
+        <tr>
+            <td><strong>Tanggal Cetak</strong></td>
+            <td>:</td>
+            <td colspan="4">{{ now()->format('d/m/Y H:i') }}</td>
         </tr>
     </table>
 
@@ -166,7 +171,7 @@
                     <td>{{ $index + 1 }}</td>
                     <td>{{ \Carbon\Carbon::parse($item->shift_date)->format('d/m/Y') }}</td>
                     <td>{{ \Carbon\Carbon::parse($item->shift_time)->format('H:i') }}</td>
-                    <td>
+                    <td data-type="s" style='mso-number-format:"\@";'>
                         <strong>{{ $item->user->name ?? '-' }}</strong><br/>
                         <small class="text-gray-500">{{ $item->user->nip ?? '-' }}</small>
                     </td>

@@ -23,17 +23,17 @@ class TaskListResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return 'Task List';
+        return 'Jobdesk';
     }
 
     public static function getModelLabel(): string
     {
-        return 'Task List';
+        return 'Jobdesk';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Task Lists';
+        return 'Jobdesk';
     }
 
     protected static ?int $navigationSort = 3;

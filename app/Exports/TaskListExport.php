@@ -6,10 +6,12 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class TaskListExport implements FromView, ShouldAutoSize, WithStyles
+class TaskListExport implements FromView, ShouldAutoSize, WithColumnFormatting, WithStyles
 {
     protected Collection $data;
 
@@ -23,7 +25,9 @@ class TaskListExport implements FromView, ShouldAutoSize, WithStyles
 
     protected string $reportNumber;
 
-    public function __construct(Collection $data, array $stats, array $settings, string $startDate, string $endDate, string $reportNumber)
+    protected string $projectName;
+
+    public function __construct(Collection $data, array $stats, array $settings, string $startDate, string $endDate, string $reportNumber, string $projectName)
     {
         $this->data = $data;
         $this->stats = $stats;
@@ -31,6 +35,7 @@ class TaskListExport implements FromView, ShouldAutoSize, WithStyles
         $this->startDate = $startDate;
         $this->endDate = $endDate;
         $this->reportNumber = $reportNumber;
+        $this->projectName = $projectName;
     }
 
     public function view(): View
@@ -42,6 +47,7 @@ class TaskListExport implements FromView, ShouldAutoSize, WithStyles
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
             'reportNumber' => $this->reportNumber,
+            'projectName' => $this->projectName,
             'isExcel' => true,
         ]);
     }
@@ -51,6 +57,13 @@ class TaskListExport implements FromView, ShouldAutoSize, WithStyles
         return [
             1 => ['font' => ['bold' => true, 'size' => 16]],
             2 => ['font' => ['bold' => true, 'size' => 12]],
+        ];
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'B' => NumberFormat::FORMAT_TEXT,
         ];
     }
 }

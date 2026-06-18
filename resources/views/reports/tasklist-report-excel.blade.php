@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Laporan Task List</title>
+    <title>Laporan Jobdesk</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -105,7 +105,7 @@
         @endif
     </div>
 
-    <div class="report-title">LAPORAN TASK LIST</div>
+    <div class="report-title">LAPORAN JOBDESK</div>
 
     <table class="meta-info">
         <tr>
@@ -117,12 +117,17 @@
             <td>{{ $startDate }} - {{ $endDate }}</td>
         </tr>
         <tr>
-            <td><strong>Tanggal Cetak</strong></td>
+            <td><strong>Project</strong></td>
             <td>:</td>
-            <td>{{ now()->format('d/m/Y H:i') }}</td>
+            <td>{{ $projectName ?? 'Semua Project' }}</td>
             <td><strong>Dicetak Oleh</strong></td>
             <td>:</td>
             <td>{{ auth()->user()->name ?? 'Administrator' }}</td>
+        </tr>
+        <tr>
+            <td><strong>Tanggal Cetak</strong></td>
+            <td>:</td>
+            <td colspan="4">{{ now()->format('d/m/Y H:i') }}</td>
         </tr>
     </table>
 
@@ -167,7 +172,7 @@
             @forelse($data as $index => $submission)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $submission->employee->nip ?? '-' }}</td>
+                    <td data-type="s" style='mso-number-format:"\@";'>{{ $submission->employee->nip ?? '-' }}</td>
                     <td>{{ $submission->employee->nama_lengkap ?? '-' }}</td>
                     <td>{{ $submission->project->nama_project ?? '-' }}</td>
                     <td>{{ $submission->room->nama_ruangan ?? '-' }}</td>

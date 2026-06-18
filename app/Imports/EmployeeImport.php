@@ -3,6 +3,7 @@
 namespace App\Imports;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -32,8 +33,8 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     'no_hp' => 'nullable|string|max:20',
                     'jenis_kelamin' => 'required|in:laki-laki,perempuan',
                     'staf' => 'required|in:cleaning_services,security_services',
-                    'tanggal_lahir' => 'nullable|date',
-                    'tanggal_masuk' => 'nullable|date',
+                    'tanggal_lahir' => 'nullable|date_format:d-m-Y',
+                    'tanggal_masuk' => 'nullable|date_format:d-m-Y',
                     'alamat' => 'nullable|string',
                     'status_pegawai' => 'required|in:aktif,non-aktif,cuti',
                     'role' => 'required|in:employee,pic,admin,super_admin',
@@ -52,6 +53,8 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     'status_pegawai.in' => 'Status pegawai harus aktif, non-aktif, atau cuti',
                     'role.required' => 'Role wajib diisi',
                     'role.in' => 'Role harus employee, pic, admin, atau super_admin',
+                    'tanggal_lahir.date_format' => 'Format tanggal lahir harus DD-MM-YYYY (contoh: 15-01-2000)',
+                    'tanggal_masuk.date_format' => 'Format tanggal masuk harus DD-MM-YYYY (contoh: 15-01-2000)',
                 ]);
 
                 if ($validator->fails()) {
@@ -60,6 +63,25 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     $this->errors[] = "Baris {$rowNumber}: {$errorMessages}";
 
                     continue;
+                }
+
+                // Parse tanggal dari format d-m-Y ke Y-m-d untuk database
+                $tanggalLahir = null;
+                if (!empty($row['tanggal_lahir'])) {
+                    try {
+                        $tanggalLahir = Carbon::createFromFormat('d-m-Y', $row['tanggal_lahir'])->format('Y-m-d');
+                    } catch (\Exception $e) {
+                        // Jika parsing gagal, biarkan null
+                    }
+                }
+
+                $tanggalMasuk = null;
+                if (!empty($row['tanggal_masuk'])) {
+                    try {
+                        $tanggalMasuk = Carbon::createFromFormat('d-m-Y', $row['tanggal_masuk'])->format('Y-m-d');
+                    } catch (\Exception $e) {
+                        // Jika parsing gagal, biarkan null
+                    }
                 }
 
                 // Buat user baru
@@ -71,8 +93,8 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     'no_hp' => $row['no_hp'] ?? null,
                     'jenis_kelamin' => $row['jenis_kelamin'],
                     'staf' => $row['staf'],
-                    'tanggal_lahir' => $row['tanggal_lahir'] ?? null,
-                    'tanggal_masuk' => $row['tanggal_masuk'] ?? null,
+                    'tanggal_lahir' => $tanggalLahir,
+                    'tanggal_masuk' => $tanggalMasuk,
                     'alamat' => $row['alamat'] ?? null,
                     'status_pegawai' => $row['status_pegawai'],
                     'role' => $row['role'],

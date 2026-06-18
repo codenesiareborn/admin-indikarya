@@ -128,12 +128,17 @@
             <td>{{ $startDate }} - {{ $endDate }}</td>
         </tr>
         <tr>
-            <td><strong>Tanggal Cetak</strong></td>
+            <td><strong>Project</strong></td>
             <td>:</td>
-            <td>{{ now()->format('d/m/Y H:i') }}</td>
+            <td>{{ $projectName ?? 'Semua Project' }}</td>
             <td><strong>Dicetak Oleh</strong></td>
             <td>:</td>
             <td>{{ auth()->user()->name ?? 'Administrator' }}</td>
+        </tr>
+        <tr>
+            <td><strong>Tanggal Cetak</strong></td>
+            <td>:</td>
+            <td colspan="4">{{ now()->format('d/m/Y H:i') }}</td>
         </tr>
     </table>
 
@@ -185,7 +190,7 @@
             @forelse($data as $index => $attendance)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $attendance->employee->nip ?? '-' }}</td>
+                    <td data-type="s" style='mso-number-format:"\@";'>{{ $attendance->employee->nip ?? '-' }}</td>
                     <td>{{ $attendance->employee->name ?? '-' }}</td>
                     <td>{{ $attendance->project->nama_project ?? '-' }}</td>
                     <td>{{ $attendance->shift_name_display ?? '-' }}</td>
