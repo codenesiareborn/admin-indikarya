@@ -13,7 +13,28 @@ class DailyQuoteController extends Controller
      */
     public function random(): JsonResponse
     {
-        $quote = DailyQuote::inRandomOrder()->first();
+        $bounds = DailyQuote::query()
+            ->selectRaw('MIN(id) as min_id, MAX(id) as max_id')
+            ->first();
+
+        if (! $bounds?->min_id || ! $bounds?->max_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No quotes available',
+            ], 404);
+        }
+
+        $randomId = random_int((int) $bounds->min_id, (int) $bounds->max_id);
+
+        $quote = DailyQuote::query()
+            ->with('creator:id,name')
+            ->where('id', '>=', $randomId)
+            ->orderBy('id')
+            ->first()
+            ?? DailyQuote::query()
+                ->with('creator:id,name')
+                ->orderBy('id')
+                ->first();
 
         if (! $quote) {
             return response()->json([
@@ -39,7 +60,8 @@ class DailyQuoteController extends Controller
      */
     public function index(): JsonResponse
     {
-        $quotes = DailyQuote::orderBy('created_at', 'desc')
+        $quotes = DailyQuote::with('creator:id,name')
+            ->orderBy('created_at', 'desc')
             ->paginate(20);
 
         return response()->json([
@@ -67,7 +89,7 @@ class DailyQuoteController extends Controller
      */
     public function show($id): JsonResponse
     {
-        $quote = DailyQuote::find($id);
+        $quote = DailyQuote::with('creator:id,name')->find($id);
 
         if (! $quote) {
             return response()->json([
