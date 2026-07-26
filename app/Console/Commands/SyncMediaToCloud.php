@@ -2,9 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\UploadMediaChunk;
 use App\Services\MediaInventory;
 use App\Services\MediaStorage;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
 
 class SyncMediaToCloud extends Command
@@ -14,6 +16,9 @@ class SyncMediaToCloud extends Command
         {--to=r2 : Disk to copy to}
         {--since= : Only consider records created on or after this date (Y-m-d)}
         {--chunk=500 : Rows to load per batch}
+        {--queue : Dispatch the uploads to the queue instead of copying inline}
+        {--queue-name=media : Queue to dispatch onto}
+        {--batch-size=200 : Files per queued job}
         {--dry-run : Report what would be uploaded without writing anything}';
 
     protected $description = 'Copy every database-referenced media file to the cloud disk, skipping files already there';
@@ -46,6 +51,10 @@ class SyncMediaToCloud extends Command
         $this->line("Indexing [{$toName}]...");
         $destinationIndex = MediaInventory::indexDisk($toName);
         $this->line('  '.number_format(count($destinationIndex)).' objects already present.');
+
+        if ($this->option('queue')) {
+            return $this->dispatchToQueue($fromName, $toName, $destinationIndex, $since, $chunk);
+        }
 
         $copied = $skipped = $missing = $failed = 0;
 
@@ -129,6 +138,81 @@ class SyncMediaToCloud extends Command
         if ($missing > 0) {
             $this->warn("{$missing} rows reference files that no longer exist on [{$fromName}]. Review before cutover.");
         }
+
+        return self::SUCCESS;
+    }
+
+    /**
+     * Hand the outstanding uploads to the queue as a trackable batch.
+     *
+     * Existence is resolved here, once, against the index already in memory,
+     * so the queued jobs carry only work that actually needs doing and never
+     * probe the destination themselves.
+     *
+     * @param  array<string, true>  $destinationIndex
+     */
+    protected function dispatchToQueue(
+        string $fromName,
+        string $toName,
+        array $destinationIndex,
+        ?string $since,
+        int $chunk,
+    ): int {
+        $batchSize = max(1, (int) $this->option('batch-size'));
+        $queueName = $this->option('queue-name');
+
+        $pending = [];
+        $skipped = 0;
+
+        foreach (MediaInventory::sources() as $source) {
+            MediaInventory::each($source, function (string $path) use ($destinationIndex, &$pending, &$skipped): void {
+                if (isset($destinationIndex[$path])) {
+                    $skipped++;
+
+                    return;
+                }
+
+                $pending[$path] = true;
+            }, $since, $chunk);
+        }
+
+        $pending = array_keys($pending);
+
+        $this->line('  '.number_format($skipped).' already on the destination, '.number_format(count($pending)).' to upload.');
+
+        if ($pending === []) {
+            $this->info('Nothing to dispatch — the destination is already complete.');
+
+            return self::SUCCESS;
+        }
+
+        $jobs = [];
+        foreach (array_chunk($pending, $batchSize) as $paths) {
+            $jobs[] = new UploadMediaChunk($paths, $fromName, $toName);
+        }
+
+        // allowFailures keeps one bad chunk from cancelling the rest; anything
+        // that still fails after its retries lands in failed_jobs, and
+        // media:verify is what decides whether the result is good enough.
+        $batch = Bus::batch($jobs)
+            ->name('media-sync')
+            ->onQueue($queueName)
+            ->allowFailures()
+            ->dispatch();
+
+        $this->newLine();
+        $this->info(sprintf(
+            'Dispatched %s jobs (%s files) to queue [%s].',
+            number_format(count($jobs)),
+            number_format(count($pending)),
+            $queueName
+        ));
+        $this->line("  Batch ID: {$batch->id}");
+        $this->newLine();
+        $this->line('Start a worker if one is not already running:');
+        $this->line("  php artisan queue:work --queue={$queueName} --tries=3 --timeout=900");
+        $this->line('Track progress with:');
+        $this->line('  php artisan media:sync-status');
 
         return self::SUCCESS;
     }
