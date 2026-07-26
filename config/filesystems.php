@@ -60,6 +60,29 @@ return [
             'report' => false,
         ],
 
+        /*
+         * Cloudflare R2. Deliberately omits the "visibility" option: R2 does not
+         * implement S3 ACLs, so sending an "x-amz-acl" header on every upload is
+         * rejected. Public reads are served by the custom domain in "url" instead.
+         *
+         * "throw" is enabled here — unlike the local disks — because a failed
+         * upload to network storage must abort the request rather than silently
+         * persist a database row pointing at a file that was never written.
+         */
+        'r2' => [
+            'driver' => 's3',
+            'key' => env('R2_ACCESS_KEY_ID'),
+            'secret' => env('R2_SECRET_ACCESS_KEY'),
+            'region' => env('R2_DEFAULT_REGION', 'auto'),
+            'bucket' => env('R2_BUCKET'),
+            'url' => env('R2_URL'),
+            'endpoint' => env('R2_ENDPOINT'),
+            'use_path_style_endpoint' => true,
+            'request_checksum_calculation' => env('R2_CHECKSUM_CALCULATION', 'when_supported'),
+            'throw' => true,
+            'report' => false,
+        ],
+
     ],
 
     /*

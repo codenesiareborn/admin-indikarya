@@ -52,7 +52,7 @@ class PatrolsTable
                 Tables\Columns\TextColumn::make('photo')
                     ->label('Foto')
                     ->formatStateUsing(fn ($state) => $state ? 'Lihat Foto' : '-')
-                    ->url(fn ($record) => $record->photo ? asset('storage/'.$record->photo) : null)
+                    ->url(fn ($record) => $record->photo_url)
                     ->openUrlInNewTab()
                     ->color('info')
                     ->icon('heroicon-o-photo'),

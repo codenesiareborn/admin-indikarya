@@ -22,7 +22,7 @@ class PatrolResource extends JsonResource
             'area_code' => $this->area_code,
             'status' => $this->status,
             'note' => $this->note,
-            'photo' => $this->photo ? asset('storage/'.$this->photo) : null,
+            'photo' => $this->photo_url,
             'patrol_date' => $this->patrol_date->format('Y-m-d'),
             'patrol_time' => $this->patrol_time,
             'submitted_at' => $this->submitted_at->format('Y-m-d H:i:s'),

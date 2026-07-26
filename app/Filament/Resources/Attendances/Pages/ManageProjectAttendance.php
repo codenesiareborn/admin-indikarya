@@ -101,7 +101,7 @@ class ManageProjectAttendance extends Page implements HasForms, HasTable
                 TextColumn::make('check_in_photo')
                     ->label('Foto Masuk')
                     ->formatStateUsing(fn ($state) => $state ? basename($state) : '-')
-                    ->url(fn ($record) => $record->check_in_photo ? asset('storage/'.$record->check_in_photo) : null)
+                    ->url(fn ($record) => $record->check_in_photo_url)
                     ->openUrlInNewTab()
                     ->color('info')
                     ->icon('heroicon-o-photo'),
@@ -128,7 +128,7 @@ class ManageProjectAttendance extends Page implements HasForms, HasTable
                 TextColumn::make('check_out_photo')
                     ->label('Foto Keluar')
                     ->formatStateUsing(fn ($state) => $state ? basename($state) : '-')
-                    ->url(fn ($record) => $record->check_out_photo ? asset('storage/'.$record->check_out_photo) : null)
+                    ->url(fn ($record) => $record->check_out_photo_url)
                     ->openUrlInNewTab()
                     ->color('info')
                     ->icon('heroicon-o-photo'),

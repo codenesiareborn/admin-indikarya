@@ -2,13 +2,14 @@
     $record = $getRecord();
     $photoField = $getState();
     $label = $getLabel();
+    $photoUrl = \App\Services\MediaStorage::url($photoField);
 @endphp
 
 <div class="w-full">
     @if($photoField)
-        <a href="{{ asset('storage/' . $photoField) }}" target="_blank" class="block">
+        <a href="{{ $photoUrl }}" target="_blank" class="block">
             <img 
-                src="{{ asset('storage/' . $photoField) }}" 
+                src="{{ $photoUrl }}" 
                 alt="{{ $label }}" 
                 class="rounded-lg max-h-80 object-contain"
                 style="max-height: 300px;"

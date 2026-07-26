@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\MediaStorage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -25,6 +26,11 @@ class Patrol extends Model
         'patrol_date' => 'date',
         'submitted_at' => 'datetime',
     ];
+
+    public function getPhotoUrlAttribute(): ?string
+    {
+        return MediaStorage::url($this->photo);
+    }
 
     public function user(): BelongsTo
     {

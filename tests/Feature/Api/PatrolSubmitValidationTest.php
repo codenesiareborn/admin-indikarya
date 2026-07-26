@@ -6,11 +6,20 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PatrolSubmitValidationTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Keep uploaded fixtures out of the real storage directory.
+        Storage::fake(config('media.disk'));
+    }
 
     public function test_cannot_submit_patrol_to_unassigned_project()
     {

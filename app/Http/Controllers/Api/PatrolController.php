@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PatrolResource;
 use App\Models\Patrol;
+use App\Services\MediaStorage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class PatrolController extends Controller
@@ -68,7 +68,7 @@ class PatrolController extends Controller
             if ($request->hasFile('photo')) {
                 $photo = $request->file('photo');
                 $filename = 'patrol_'.time().'_'.uniqid().'.'.$photo->getClientOriginalExtension();
-                $photoPath = $photo->storeAs('patrols', $filename, 'public');
+                $photoPath = MediaStorage::store($photo, 'patrols', $filename);
             }
 
             // Create patrol record
@@ -100,7 +100,7 @@ class PatrolController extends Controller
             DB::rollBack();
 
             if (isset($photoPath)) {
-                Storage::disk('public')->delete($photoPath);
+                MediaStorage::delete($photoPath);
             }
 
             return response()->json([

@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Attendance;
+use App\Services\MediaStorage;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Storage;
 
 class AttendancePhotoSeeder extends Seeder
 {
@@ -13,8 +13,12 @@ class AttendancePhotoSeeder extends Seeder
         // Create a simple placeholder image (1x1 pixel PNG)
         $placeholderImage = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
 
+        // Write to whichever disk the application currently reads media from,
+        // so the seeded placeholders are actually visible in the UI.
+        $disk = MediaStorage::primaryDisk();
+
         // Create folder if not exists
-        Storage::disk('public')->makeDirectory('attendances');
+        $disk->makeDirectory('attendances');
 
         // Get attendances without photos (limit to 10 for testing)
         $attendances = Attendance::whereNull('check_in_photo')
@@ -35,8 +39,8 @@ class AttendancePhotoSeeder extends Seeder
             $checkOutFilename = "attendances/check_out_{$attendance->id}_".time().'.png';
 
             // Save placeholder images
-            Storage::disk('public')->put($checkInFilename, $placeholderImage);
-            Storage::disk('public')->put($checkOutFilename, $placeholderImage);
+            $disk->put($checkInFilename, $placeholderImage);
+            $disk->put($checkOutFilename, $placeholderImage);
 
             // Update attendance record
             $attendance->update([

@@ -23,9 +23,7 @@ class AttendanceResource extends JsonResource
             'shift_name' => $this->shift_name_snapshot ?? $this->shift?->name,
             'tanggal' => $this->tanggal?->format('Y-m-d'),
             'check_in' => $this->check_in ? (is_string($this->check_in) ? substr($this->check_in, 0, 5) : $this->check_in->format('H:i')) : null,
-            'check_in_photo_url' => $this->check_in_photo
-                ? url('storage/'.$this->check_in_photo)
-                : null,
+            'check_in_photo_url' => $this->check_in_photo_url,
             'check_in_latitude' => $this->check_in_latitude
                 ? (float) $this->check_in_latitude
                 : null,
@@ -34,9 +32,7 @@ class AttendanceResource extends JsonResource
                 : null,
             'check_in_address' => $this->check_in_address,
             'check_out' => $this->check_out ? (is_string($this->check_out) ? substr($this->check_out, 0, 5) : $this->check_out->format('H:i')) : null,
-            'check_out_photo_url' => $this->check_out_photo
-                ? url('storage/'.$this->check_out_photo)
-                : null,
+            'check_out_photo_url' => $this->check_out_photo_url,
             'check_out_latitude' => $this->check_out_latitude
                 ? (float) $this->check_out_latitude
                 : null,

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\MediaStorage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -69,18 +70,14 @@ class Attendance extends Model
         };
     }
 
-    public function getCheckInPhotoUrlAttribute()
+    public function getCheckInPhotoUrlAttribute(): ?string
     {
-        return $this->check_in_photo
-            ? asset('storage/'.$this->check_in_photo)
-            : null;
+        return MediaStorage::url($this->check_in_photo);
     }
 
-    public function getCheckOutPhotoUrlAttribute()
+    public function getCheckOutPhotoUrlAttribute(): ?string
     {
-        return $this->check_out_photo
-            ? asset('storage/'.$this->check_out_photo)
-            : null;
+        return MediaStorage::url($this->check_out_photo);
     }
 
     public function getCheckInLocationAttribute()

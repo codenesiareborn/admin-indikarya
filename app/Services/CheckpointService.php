@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\ProjectRoom;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class CheckpointService
 {
@@ -15,9 +14,8 @@ class CheckpointService
     public function uploadPhoto(UploadedFile $photo): string
     {
         $filename = time().'_'.uniqid().'.'.$photo->getClientOriginalExtension();
-        $path = $photo->storeAs('checkpoints', $filename, 'public');
 
-        return $path;
+        return MediaStorage::store($photo, 'checkpoints', $filename);
     }
 
     /**
@@ -25,11 +23,7 @@ class CheckpointService
      */
     public function deletePhoto(string $path): bool
     {
-        if (Storage::disk('public')->exists($path)) {
-            return Storage::disk('public')->delete($path);
-        }
-
-        return false;
+        return MediaStorage::delete($path);
     }
 
     /**
@@ -144,6 +138,6 @@ class CheckpointService
             return null;
         }
 
-        return Storage::disk('public')->url($path);
+        return MediaStorage::url($path);
     }
 }

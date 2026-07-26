@@ -97,7 +97,7 @@ class ManageProjectPatrol extends Page implements HasForms, HasTable
 
                 ImageColumn::make('photo')
                     ->label('Foto')
-                    ->disk('public')
+                    ->disk(config('media.disk'))
                     ->height(50)
                     ->defaultImageUrl(url('/images/no-image.png')),
 

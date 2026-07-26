@@ -4,7 +4,6 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AttendanceService
@@ -46,10 +45,7 @@ class AttendanceService
         $extension = $file->getClientOriginalExtension();
         $filename = "{$type}_{$date}_{$timestamp}_{$this->generateRandomString(8)}.{$extension}";
 
-        // Store in public disk under attendances directory
-        $path = $file->storeAs('attendances', $filename, 'public');
-
-        return $path;
+        return MediaStorage::store($file, 'attendances', $filename);
     }
 
     /**
@@ -82,10 +78,6 @@ class AttendanceService
      */
     public function deletePhoto(string $path): bool
     {
-        if (Storage::disk('public')->exists($path)) {
-            return Storage::disk('public')->delete($path);
-        }
-
-        return false;
+        return MediaStorage::delete($path);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\MediaStorage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -48,6 +49,11 @@ class TaskSubmission extends Model
     public function items(): HasMany
     {
         return $this->hasMany(TaskSubmissionItem::class);
+    }
+
+    public function getFotoUrlAttribute(): ?string
+    {
+        return MediaStorage::url($this->foto);
     }
 
     public function getCompletedCountAttribute(): int

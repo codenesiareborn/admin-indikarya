@@ -1,13 +1,14 @@
 @php
     $record = $getRecord();
     $foto = $record->foto;
+    $photoUrl = \App\Services\MediaStorage::url($foto);
 @endphp
 
 <div class="w-full">
     @if($foto)
-        <a href="{{ asset('storage/' . $foto) }}" target="_blank" class="block">
+        <a href="{{ $photoUrl }}" target="_blank" class="block">
             <img
-                src="{{ asset('storage/' . $foto) }}"
+                src="{{ $photoUrl }}"
                 alt="Foto Checkpoint"
                 class="rounded-lg max-h-80 object-contain"
                 style="max-height: 300px;"

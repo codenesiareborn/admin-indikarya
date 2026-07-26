@@ -106,7 +106,7 @@ class ManageProjectTaskList extends Page implements HasForms, HasTable
 
                 ImageColumn::make('foto')
                     ->label('Foto')
-                    ->disk('public')
+                    ->disk(config('media.disk'))
                     ->height(50)
                     ->defaultImageUrl(url('/images/no-image.png')),
 
