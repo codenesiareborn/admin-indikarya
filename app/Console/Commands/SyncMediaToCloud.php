@@ -43,6 +43,10 @@ class SyncMediaToCloud extends Command
             $since ? " for records created since {$since}" : ''
         ));
 
+        $this->line("Indexing [{$toName}]...");
+        $destinationIndex = MediaInventory::indexDisk($toName);
+        $this->line('  '.number_format(count($destinationIndex)).' objects already present.');
+
         $copied = $skipped = $missing = $failed = 0;
 
         foreach (MediaInventory::sources() as $source) {
@@ -54,12 +58,12 @@ class SyncMediaToCloud extends Command
             $bar->start();
 
             MediaInventory::each($source, function (string $path) use (
-                $from, $to, $dryRun, &$copied, &$skipped, &$missing, &$failed, $bar
+                $from, $to, $dryRun, &$destinationIndex, &$copied, &$skipped, &$missing, &$failed, $bar
             ): void {
                 $bar->advance();
 
                 try {
-                    if ($to->exists($path)) {
+                    if (isset($destinationIndex[$path])) {
                         $skipped++;
 
                         return;
@@ -95,6 +99,7 @@ class SyncMediaToCloud extends Command
                         }
                     }
 
+                    $destinationIndex[$path] = true;
                     $copied++;
                 } catch (\Throwable $e) {
                     $failed++;

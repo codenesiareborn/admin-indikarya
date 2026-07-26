@@ -32,7 +32,10 @@ class PruneLocalMedia extends Command
         }
 
         $local = Storage::disk($localName);
-        $cloud = Storage::disk($cloudName);
+
+        $this->line("Indexing [{$cloudName}]...");
+        $cloudIndex = MediaInventory::indexDisk($cloudName);
+        $this->line('  '.number_format(count($cloudIndex)).' objects present.');
 
         if (! $force) {
             $this->warn('[DRY RUN] Nothing will be deleted. Pass --force to actually prune.');
@@ -58,7 +61,7 @@ class PruneLocalMedia extends Command
             $bar->start();
 
             MediaInventory::each($source, function (string $path) use (
-                $local, $cloud, $force, $bar, &$deleted, &$keptNotOnCloud, &$alreadyGone, &$failed, &$bytesFreed
+                $local, $cloudIndex, $force, $bar, &$deleted, &$keptNotOnCloud, &$alreadyGone, &$failed, &$bytesFreed
             ): void {
                 $bar->advance();
 
@@ -71,7 +74,7 @@ class PruneLocalMedia extends Command
 
                     // Never delete a local file unless the cloud copy is confirmed
                     // to exist. This check is the entire safety of the command.
-                    if (! $cloud->exists($path)) {
+                    if (! isset($cloudIndex[$path])) {
                         $keptNotOnCloud++;
 
                         return;

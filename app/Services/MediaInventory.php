@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Patrol;
 use App\Models\TaskSubmission;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Enumerates every media path referenced by the database.
@@ -40,6 +41,32 @@ class MediaInventory
     public static function count(array $source, ?string $since = null): int
     {
         return static::query($source, $since)->count();
+    }
+
+    /**
+     * Index every file present on a disk, as a lookup keyed by path.
+     *
+     * Object stores answer a listing in pages of 1000, so indexing a bucket of
+     * 100k files costs ~100 requests. Asking "does this exist?" per database
+     * row instead costs 100k round trips, which at this scale is the
+     * difference between a minute and several hours. The array is keyed rather
+     * than a list so membership tests stay O(1).
+     *
+     * @param  array<int, string>|null  $directories
+     * @return array<string, true>
+     */
+    public static function indexDisk(string $disk, ?array $directories = null): array
+    {
+        $directories ??= config('media.directories');
+        $index = [];
+
+        foreach ($directories as $directory) {
+            foreach (Storage::disk($disk)->allFiles($directory) as $file) {
+                $index[$file] = true;
+            }
+        }
+
+        return $index;
     }
 
     /**

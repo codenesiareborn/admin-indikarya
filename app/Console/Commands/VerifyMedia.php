@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Services\MediaInventory;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
 
 class VerifyMedia extends Command
 {
@@ -24,10 +23,16 @@ class VerifyMedia extends Command
         $since = $this->option('since');
         $chunk = max(1, (int) $this->option('chunk'));
 
-        $local = Storage::disk($localName);
-        $cloud = Storage::disk($cloudName);
-
         $this->info("Verifying media across local [{$localName}] and cloud [{$cloudName}].");
+
+        $this->line('Indexing both disks...');
+        $cloudIndex = MediaInventory::indexDisk($cloudName);
+        $localIndex = MediaInventory::indexDisk($localName);
+        $this->line(sprintf(
+            '  %s objects on [%s], %s on [%s].',
+            number_format(count($cloudIndex)), $cloudName,
+            number_format(count($localIndex)), $localName
+        ));
 
         $rows = [];
         $totalMissingFromCloud = 0;
@@ -44,12 +49,12 @@ class VerifyMedia extends Command
             $bar->start();
 
             MediaInventory::each($source, function (string $path) use (
-                $local, $cloud, $bar, &$onCloud, &$onLocal, &$onNeither, &$missingPaths
+                $cloudIndex, $localIndex, $bar, &$onCloud, &$onLocal, &$onNeither, &$missingPaths
             ): void {
                 $bar->advance();
 
-                $inCloud = $cloud->exists($path);
-                $inLocal = $local->exists($path);
+                $inCloud = isset($cloudIndex[$path]);
+                $inLocal = isset($localIndex[$path]);
 
                 if ($inCloud) {
                     $onCloud++;
