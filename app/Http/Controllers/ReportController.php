@@ -12,7 +12,6 @@ use App\Models\ShiftReport;
 use App\Models\TaskSubmission;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -45,14 +44,15 @@ class ReportController extends Controller
         $filename = "laporan-presensi-{$startDate}-{$endDate}.xlsx";
         $path = "exports/{$filename}";
 
-        // Save to storage first
+        // Written to the private local disk, never the media disk: the file is
+        // read back by absolute path below and deleted after sending.
         Excel::store(
             new AttendanceExport($data, $stats, $settings, $startDate, $endDate, $reportNumber),
             $path,
-            'public'
+            'local'
         );
 
-        $fullPath = storage_path("app/public/{$path}");
+        $fullPath = storage_path("app/private/{$path}");
 
         // Return with explicit headers
         return response()->download($fullPath, $filename, [
@@ -89,7 +89,7 @@ class ReportController extends Controller
         $reportNumber = 'LAP-ABS-'.now()->format('Y').'-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $filename = "laporan-presensi-{$startDate}-{$endDate}.pdf";
-        $fullPath = storage_path("app/public/exports/{$filename}");
+        $fullPath = storage_path("app/private/exports/{$filename}");
 
         // Ensure directory exists
         if (! file_exists(dirname($fullPath))) {
@@ -145,14 +145,15 @@ class ReportController extends Controller
         $filename = "laporan-tasklist-{$startDate}-{$endDate}.xlsx";
         $path = "exports/{$filename}";
 
-        // Save to storage first
+        // Written to the private local disk, never the media disk: the file is
+        // read back by absolute path below and deleted after sending.
         Excel::store(
             new TaskListExport($data, $stats, $settings, $startDate, $endDate, $reportNumber),
             $path,
-            'public'
+            'local'
         );
 
-        $fullPath = storage_path("app/public/{$path}");
+        $fullPath = storage_path("app/private/{$path}");
 
         // Return with explicit headers
         return response()->download($fullPath, $filename, [
@@ -189,7 +190,7 @@ class ReportController extends Controller
         $reportNumber = 'LAP-TSK-'.now()->format('Y').'-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $filename = "laporan-tasklist-{$startDate}-{$endDate}.pdf";
-        $fullPath = storage_path("app/public/exports/{$filename}");
+        $fullPath = storage_path("app/private/exports/{$filename}");
 
         // Ensure directory exists
         if (! file_exists(dirname($fullPath))) {
@@ -279,14 +280,15 @@ class ReportController extends Controller
         $filename = "laporan-patroli-{$startDate}-{$endDate}.xlsx";
         $path = "exports/{$filename}";
 
-        // Save to storage first
+        // Written to the private local disk, never the media disk: the file is
+        // read back by absolute path below and deleted after sending.
         Excel::store(
             new \App\Exports\PatrolExport($data, $stats, $settings, $startDate, $endDate, $reportNumber),
             $path,
-            'public'
+            'local'
         );
 
-        $fullPath = storage_path("app/public/{$path}");
+        $fullPath = storage_path("app/private/{$path}");
 
         // Return with explicit headers
         return response()->download($fullPath, $filename, [
@@ -323,7 +325,7 @@ class ReportController extends Controller
         $reportNumber = 'LAP-PTR-'.now()->format('Y').'-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $filename = "laporan-patroli-{$startDate}-{$endDate}.pdf";
-        $fullPath = storage_path("app/public/exports/{$filename}");
+        $fullPath = storage_path("app/private/exports/{$filename}");
 
         // Ensure directory exists
         if (! file_exists(dirname($fullPath))) {
@@ -397,10 +399,10 @@ class ReportController extends Controller
         Excel::store(
             new ShiftReportExport($data, $stats, $settings, $startDate, $endDate, $reportNumber),
             $path,
-            'public'
+            'local'
         );
 
-        $fullPath = storage_path("app/public/{$path}");
+        $fullPath = storage_path("app/private/{$path}");
 
         return response()->download($fullPath, $filename, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -432,7 +434,7 @@ class ReportController extends Controller
         $reportNumber = 'LAP-SFT-'.now()->format('Y').'-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $filename = "laporan-shift-{$startDate}-{$endDate}.pdf";
-        $fullPath = storage_path("app/public/exports/{$filename}");
+        $fullPath = storage_path("app/private/exports/{$filename}");
 
         if (! file_exists(dirname($fullPath))) {
             mkdir(dirname($fullPath), 0755, true);
